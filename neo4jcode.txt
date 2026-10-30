@@ -1,0 +1,124 @@
+// Limpiar la base por completo y crear datos interconectados de prueba
+MATCH (n) DETACH DELETE n;
+
+CREATE (c:Cliente {id_cliente: "cli-001", razon_social: "Logística Austral S.A.", pais: "Argentina"})
+CREATE (e:Envio {id_envio: "env-101", estado: "Entregado", prioridad: "Alta", fecha_creacion: datetime("2026-10-01T08:00:00")})
+CREATE (t:Tramo {id_tramo: "trm-01", medio_transporte: "Terrestre", fecha_salida: datetime("2026-10-01T10:00:00")})
+CREATE (u1:Ubicacion {id_ubicacion: "ub-01", nombre_puerto_nodo: "Puerto Buenos Aires"})
+CREATE (u2:Ubicacion {id_ubicacion: "ub-02", nombre_puerto_nodo: "Centro Logístico Mendoza"})
+CREATE (v:Vehiculo {id_vehiculo: "veh-801", tipo: "Camión"})
+CREATE (o:Operador {id_operador: "op-501", nombre: "Transportes del Sur"})
+CREATE (i:Incidente {id_incidente: "inc-901", tipo: "Demora en Aduana", severidad: "Media", fecha: datetime("2026-10-02T11:00:00")})
+
+CREATE (c)-[:SOLICITA]->(e)
+CREATE (e)-[:COMPUESTO_POR {orden: 1}]->(t)
+CREATE (t)-[:ORIGEN]->(u1)
+CREATE (t)-[:DESTINO]->(u2)
+CREATE (t)-[:EJECUTADO_POR]->(v)
+CREATE (v)-[:PERTENECE_A]->(o)
+CREATE (e)-[:REGISTRA]->(i)
+CREATE (t)-[:REGISTRA]->(i);
+```[cite: 1, 2]
+
+---
+
+### Paso 2: Consultas para verificar las 13 tareas individualmente
+
+* **R11 - Red de relaciones entre clientes, operadores y envíos**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente)-[:SOLICITA]->(e:Envio)-[:COMPUESTO_POR]->(t:Tramo)-[:EJECUTADO_POR]->(v:Vehiculo)-[:PERTENECE_A]->(o:Operador)
+  RETURN c, e, t, v, o;
+  ```[cite: 1, 2]
+
+* **R27 - Ranking de rutas con mayor cantidad de incidentes**[cite: 2]:
+  ```cypher
+  MATCH (t:Tramo)<-[:COMPUESTO_POR]-(e:Envio)
+  OPTIONAL MATCH (t)-[:REGISTRA]->(i:Incidente)
+  RETURN t.id_tramo AS tramo, t.medio_transporte AS transporte, count(i) AS total_incidentes
+  ORDER BY total_incidentes DESC;
+  ```[cite: 1, 2]
+
+* **R28 - Ranking de clientes por volumen transportado**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente)-[:SOLICITA]->(e:Envio)
+  RETURN c.id_cliente AS id_cliente, c.razon_social AS cliente, count(e) AS volumen_envios
+  ORDER BY volumen_envios DESC;
+  ```[cite: 1, 2]
+
+* **R29 - Predicción de atrasos**[cite: 2]:
+  ```cypher
+  MATCH (e:Envio)-[cp:COMPUESTO_POR]->(t:Tramo)
+  OPTIONAL MATCH (t)-[:REGISTRA]->(i:Incidente)
+  WITH e, t, cp, count(i) AS incidentes_tramo
+  RETURN e.id_envio AS envio, sum(incidentes_tramo) AS total_incidentes,
+         CASE WHEN sum(incidentes_tramo) >= 2 THEN 'Alto Riesgo' ELSE 'Normal / Sin Riesgo' END AS prediccion;
+  ```[cite: 1, 2]
+
+* **R30 - Gestión de trayectos de cada envío (seguimiento)**[cite: 2]:
+  ```cypher
+  MATCH (e:Envio)-[cp:COMPUESTO_POR]->(t:Tramo)
+  OPTIONAL MATCH (t)-[:ORIGEN]->(ori:Ubicacion)
+  OPTIONAL MATCH (t)-[:DESTINO]->(des:Ubicacion)
+  RETURN e.id_envio AS envio, cp.orden AS orden, t.id_tramo AS tramo, ori.nombre_puerto_nodo AS origen, des.nombre_puerto_nodo AS destino
+  ORDER BY e.id_envio, cp.orden;
+  ```[cite: 1, 2]
+
+* **R31 - Detección de incidentes**[cite: 2]:
+  ```cypher
+  MATCH (e:Envio)
+  OPTIONAL MATCH (e)-[:REGISTRA]->(ie:Incidente)
+  OPTIONAL MATCH (e)-[:COMPUESTO_POR]->(t:Tramo)-[:REGISTRA]->(it:Incidente)
+  RETURN e.id_envio AS envio, collect(DISTINCT ie.id_incidente) AS incidentes_envio, collect(DISTINCT it.id_incidente) AS incidentes_tramo;
+  ```[cite: 1, 2]
+
+* **R33 - Creación de reportes de Envíos (país, estado, cliente, incidentes abiertos)**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente)-[:SOLICITA]->(e:Envio)
+  OPTIONAL MATCH (e)-[:REGISTRA]->(i:Incidente)
+  RETURN c.pais AS pais, e.estado AS estado, c.razon_social AS cliente, 
+         collect(DISTINCT e.id_envio) AS envios, count(DISTINCT i) AS incidentes_abiertos;
+  ```[cite: 2]
+
+* **R34 - Reporte analítico de Tiempos máximos y mínimos de envío por cliente**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente)-[:SOLICITA]->(e:Envio)-[:COMPUESTO_POR]->(t:Tramo)
+  WHERE t.fecha_salida IS NOT NULL AND e.fecha_creacion IS NOT NULL
+  WITH c, e, duration.between(e.fecha_creacion, t.fecha_salida).days AS dias
+  RETURN c.razon_social AS cliente, max(dias) AS max_dias, min(dias) AS min_dias;
+  ```[cite: 2]
+
+* **R35 - Reporte analítico de Promedio de incidentes por país / estado / cliente**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente)-[:SOLICITA]->(e:Envio)
+  OPTIONAL MATCH (e)-[:REGISTRA]->(i:Incidente)
+  RETURN c.pais AS pais, e.estado AS estado, c.razon_social AS cliente, 
+         count(DISTINCT e) AS total_envios, count(DISTINCT i) AS total_incidentes,
+         (toFloat(count(DISTINCT i)) / CASE WHEN count(DISTINCT e) = 0 THEN 1 ELSE count(DISTINCT e) END) AS promedio;
+  ```[cite: 2]
+
+* **R36 - Reporte analítico de Tiempos promedio de entrega**[cite: 2]:
+  ```cypher
+  MATCH (e:Envio)
+  WHERE e.estado = 'Entregado' AND e.fecha_creacion IS NOT NULL
+  RETURN avg(duration.between(e.fecha_creacion, datetime()).hours) AS promedio_horas_entrega;
+  ```[cite: 2]
+
+* **R37 - Reporte analítico de Costos / Tramos por tipo de transporte**[cite: 2]:
+  ```cypher
+  MATCH (t:Tramo)<-[:COMPUESTO_POR]-(e:Envio)
+  RETURN t.medio_transporte AS medio_transporte, count(e) AS total_envios_asociados;
+  ```[cite: 2]
+
+* **R38 - Creación de reportes de análisis predictivos (atrasos y riesgos)**[cite: 2]:
+  ```cypher
+  MATCH (e:Envio)-[:COMPUESTO_POR]->(t:Tramo)-[:REGISTRA]->(i:Incidente)
+  RETURN e.id_envio AS envio, i.tipo AS tipo_incidente, i.severidad AS severidad, 'Requiere atención' AS riesgo;
+  ```[cite: 2]
+
+* **R39 - Creación de reportes operativos y analíticos parametrizados**[cite: 2]:
+  ```cypher
+  MATCH (c:Cliente {pais: "Argentina"})-[:SOLICITA]->(e:Envio)-[cp:COMPUESTO_POR]->(t:Tramo)
+  OPTIONAL MATCH (t)-[:ORIGEN]->(ori:Ubicacion)
+  OPTIONAL MATCH (t)-[:DESTINO]->(des:Ubicacion)
+  RETURN c.razon_social AS cliente, e.id_envio AS envio, cp.orden AS orden, ori.nombre_puerto_nodo AS origen, des.nombre_puerto_nodo AS destino;
+  ```[cite: 2]
