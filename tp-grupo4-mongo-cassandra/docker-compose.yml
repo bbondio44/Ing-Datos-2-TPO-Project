@@ -1,0 +1,31 @@
+# Solo para quien NO tenga ya los contenedores (ej. compañeros del grupo).
+#   docker compose up -d        y después   cargar_todo.bat  (o ./cargar_todo.sh)
+# Si ya tenés tus propios contenedores de Mongo y Cassandra, este archivo no hace falta.
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: tp4-mongo
+    ports: ["27017:27017"]
+    volumes: [mongo_datos:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      retries: 10
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: tp4-cassandra
+    ports: ["9042:9042"]
+    environment:
+      CASSANDRA_CLUSTER_NAME: tp-grupo4
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 200M
+    volumes: [cassandra_datos:/var/lib/cassandra]
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "SELECT release_version FROM system.local"]
+      interval: 15s
+      retries: 20
+
+volumes:
+  mongo_datos:
+  cassandra_datos:
