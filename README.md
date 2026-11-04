@@ -1,4 +1,8 @@
-# Plataforma de logística internacional e IoT Grupo 4
+# Ing-Datos-2-TPO-Project
+
+Ingeniería de Datos II - Segundo Cuatrimestre 2026 - UADE
+
+## Plataforma de logística internacional e IoT - Grupo 4
 
 Aplicación de escritorio JavaFX con backend Spring Boot y persistencia políglota. PostgreSQL es la fuente transaccional; Cassandra conserva telemetría; MongoDB almacena eventos, alertas, reportes y mensajería; Neo4j mantiene una proyección del grafo logístico.
 
@@ -34,4 +38,3 @@ El bootstrap no contiene una contraseña predeterminada. Si las variables no est
 ```
 
 Las referencias originales del equipo están en `database/referencia-postgresql` y `docs/referencias`. No deben ejecutarse scripts destructivos ni el seed de demo sobre una base remota existente.
-

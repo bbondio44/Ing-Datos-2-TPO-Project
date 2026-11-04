@@ -1,0 +1,164 @@
+entidad,codigo,uuid,descripcion,referencias
+empresa,EMP,b1052e98-971b-52d6-9913-aed4e195c326,Grupo 4 Logística (plataforma),
+cliente,C01,aef2750c-1592-5ed4-b7a7-ab5771efc165,Frigorífico del Sur S.A.,pais=AR
+cliente,C02,270823a9-7978-5eda-80f0-9ae673331b0b,Lácteos Pampeanos S.A.,pais=AR
+cliente,C03,e32b1f7c-90fe-5eca-935c-8062fca267ae,Vinos de Cuyo S.R.L.,pais=AR
+cliente,C04,07b5388d-ba2c-57c2-adbd-21e43c3f9c4c,AgroExport Litoral S.A.,pais=AR
+cliente,C05,a56aebe9-c263-5b49-bd7c-7a3654bf7861,Farmacéutica Andina S.A.,pais=CL
+cliente,C06,c0b39af2-ed0c-56a5-99ae-7382599403ee,Textil Oriental S.A.,pais=UY
+cliente,C07,23b37d19-2e70-5f15-b7c1-2aa4f3ea38d9,Autopartes Mercosur S.A.,pais=BR
+cliente,C08,e69fcda7-5ac8-5eb4-b731-e9154a6a607f,Frutas del Valle S.A.,pais=AR
+proveedor,P01,6a74a60b-b5fc-5d40-8879-14cf5d7ccc90,Seguros Carga Segura,
+proveedor,P02,ec12ca06-a78a-5605-ab40-31988a417f61,FrioTech Mantenimiento Reefer,
+proveedor,P03,6c866005-e083-5a0a-b855-6f8e23aca2c3,Despachante Aduanero Gómez,
+proveedor,P04,1aeca0f8-8cd4-5a5e-8f87-fb9bdb20f39e,Embalajes Industriales SRL,
+proveedor,P05,899c5257-09ac-51ef-958e-a36a42ba6dc5,IoT Sensores Patagonia,
+proveedor,P06,c89fd6c8-12dc-5938-82cc-2746d57b28f7,Depósito Fiscal Dock Sud,
+proveedor,P07,cfe36932-be4f-5a57-ba2b-849d2ac26bf8,Combustibles del Plata,
+proveedor,P08,ff36ff95-7ed3-5940-bbc0-181762f657c3,Consultora Logística Norte,
+operador_logistico,O01,c6d39b10-a95f-5346-90b9-0de9d2f1f771,Naviera Atlántica S.A.,
+operador_logistico,O02,5cc8943e-4796-5ad4-89ab-ebbd3ce8d9cd,Transportes Ruta 9 S.A.,
+operador_logistico,O03,96ac1bd1-ea98-5326-ab6d-609f870b3e93,AeroCargo Sudamericana,
+operador_logistico,O04,21797c7a-0338-5b31-b45f-2c487f68eb84,Logística Cordillera S.A.,
+operador_logistico,O05,4fe76672-61b9-5752-90a1-a4812a5150cd,Fletes del Litoral SRL,
+usuario,U-ADMIN,aa621106-4bb0-59d5-aafd-48ca46e584cf,Admin Plataforma,rol=ADMIN;INTERNO=b1052e98-971b-52d6-9913-aed4e195c326
+usuario,U-OPS,6810f791-1878-5de4-b0f6-7e63d996d4ac,Lucía Operaciones,rol=OPERACIONES;INTERNO=b1052e98-971b-52d6-9913-aed4e195c326
+usuario,U-C01,f68c3c80-1d10-5742-a526-db58c06e1790,Martín (Frigorífico del Sur),rol=CLIENTE;CLIENTE=aef2750c-1592-5ed4-b7a7-ab5771efc165
+usuario,U-C02,a841cc7a-599e-59a5-9a94-aca73ccae354,Sofía (Lácteos Pampeanos),rol=CLIENTE;CLIENTE=270823a9-7978-5eda-80f0-9ae673331b0b
+usuario,U-O01,c5064550-9836-5ea7-907a-6a42e69a8c58,Diego (Naviera Atlántica),rol=OPERADOR;OPERADOR=c6d39b10-a95f-5346-90b9-0de9d2f1f771
+usuario,U-O02,ce4c9cee-103c-5a27-99a4-0d7cffa87635,Carla (Transportes Ruta 9),rol=OPERADOR;OPERADOR=5cc8943e-4796-5ad4-89ab-ebbd3ce8d9cd
+usuario,U-P02,ed4790a5-f2d1-5b87-aa7a-fdfac52d73a3,Julián (FrioTech),rol=PROVEEDOR;PROVEEDOR=ec12ca06-a78a-5605-ab40-31988a417f61
+usuario,U-P03,91b073d7-1124-59c9-912f-a7fc845c3aac,Ana (Despachante Gómez),rol=PROVEEDOR;PROVEEDOR=6c866005-e083-5a0a-b855-6f8e23aca2c3
+usuario,U-P05,527a32d4-0d2d-565f-a516-8c29040deac3,Bruno (IoT Sensores),rol=PROVEEDOR;PROVEEDOR=899c5257-09ac-51ef-958e-a36a42ba6dc5
+envio,E001,d72d0543-b3be-54c5-9248-ceb758d30add,Buenos Aires -> Puerto de Santos,cliente=C01;prioridad=ALTA
+tramo,E001-T1,22ff43b2-a1c6-5f83-ac06-0a4011c3d943,TERRESTRE Buenos Aires -> Puerto de Buenos Aires,envio=E001;orden=1;operador=O02;salida=2026-10-19T18:00Z;llegada_estimada=2026-10-19T20:00Z
+tramo,E001-T2,e8151a73-77d5-56e2-bf25-38268b7bf295,MARITIMO Puerto de Buenos Aires -> Puerto de Santos,envio=E001;orden=2;operador=O01;salida=2026-10-20T06:00Z;llegada_estimada=2026-10-25T16:00Z
+envio,E002,ec22d634-96cd-5267-b7bd-accdce959d92,Córdoba -> Puerto de Santos,cliente=C02;prioridad=ALTA
+tramo,E002-T1,aeec7c55-cc6e-5ae6-8044-9632f64fac74,TERRESTRE Córdoba -> Puerto de Buenos Aires,envio=E002;orden=1;operador=O04;salida=2026-10-19T22:00Z;llegada_estimada=2026-10-20T16:00Z
+tramo,E002-T2,832d03fd-5634-54bc-bbb2-b831c1d3bb52,MARITIMO Puerto de Buenos Aires -> Puerto de Santos,envio=E002;orden=2;operador=O01;salida=2026-10-21T02:00Z;llegada_estimada=2026-10-26T12:00Z
+envio,E003,506de4f8-5386-58b4-ad0d-2f851434aec6,Mendoza -> Valparaíso,cliente=C03;prioridad=MEDIA
+tramo,E003-T1,521dd8bd-0f98-5e42-b8ff-e4b1723f986c,TERRESTRE Mendoza -> Santiago,envio=E003;orden=1;operador=O05;salida=2026-10-19T16:00Z;llegada_estimada=2026-10-19T21:00Z
+tramo,E003-T2,2a08ba84-7b43-5424-aa6e-76fbb0d7e7ff,TERRESTRE Santiago -> Valparaíso,envio=E003;orden=2;operador=O05;salida=2026-10-20T07:00Z;llegada_estimada=2026-10-20T10:00Z
+envio,E004,6378a987-ec3f-504e-80db-0a38c77ee116,Rosario -> Montevideo,cliente=C04;prioridad=MEDIA
+tramo,E004-T1,a03ca0b0-0d03-5875-9291-5e1cd1a2ef87,TERRESTRE Rosario -> Puerto de Buenos Aires,envio=E004;orden=1;operador=O02;salida=2026-10-20T08:00Z;llegada_estimada=2026-10-20T16:00Z
+tramo,E004-T2,bc56de92-e405-5c2c-b6cf-c189645f32f6,MARITIMO Puerto de Buenos Aires -> Montevideo,envio=E004;orden=2;operador=O01;salida=2026-10-21T02:00Z;llegada_estimada=2026-10-21T18:00Z
+envio,E005,ecae19bc-e959-5b5d-bb35-be45c2e6c910,Buenos Aires -> Santiago,cliente=C05;prioridad=ALTA
+tramo,E005-T1,881df510-7542-50fd-a2cc-f4bbe1db7dee,TERRESTRE Buenos Aires -> Mendoza,envio=E005;orden=1;operador=O04;salida=2026-10-19T14:00Z;llegada_estimada=2026-10-20T17:00Z
+tramo,E005-T2,46c78512-166d-5584-9358-28d9dd67bb85,TERRESTRE Mendoza -> Santiago,envio=E005;orden=2;operador=O04;salida=2026-10-21T03:00Z;llegada_estimada=2026-10-21T08:00Z
+envio,E006,98fc9f7b-15bc-5e20-94c8-b875df1ed8d6,Buenos Aires -> Montevideo,cliente=C06;prioridad=BAJA
+tramo,E006-T1,0e0e2068-d4ee-5749-9bc2-3688386e625e,TERRESTRE Buenos Aires -> Puerto de Buenos Aires,envio=E006;orden=1;operador=O05;salida=2026-10-20T18:00Z;llegada_estimada=2026-10-20T20:00Z
+tramo,E006-T2,1d914803-2c41-55ef-b2b0-981105b0db81,MARITIMO Puerto de Buenos Aires -> Montevideo,envio=E006;orden=2;operador=O01;salida=2026-10-21T06:00Z;llegada_estimada=2026-10-21T22:00Z
+envio,E007,5bcda798-982d-5078-a904-acb7769b79dd,Córdoba -> Asunción,cliente=C07;prioridad=MEDIA
+tramo,E007-T1,769346ac-d406-51ac-8f14-985679cfaeb5,TERRESTRE Córdoba -> Rosario,envio=E007;orden=1;operador=O02;salida=2026-10-19T20:00Z;llegada_estimada=2026-10-20T06:00Z
+tramo,E007-T2,c09375ab-c708-57d4-b799-197a59043538,TERRESTRE Rosario -> Asunción,envio=E007;orden=2;operador=O02;salida=2026-10-20T16:00Z;llegada_estimada=2026-10-21T17:00Z
+envio,E008,c1e5c9aa-6f01-5eff-8623-055ad1cf9fb4,Mendoza -> Aeropuerto de Ezeiza,cliente=C08;prioridad=ALTA
+tramo,E008-T1,a5f8a76a-a5ad-5a0e-a311-f01d71122fbe,TERRESTRE Mendoza -> Buenos Aires,envio=E008;orden=1;operador=O04;salida=2026-10-20T00:00Z;llegada_estimada=2026-10-21T03:00Z
+tramo,E008-T2,e9050c1b-1160-529a-8259-e72989da689a,TERRESTRE Buenos Aires -> Aeropuerto de Ezeiza,envio=E008;orden=2;operador=O04;salida=2026-10-21T13:00Z;llegada_estimada=2026-10-21T15:00Z
+envio,E009,23314655-0f49-57cf-aa62-6b86d1aa705b,Buenos Aires -> Miami,cliente=C01;prioridad=ALTA
+tramo,E009-T1,700ccfa7-2500-5352-a827-713d61fb4a19,TERRESTRE Buenos Aires -> Aeropuerto de Ezeiza,envio=E009;orden=1;operador=O05;salida=2026-10-21T04:00Z;llegada_estimada=2026-10-21T06:00Z
+tramo,E009-T2,6cf16c11-01b1-5b46-aaf1-fa7d56d354f1,AEREO Aeropuerto de Ezeiza -> Miami,envio=E009;orden=2;operador=O03;salida=2026-10-21T11:00Z;llegada_estimada=2026-10-22T04:00Z
+envio,E010,986c09d3-a6be-5353-a94d-ab683bd9434c,Rosario -> Puerto de Santos,cliente=C02;prioridad=MEDIA
+tramo,E010-T1,beb0be6f-8128-5b77-b89f-05d8c270eef8,TERRESTRE Rosario -> Puerto de Buenos Aires,envio=E010;orden=1;operador=O02;salida=2026-10-20T04:00Z;llegada_estimada=2026-10-20T12:00Z
+tramo,E010-T2,93e65e0a-7c8f-50a1-a85b-7128e7c5dc4a,MARITIMO Puerto de Buenos Aires -> Puerto de Santos,envio=E010;orden=2;operador=O01;salida=2026-10-20T22:00Z;llegada_estimada=2026-10-26T08:00Z
+envio,E011,6ee84809-f672-5b8d-87f1-7f395cdaa8ed,Mendoza -> Valparaíso,cliente=C03;prioridad=BAJA
+tramo,E011-T1,f4a96996-c5a2-5b37-bc2b-308ff9529662,TERRESTRE Mendoza -> Santiago,envio=E011;orden=1;operador=O04;salida=2026-10-20T14:00Z;llegada_estimada=2026-10-20T19:00Z
+tramo,E011-T2,c647901c-2afe-5ef8-9333-4be47788079c,TERRESTRE Santiago -> Valparaíso,envio=E011;orden=2;operador=O04;salida=2026-10-21T05:00Z;llegada_estimada=2026-10-21T08:00Z
+envio,E012,653dad7d-e412-585e-9a1b-c1c97c370d0c,Rosario -> Puerto de Santos,cliente=C04;prioridad=MEDIA
+tramo,E012-T1,0ef18837-cea0-5ee7-8133-6c57bb9d2e01,TERRESTRE Rosario -> Puerto de Buenos Aires,envio=E012;orden=1;operador=O05;salida=2026-10-19T13:00Z;llegada_estimada=2026-10-19T21:00Z
+tramo,E012-T2,0fafb0aa-1426-53ca-be25-f376fda66da7,MARITIMO Puerto de Buenos Aires -> Puerto de Santos,envio=E012;orden=2;operador=O01;salida=2026-10-20T07:00Z;llegada_estimada=2026-10-25T17:00Z
+envio,E013,dceca613-bcf0-57cf-9929-3d8f07522fe7,Córdoba -> Callao,cliente=C05;prioridad=ALTA
+tramo,E013-T1,6b3a18d6-ae1a-52b4-8e34-46c52902dd01,TERRESTRE Córdoba -> Aeropuerto de Ezeiza,envio=E013;orden=1;operador=O02;salida=2026-10-21T08:00Z;llegada_estimada=2026-10-22T02:00Z
+tramo,E013-T2,1fb6bb17-903d-5fee-a675-3eb489b268a3,AEREO Aeropuerto de Ezeiza -> Callao,envio=E013;orden=2;operador=O03;salida=2026-10-22T07:00Z;llegada_estimada=2026-10-22T16:00Z
+envio,E014,f6f08a03-2a92-5140-9846-0e2ef076db3d,Buenos Aires -> Montevideo,cliente=C06;prioridad=BAJA
+tramo,E014-T1,e804aef0-961b-536c-a56e-f53d7501b635,TERRESTRE Buenos Aires -> Puerto de Buenos Aires,envio=E014;orden=1;operador=O04;salida=2026-10-21T14:00Z;llegada_estimada=2026-10-21T16:00Z
+tramo,E014-T2,457efe24-5708-582a-b74c-feb8dc5a42f9,MARITIMO Puerto de Buenos Aires -> Montevideo,envio=E014;orden=2;operador=O01;salida=2026-10-22T02:00Z;llegada_estimada=2026-10-22T18:00Z
+envio,E015,cdea56b0-4ef2-5338-8342-9a3444d56919,Rosario -> Mendoza,cliente=C07;prioridad=MEDIA
+tramo,E015-T1,dcab0450-00f4-5a7d-a890-312a079cf3f6,TERRESTRE Rosario -> Córdoba,envio=E015;orden=1;operador=O05;salida=2026-10-20T02:00Z;llegada_estimada=2026-10-20T12:00Z
+tramo,E015-T2,e93319ba-3433-56af-b122-1925b529c370,TERRESTRE Córdoba -> Mendoza,envio=E015;orden=2;operador=O05;salida=2026-10-20T22:00Z;llegada_estimada=2026-10-21T11:00Z
+envio,E016,7b77f577-b7f6-5cd0-b620-0fcfc4a97c53,Mendoza -> Valparaíso,cliente=C08;prioridad=MEDIA
+tramo,E016-T1,2c2bd0d3-af66-5963-8723-cbc7ce49b770,TERRESTRE Mendoza -> Santiago,envio=E016;orden=1;operador=O02;salida=2026-10-19T15:00Z;llegada_estimada=2026-10-19T20:00Z
+tramo,E016-T2,413f0621-7bd7-5ebd-99e9-07f373e65358,TERRESTRE Santiago -> Valparaíso,envio=E016;orden=2;operador=O02;salida=2026-10-20T06:00Z;llegada_estimada=2026-10-20T09:00Z
+envio,E017,cbb962f0-a717-5f72-8213-1ea6a59dae3e,Buenos Aires -> Puerto de Santos,cliente=C01;prioridad=ALTA
+tramo,E017-T1,e8bb3dd9-25b1-5ec1-8fbb-88ab8c584d62,TERRESTRE Buenos Aires -> Puerto de Buenos Aires,envio=E017;orden=1;operador=O04;salida=2026-10-20T10:00Z;llegada_estimada=2026-10-20T12:00Z
+tramo,E017-T2,44f48daa-e7d0-5756-bb3e-e83ebb7777fd,MARITIMO Puerto de Buenos Aires -> Puerto de Santos,envio=E017;orden=2;operador=O01;salida=2026-10-20T22:00Z;llegada_estimada=2026-10-26T08:00Z
+envio,E018,4770f530-1292-5b45-8bc1-bb7e26559b28,Córdoba -> Asunción,cliente=C02;prioridad=BAJA
+tramo,E018-T1,f6642cb1-dc38-50d4-9f55-8720afd16144,TERRESTRE Córdoba -> Rosario,envio=E018;orden=1;operador=O05;salida=2026-10-20T06:00Z;llegada_estimada=2026-10-20T16:00Z
+tramo,E018-T2,34dd81b3-884f-501d-ab93-bf704be12d2b,TERRESTRE Rosario -> Asunción,envio=E018;orden=2;operador=O05;salida=2026-10-21T02:00Z;llegada_estimada=2026-10-22T03:00Z
+envio,E019,d5b901e5-603a-585b-8e8b-fa02b491e825,Mendoza -> Puerto de Buenos Aires,cliente=C03;prioridad=MEDIA
+tramo,E019-T1,478b706d-5b14-59a7-ac23-1213e30a0763,TERRESTRE Mendoza -> Buenos Aires,envio=E019;orden=1;operador=O02;salida=2026-10-19T21:00Z;llegada_estimada=2026-10-21T00:00Z
+tramo,E019-T2,ca428262-9867-587b-ada6-4622878da9ce,TERRESTRE Buenos Aires -> Puerto de Buenos Aires,envio=E019;orden=2;operador=O02;salida=2026-10-21T10:00Z;llegada_estimada=2026-10-21T12:00Z
+envio,E020,c231e5a7-7434-5d4b-b8db-405b7f42be44,Rosario -> Miami,cliente=C04;prioridad=MEDIA
+tramo,E020-T1,059c6b5a-2b9c-508f-b9a3-83059e0118c1,TERRESTRE Rosario -> Aeropuerto de Ezeiza,envio=E020;orden=1;operador=O04;salida=2026-10-21T00:00Z;llegada_estimada=2026-10-21T08:00Z
+tramo,E020-T2,646fdaea-f447-5aa0-bf65-1c0f07741a3d,AEREO Aeropuerto de Ezeiza -> Miami,envio=E020;orden=2;operador=O03;salida=2026-10-21T13:00Z;llegada_estimada=2026-10-22T06:00Z
+contenedor,MSKU0000001,42d867d9-d7a4-5248-9681-33e2c0cdb123,REEFER 67.7 m3,envio=E001
+contenedor,MSKU0000002,5ce5419b-847b-5ecc-b70d-03b18c5c0003,REEFER 67.7 m3,envio=E001
+contenedor,MSKU0000003,96f3d043-00e2-5c9e-8a9d-d0810f2f5995,REEFER 67.7 m3,envio=E002
+contenedor,MSKU0000004,3d6fc9f1-b24d-542d-9932-01963831a4a0,REEFER 67.7 m3,envio=E002
+contenedor,MSKU0000005,d37ca4b8-0970-5cec-ac9b-490429b7df61,REEFER 67.7 m3,envio=E003
+contenedor,MSKU0000006,a7ad0dad-7b9a-52d8-adfc-677e239892f3,REEFER 67.7 m3,envio=E003
+contenedor,MSKU0000007,5a92f38e-c32b-5035-8b97-1d253d2e58b1,REEFER 67.7 m3,envio=E004
+contenedor,MSKU0000008,a64ebff9-ffe1-5cac-9d63-03a4a6ff5225,REEFER 67.7 m3,envio=E004
+contenedor,MSKU0000009,2476f78b-a4fe-5d49-af25-e097bb04de76,OPEN_TOP 33.2 m3,envio=E005
+contenedor,MSKU0000010,66df8b40-0b65-53d3-ab37-a76ea2405973,DRY 33.2 m3,envio=E005
+contenedor,MSKU0000011,1f1e7b63-f3fc-5911-9659-81d67085a4a0,DRY 33.2 m3,envio=E006
+contenedor,MSKU0000012,a4f4c383-f83a-5fe5-9a33-902d50f7f487,OPEN_TOP 33.2 m3,envio=E007
+contenedor,MSKU0000013,8673db80-6691-5e62-abb9-90bacf34c8d7,DRY 33.2 m3,envio=E008
+contenedor,MSKU0000014,544cfffd-f74c-592b-b6f5-12dbfcc2466c,DRY 33.2 m3,envio=E009
+contenedor,MSKU0000015,2cb2fb44-c11d-517c-b802-27f09bd1433c,OPEN_TOP 33.2 m3,envio=E010
+contenedor,MSKU0000016,8c224184-d7bc-5016-92f6-e72773f8b2c0,DRY 33.2 m3,envio=E011
+contenedor,MSKU0000017,4003fbfb-f791-56dd-9be0-e13e9e7b5e8f,DRY 33.2 m3,envio=E012
+contenedor,MSKU0000018,ddda79aa-4ad6-5abb-b1d1-b61f25812c47,OPEN_TOP 33.2 m3,envio=E013
+contenedor,MSKU0000019,bf05ae76-f8c9-529d-8cdb-52b4cedb42d9,DRY 33.2 m3,envio=E014
+contenedor,MSKU0000020,efca5f90-e9bc-58ef-9e6d-87b0d85e4af0,DRY 33.2 m3,envio=E015
+contenedor,MSKU0000021,3cb5d737-2d39-56a5-999e-a6fb4d327db4,OPEN_TOP 33.2 m3,envio=E016
+contenedor,MSKU0000022,72234b4d-c7e7-575f-9e9b-dd19389d9909,DRY 33.2 m3,envio=E017
+contenedor,MSKU0000023,bba9ae70-be3c-57df-9319-4371224c4a5a,DRY 33.2 m3,envio=E018
+contenedor,MSKU0000024,5a4a52d9-7346-50a7-9ee8-830e3e31a2ca,OPEN_TOP 33.2 m3,envio=E019
+contenedor,MSKU0000025,3b0c2b4a-965d-51ea-9dd5-ccc7f7a2bb41,DRY 33.2 m3,envio=E020
+sensor,SEN-001,101231a8-af8f-53ec-bfb0-f4d579ba7455,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000001
+sensor,SEN-002,d9e437b3-519e-5123-badd-eabc293e132b,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000002
+sensor,SEN-003,12330766-e3ec-52b9-b9c0-b400c16274f6,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000003
+sensor,SEN-004,51847209-55f1-54b5-83fc-698738457784,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000004
+sensor,SEN-005,94858666-0f1b-5d7a-8f8d-0118791421e9,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000005
+sensor,SEN-006,8e4ab8c8-5e28-5d73-a6fb-09e7ef2e5eba,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000006
+sensor,SEN-007,ee32d9a8-5a2d-5bb2-b703-370676b20446,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000007
+sensor,SEN-008,02c4c136-b65a-5b53-ae1a-2fb639f8e342,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000008
+sensor,SEN-009,47c50803-5d2b-56e3-b880-3c1183fcee9a,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000009
+sensor,SEN-010,45030ca6-267c-52cc-9dd8-ae5c999ebd8b,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000010
+sensor,SEN-011,03ebe16a-2179-5a10-8ef3-9ddee070e4f2,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000011
+sensor,SEN-012,5f9d963d-5c94-598d-9f99-83906ed03b7b,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000012
+sensor,SEN-013,485bbb29-3858-538d-a4fc-14825417c1bb,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000013
+sensor,SEN-014,5c6b62dc-896f-56bb-bedf-2fff168dbd28,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000014
+sensor,SEN-015,ce360620-7aac-5c00-8eb2-768e008bb00c,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000015
+sensor,SEN-016,0c6628df-23c1-5215-8042-6e28f0917c99,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000016
+sensor,SEN-017,b8db9365-eabb-5abd-a0ae-f33b9e88eed2,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000017
+sensor,SEN-018,a9953280-dfe2-577d-853a-dee5ed77ca63,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000018
+sensor,SEN-019,907febb0-9f7a-5107-aa92-8e746dee266b,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000019
+sensor,SEN-020,099eb63e-59f7-5b79-82f9-ecd7cc14a31a,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000020
+sensor,SEN-021,a64abe30-e9c6-5def-a494-b7da3a1b5401,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000021
+sensor,SEN-022,4e26c50a-502b-5de0-a0d2-42bfca9cc588,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000022
+sensor,SEN-023,869f9a01-3e51-5644-b367-c63e14f2e613,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000023
+sensor,SEN-024,72d03735-e45d-549f-993c-054050f48ad0,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000024
+sensor,SEN-025,83006645-c8d5-5362-8e16-4f25460e5efe,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000025
+sensor,SEN-026,458d6508-e6b4-5322-b376-9e3a8333f438,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000001
+sensor,SEN-027,96b7f637-cb2b-54c0-98bb-1f09d71ef328,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000002
+sensor,SEN-028,51e58f15-26aa-5a22-818e-6a3b41fe2d5b,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000003
+sensor,SEN-029,b53c466a-939d-5642-99c6-7a1d32725d4f,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000004
+sensor,SEN-030,04b93978-b79f-5ec2-b27e-9227c53497d6,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000005
+sensor,SEN-031,591f5045-dbec-5eca-b5fb-7d8bdb2a30a8,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000006
+sensor,SEN-032,b89f241c-d8f2-5dc8-847e-c8934067b02d,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000007
+sensor,SEN-033,4617a0c9-64bf-513a-ac32-1ac5fd19a7db,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000008
+sensor,SEN-034,58f32a1b-f2d6-5968-b9bc-e12f672d35fb,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000009
+sensor,SEN-035,31dfb9b1-85fd-523e-9bd9-aac4b96b292d,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000010
+sensor,SEN-036,13420416-b2c6-5a5d-812b-9e1c5f0cb14a,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000011
+sensor,SEN-037,07b2aff3-26f5-590e-9a9c-5f7665997d0e,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000012
+sensor,SEN-038,2e417392-252c-5763-9d55-9ed7b82bbcdd,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000013
+sensor,SEN-039,df17a291-d8f9-5a4c-8e52-3aa43d682a36,TEMPERATURA_HUMEDAD (Sensitech),contenedor=MSKU0000014
+sensor,SEN-040,1a41b97f-b75c-5365-8111-d65ac5ec9d46,MULTIPARAMETRO (Teltonika),contenedor=MSKU0000025
+regla_alerta,REG-01,96196805-40db-51f4-a2b2-0e8cc7ee2a63,Cadena de frío: temperatura mayor a 8 °C (contenedores REEFER),tipo=TEMPERATURA;operador=>;umbral=8.0;severidad=ALTA
+regla_alerta,REG-02,ba9fb76f-fec9-5f6e-b9b5-df61a2035234,Cadena de frío: temperatura menor a 2 °C (contenedores REEFER),tipo=TEMPERATURA;operador=<;umbral=2.0;severidad=MEDIA
+regla_alerta,REG-03,e175309e-cb9c-542e-91b0-946800a453f3,Batería del sensor por debajo del 15 %,tipo=BATERIA;operador=<;umbral=15.0;severidad=MEDIA
+regla_alerta,REG-04,f686b8bb-fc4e-531e-9635-1966bb5ed92f,Sensor sin reportar más de 120 minutos,tipo=INACTIVIDAD;operador=>;umbral=120.0;severidad=ALTA
+regla_alerta,REG-05,9c1403ef-fefe-5226-a415-d021f0f00376,Vibración mayor a 2.5 g (posible golpe),tipo=VIBRACION;operador=>;umbral=2.5;severidad=MEDIA
+regla_alerta,REG-06,8682a474-dea2-5b6e-af19-2862d4840b65,Humedad relativa mayor a 90 %,tipo=HUMEDAD;operador=>;umbral=90.0;severidad=BAJA
+regla_alerta,REG-07,810b94b9-8c35-5cce-bd94-ce9c0a9ca625,Anomalía estadística: |z| > 3 respecto del histórico del sensor,tipo=ANOMALIA_TEMPERATURA;operador=>;umbral=3.0;severidad=MEDIA

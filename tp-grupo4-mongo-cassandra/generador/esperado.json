@@ -1,0 +1,283 @@
+{
+  "cassandra": {
+    "lecturas_totales": 2772,
+    "filas_lecturas_por_sensor_dia": 2772,
+    "filas_lecturas_por_contenedor_dia": 2772,
+    "filas_posiciones_por_contenedor_dia": 1763,
+    "consultas": {
+      "Q01": {
+        "antes": 24,
+        "despues": 25
+      },
+      "Q02": 13,
+      "Q03": [
+        "23:00",
+        "22:00",
+        "21:00",
+        "20:00",
+        "19:00"
+      ],
+      "Q04": 8,
+      "Q05": {
+        "fecha_hora": "2026-10-22 23:00",
+        "temperatura": 3.83
+      },
+      "Q07": {
+        "total": 72,
+        "dia_22": 24
+      },
+      "Q08": {
+        "MSKU0000001": [
+          -29.2729,
+          -52.35262
+        ],
+        "MSKU0000002": [
+          -29.23328,
+          -52.30551
+        ]
+      },
+      "Q09": 4,
+      "Q10": 30,
+      "Q11": {
+        "filas": 39,
+        "inactivos": [
+          "SEN-007"
+        ],
+        "sin_datos": [
+          "SEN-040"
+        ]
+      },
+      "Q12": {
+        "z": 6.73,
+        "dia_22_max": 7.9
+      }
+    }
+  },
+  "mongodb": {
+    "eventos_logisticos": 173,
+    "alertas": 8,
+    "conversaciones": 4,
+    "mensajes": 19,
+    "reportes_generados": 3
+  },
+  "mongodb_consultas": [
+    {
+      "req": "R09",
+      "descripcion": "Alta de alerta (regla REG-06 definida en PostgreSQL)",
+      "esperado": true
+    },
+    {
+      "req": "R09",
+      "descripcion": "Segunda alerta ACTIVA para la misma regla+sensor es rechazada (índice único parcial)",
+      "esperado": "E11000 duplicate key"
+    },
+    {
+      "req": "R09",
+      "descripcion": "La repetición se registra sumando ocurrencias (no se duplica la alerta)",
+      "esperado": 2
+    },
+    {
+      "req": "R09",
+      "descripcion": "El validador $jsonSchema rechaza un estado inexistente",
+      "esperado": "DocumentValidationFailure"
+    },
+    {
+      "req": "R09",
+      "descripcion": "Modificación: ABIERTA -> RECONOCIDA (con historial)",
+      "esperado": 1
+    },
+    {
+      "req": "R09",
+      "descripcion": "Transición inválida: volver a 'reconocer' no modifica nada",
+      "esperado": 0
+    },
+    {
+      "req": "R09",
+      "descripcion": "Baja lógica: cerrar la alerta (activa = false)",
+      "esperado": 1
+    },
+    {
+      "req": "R09",
+      "descripcion": "Reapertura: una nueva violación tras el cierre crea otra alerta",
+      "esperado": true
+    },
+    {
+      "req": "R09",
+      "descripcion": "Se eliminan los documentos de prueba (el dataset queda como estaba)",
+      "esperado": 2
+    },
+    {
+      "req": "R17",
+      "descripcion": "Línea de tiempo del envío E002: eventos + alertas ($unionWith)",
+      "esperado": 12
+    },
+    {
+      "req": "R17",
+      "descripcion": "Estado de seguimiento actual de E002 (último evento logístico)",
+      "esperado": "RETRASO"
+    },
+    {
+      "req": "R17",
+      "descripcion": "Alertas activas del envío E002",
+      "esperado": 2
+    },
+    {
+      "req": "R23",
+      "descripcion": "Alertas activas de estado de sensor (batería baja / sin conexión)",
+      "esperado": 3
+    },
+    {
+      "req": "R24",
+      "descripcion": "Seguimiento por tramo del envío E002 (eventos agrupados por tramo, en orden)",
+      "esperado": [
+        4,
+        6
+      ]
+    },
+    {
+      "req": "R24",
+      "descripcion": "Estado de seguimiento de todos los envíos (último evento de cada uno)",
+      "esperado": {
+        "ENTREGADO": 15,
+        "EN_TRANSITO": 1,
+        "RETRASO": 1,
+        "SALIDA": 3
+      }
+    },
+    {
+      "req": "R24",
+      "descripcion": "Eventos registrados a menos de 5 km del Puerto de Buenos Aires (índice 2dsphere)",
+      "esperado": 39
+    },
+    {
+      "req": "R25",
+      "descripcion": "Eventos RETRASO/DESVIO vinculados a su incidente (PostgreSQL)",
+      "esperado": 2
+    },
+    {
+      "req": "R25",
+      "descripcion": "Incidentes detectados por origen (evento operativo o alerta de sensor)",
+      "esperado": {
+        "ALERTA": 3,
+        "EVENTO": 2
+      }
+    },
+    {
+      "req": "R25",
+      "descripcion": "Incidente <-> alerta que lo originó ($lookup)",
+      "esperado": 3
+    },
+    {
+      "req": "R25",
+      "descripcion": "Control de consistencia: alertas ALTA/CRÍTICA sin incidente asociado",
+      "esperado": 0
+    },
+    {
+      "req": "R26",
+      "descripcion": "Alertas por estado",
+      "esperado": {
+        "ABIERTA": 6,
+        "CERRADA": 1,
+        "RECONOCIDA": 1
+      }
+    },
+    {
+      "req": "R26",
+      "descripcion": "Alertas activas por tipo de regla",
+      "esperado": {
+        "ANOMALIA_TEMPERATURA": 2,
+        "BATERIA": 1,
+        "INACTIVIDAD": 2,
+        "TEMPERATURA": 1,
+        "VIBRACION": 1
+      }
+    },
+    {
+      "req": "R26",
+      "descripcion": "Nunca hay dos alertas activas con la misma clave (deduplicación)",
+      "esperado": 0
+    },
+    {
+      "req": "R26",
+      "descripcion": "Alertas abiertas/reconocidas del cliente C02 (usa índice ix_cliente_estado_fecha)",
+      "esperado": 2
+    },
+    {
+      "req": "R26",
+      "descripcion": "Alerta con su evento ALERTA_GENERADA (trazabilidad Alerta -> Evento del enunciado)",
+      "esperado": 8
+    },
+    {
+      "req": "R32",
+      "descripcion": "Lecturas anómalas de temperatura detectadas (|z| > 3)",
+      "esperado": 5
+    },
+    {
+      "req": "R32",
+      "descripcion": "Sensores con anomalía de temperatura",
+      "esperado": 2
+    },
+    {
+      "req": "R40",
+      "descripcion": "Bandeja del cliente C02 (solo sus conversaciones, más reciente primero)",
+      "esperado": [
+        "Demora del envío E002",
+        "Excursión de temperatura contenedor MSKU0000003"
+      ]
+    },
+    {
+      "req": "R40",
+      "descripcion": "Aislamiento: el cliente C01 NO puede abrir la conversación privada de C02",
+      "esperado": "DENEGADO"
+    },
+    {
+      "req": "R40",
+      "descripcion": "El participante sí puede abrirla",
+      "esperado": "PERMITIDO"
+    },
+    {
+      "req": "R40",
+      "descripcion": "Mensajería grupal: grupos de trabajo existentes",
+      "esperado": 2
+    },
+    {
+      "req": "R40",
+      "descripcion": "Historial de la conversación grupal, paginado (3 por página)",
+      "esperado": [
+        3,
+        3
+      ]
+    },
+    {
+      "req": "R40",
+      "descripcion": "Mensajes no leídos del operador O01",
+      "esperado": 1
+    },
+    {
+      "req": "R40",
+      "descripcion": "Enviar mensaje privado (C02 -> O01): se guarda y se actualiza la conversación",
+      "esperado": 1
+    },
+    {
+      "req": "R40",
+      "descripcion": "El operador O01 ve el nuevo mensaje como no leído y luego los marca leídos",
+      "esperado": [
+        2,
+        0
+      ]
+    },
+    {
+      "req": "R40",
+      "descripcion": "Se revierte la prueba (mensaje de prueba y lecturas) para poder repetir el script",
+      "esperado": [
+        1,
+        1
+      ]
+    },
+    {
+      "req": "R40",
+      "descripcion": "El proveedor P02 solo ve el grupo de trabajo donde participa",
+      "esperado": 1
+    }
+  ]
+}
