@@ -70,6 +70,7 @@ Modelo físico detallado de MongoDB y Cassandra: @docs/modelo-fisico-mongodb-cas
 
 ## Reglas de trabajo
 
+- En las bases, usar primero lo visto en clase y seguir su regla de uso: @docs/visto-en-clase.md
 - Antes de un cambio que toque varios archivos o el modelo de datos, proponer un plan y esperar OK.
 - Un módulo de Spring Data por base (JPA, Spring Data MongoDB, Spring Data Cassandra,
   Spring Data Neo4j), con paquetes separados por base.
