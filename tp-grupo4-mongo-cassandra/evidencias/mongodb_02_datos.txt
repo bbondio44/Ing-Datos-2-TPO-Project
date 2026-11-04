@@ -1,0 +1,6 @@
+﻿eventos_logisticos   nuevos:  173  reemplazados:    0  total en colección: 173
+alertas              nuevos:    8  reemplazados:    0  total en colección: 8
+conversaciones       nuevos:    4  reemplazados:    0  total en colección: 4
+mensajes             nuevos:   19  reemplazados:    0  total en colección: 19
+reportes_generados   nuevos:    3  reemplazados:    0  total en colección: 3
+Datos de prueba de MongoDB cargados.

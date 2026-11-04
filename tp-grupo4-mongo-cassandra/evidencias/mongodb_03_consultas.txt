@@ -1,0 +1,130 @@
+﻿
+==================== R09 ====================
+OK    R09 · Alta de alerta (regla REG-06 definida en PostgreSQL)
+       resultado: true
+OK    R09 · Segunda alerta ACTIVA para la misma regla+sensor es rechazada (índice único parcial)
+       resultado: "E11000 duplicate key"
+OK    R09 · La repetición se registra sumando ocurrencias (no se duplica la alerta)
+       resultado: 2
+OK    R09 · El validador $jsonSchema rechaza un estado inexistente
+       resultado: "DocumentValidationFailure"
+OK    R09 · Modificación: ABIERTA -> RECONOCIDA (con historial)
+       resultado: 1
+OK    R09 · Transición inválida: volver a 'reconocer' no modifica nada
+       resultado: 0
+OK    R09 · Baja lógica: cerrar la alerta (activa = false)
+       resultado: 1
+OK    R09 · Reapertura: una nueva violación tras el cierre crea otra alerta
+       resultado: true
+OK    R09 · Se eliminan los documentos de prueba (el dataset queda como estaba)
+       resultado: 2
+
+==================== R17 ====================
+    2026-10-19T20:00 EVENTO CARGA_INICIADA       Inicio de carga de 2 contenedor(es)
+    2026-10-19T22:00 EVENTO SALIDA               Salida tramo 1 (terrestre) con Logística Cordillera S.A.
+    2026-10-20T07:00 EVENTO EN_TRANSITO          Reporte de posición del operador
+    2026-10-20T18:00 EVENTO TRASBORDO            Trasbordo a tramo 2
+    2026-10-21T02:00 EVENTO SALIDA               Salida tramo 2 (maritimo) con Naviera Atlántica S.A.
+    2026-10-21T08:00 EVENTO RETRASO              Demora informada por la naviera
+    2026-10-21T08:00 EVENTO INCIDENTE_DETECTADO  Demora de 18 h en tramo marítimo
+    2026-10-21T14:00 EVENTO ALERTA_GENERADA      Temperatura 10.8 °C supera 8 °C en contenedor REEFER
+    2026-10-21T14:00 ALERTA TEMPERATURA          Temperatura 10.8 °C supera 8 °C en contenedor REEFER
+    2026-10-21T14:00 EVENTO INCIDENTE_DETECTADO  Temperatura 10.8 °C supera 8 °C en contenedor REEFER
+    2026-10-22T23:15 EVENTO ALERTA_GENERADA      4 lectura(s) de temperatura anómalas (|z| máx 4.26)
+    2026-10-22T23:15 ALERTA ANOMALIA_TEMPERATURA 4 lectura(s) de temperatura anómalas (|z| máx 4.26)
+OK    R17 · Línea de tiempo del envío E002: eventos + alertas ($unionWith)
+       resultado: 12
+OK    R17 · Estado de seguimiento actual de E002 (último evento logístico)
+       resultado: "RETRASO"
+OK    R17 · Alertas activas del envío E002
+       resultado: 2
+
+==================== R23 ====================
+    BATERIA      MEDIA  2026-10-21T18:00 ocurrencias=30 | Batería del sensor en 14.8 %
+    INACTIVIDAD  ALTA   2026-10-21T02:30 ocurrencias=46 | Sensor sin lecturas desde su instalación
+    INACTIVIDAD  ALTA   2026-10-21T12:30 ocurrencias=36 | Sensor sin lecturas hace 150 minutos
+OK    R23 · Alertas activas de estado de sensor (batería baja / sin conexión)
+       resultado: 3
+
+==================== R24 ====================
+    tramo 1 2026-10-19T20:00 -> 2026-10-20T18:00 CARGA_INICIADA > SALIDA > EN_TRANSITO > TRASBORDO
+    tramo 2 2026-10-21T02:00 -> 2026-10-22T23:15 SALIDA > RETRASO > INCIDENTE_DETECTADO > ALERTA_GENERADA > INCIDENTE_DETECTADO > ALERTA_GENERADA
+OK    R24 · Seguimiento por tramo del envío E002 (eventos agrupados por tramo, en orden)
+       resultado: [4,6]
+OK    R24 · Estado de seguimiento de todos los envíos (último evento de cada uno)
+       resultado: {"ENTREGADO":15,"EN_TRANSITO":1,"RETRASO":1,"SALIDA":3}
+    2026-10-20T18:00 TRASBORDO Puerto de Buenos Aires
+    2026-10-19T23:00 TRASBORDO Puerto de Buenos Aires
+    2026-10-20T22:00 TRASBORDO Puerto de Buenos Aires
+OK    R24 · Eventos registrados a menos de 5 km del Puerto de Buenos Aires (índice 2dsphere)
+       resultado: 39
+
+==================== R25 ====================
+OK    R25 · Eventos RETRASO/DESVIO vinculados a su incidente (PostgreSQL)
+       resultado: 2
+OK    R25 · Incidentes detectados por origen (evento operativo o alerta de sensor)
+       resultado: {"ALERTA":3,"EVENTO":2}
+    2026-10-21T14:00 TEMPERATURA  ALTA incidente 4288a948-e9e1-51e6-b693-7029d2d32414
+    2026-10-21T12:30 INACTIVIDAD  ALTA incidente 29ad900d-f0a7-5bdf-a550-c423dd619494
+    2026-10-21T02:30 INACTIVIDAD  ALTA incidente 8d248830-f083-5b21-a26e-bad0492938ce
+OK    R25 · Incidente <-> alerta que lo originó ($lookup)
+       resultado: 3
+OK    R25 · Control de consistencia: alertas ALTA/CRÍTICA sin incidente asociado
+       resultado: 0
+
+==================== R26 ====================
+OK    R26 · Alertas por estado
+       resultado: {"ABIERTA":6,"CERRADA":1,"RECONOCIDA":1}
+OK    R26 · Alertas activas por tipo de regla
+       resultado: {"ANOMALIA_TEMPERATURA":2,"BATERIA":1,"INACTIVIDAD":2,"TEMPERATURA":1,"VIBRACION":1}
+OK    R26 · Nunca hay dos alertas activas con la misma clave (deduplicación)
+       resultado: 0
+    plan usa ix_cliente_estado_fecha: true
+OK    R26 · Alertas abiertas/reconocidas del cliente C02 (usa índice ix_cliente_estado_fecha)
+       resultado: 2
+OK    R26 · Alerta con su evento ALERTA_GENERADA (trazabilidad Alerta -> Evento del enunciado)
+       resultado: 8
+
+==================== R32 ====================
+    2026-10-21T14:00 temp 10.8 z 3.74
+    2026-10-21T15:00 temp 11.4 z 4.13
+    2026-10-21T16:00 temp 11.6 z 4.26
+    2026-10-21T17:00 temp 10.9 z 3.81
+    2026-10-22T09:00 temp 7.9 z 6.73
+OK    R32 · Lecturas anómalas de temperatura detectadas (|z| > 3)
+       resultado: 5
+OK    R32 · Sensores con anomalía de temperatura
+       resultado: 2
+
+==================== R40 ====================
+OK    R40 · Bandeja del cliente C02 (solo sus conversaciones, más reciente primero)
+       resultado: ["Demora del envío E002","Excursión de temperatura contenedor MSKU0000003"]
+OK    R40 · Aislamiento: el cliente C01 NO puede abrir la conversación privada de C02
+       resultado: "DENEGADO"
+OK    R40 · El participante sí puede abrirla
+       resultado: "PERMITIDO"
+    GT Cadena de frío E002 -> INTERNO Grupo 4 Logística (plataforma), CLIENTE Lácteos Pampeanos S.A., OPERADOR Naviera Atlántica S.A., PROVEEDOR FrioTech Mantenimiento Reefer
+    GT Mantenimiento IoT -> INTERNO Grupo 4 Logística (plataforma), OPERADOR Transportes Ruta 9 S.A., PROVEEDOR IoT Sensores Patagonia
+OK    R40 · Mensajería grupal: grupos de trabajo existentes
+       resultado: 2
+    2026-10-21T18:40 Grupo 4 Logística (plataforma)   Registramos el incidente asociado y dejamos la alerta como r
+    2026-10-21T18:25 FrioTech Mantenimiento Reefer    Temperatura nuevamente en 4.6 °C desde las 18:00. Recomendam
+    2026-10-21T15:45 Lácteos Pampeanos S.A.           Necesitamos saber si la mercadería sigue apta. Adjuntamos ce
+    2026-10-21T15:20 Naviera Atlántica S.A.           Naviera: personal a bordo reinició el equipo de frío, inform
+    2026-10-21T14:55 FrioTech Mantenimiento Reefer    FrioTech: revisamos la telemetría, parece una falla del comp
+    2026-10-21T14:25 Grupo 4 Logística (plataforma)   Se detectó temperatura de 10.8 °C en MSKU0000003 (alerta REG
+OK    R40 · Historial de la conversación grupal, paginado (3 por página)
+       resultado: [3,3]
+OK    R40 · Mensajes no leídos del operador O01
+       resultado: 1
+OK    R40 · Enviar mensaje privado (C02 -> O01): se guarda y se actualiza la conversación
+       resultado: 1
+OK    R40 · El operador O01 ve el nuevo mensaje como no leído y luego los marca leídos
+       resultado: [2,0]
+OK    R40 · Se revierte la prueba (mensaje de prueba y lecturas) para poder repetir el script
+       resultado: [1,1]
+OK    R40 · El proveedor P02 solo ve el grupo de trabajo donde participa
+       resultado: 1
+
+=====================================================================
+RESUMEN: 37 de 37 verificaciones OK
