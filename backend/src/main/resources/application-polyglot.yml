@@ -5,3 +5,18 @@ app:
     username: ${NEO4J_USERNAME:neo4j}
     password: ${NEO4J_PASSWORD:logistica_dev_neo4j}
     database: ${NEO4J_DATABASE:neo4j}
+  mongo:
+    enabled: true
+    uri: ${MONGO_URI:mongodb://localhost:27017}
+    database: ${MONGO_DATABASE:logistica_docs}
+  cassandra:
+    enabled: true
+    contact-points: ${CASSANDRA_CONTACT_POINTS:127.0.0.1:9042}
+    local-datacenter: ${CASSANDRA_LOCAL_DATACENTER:datacenter1}
+    keyspace: ${CASSANDRA_KEYSPACE:logistica_iot}
+
+# El indicador de Actuator crearía la CqlSession al arrancar y anularía el @Lazy.
+management:
+  health:
+    cassandra:
+      enabled: false
