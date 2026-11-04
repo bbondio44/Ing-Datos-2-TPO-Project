@@ -44,12 +44,11 @@ Además `id_lectura uuid`, `fecha_hora timestamp`, `dia date` y la referencia cr
   por día; acota el tamaño (recomendado < 100 MB / 100k filas) y evita hot partitions que crecen sin fin.
 - Consultas de varios días: se consulta cada partición (`dia IN (...)` o una consulta por día) y la
   aplicación fusiona el resultado; **nunca `ALLOW FILTERING` sobre toda la tabla** (C02).
-  El único `ALLOW FILTERING` (Q09, Q10) está acotado a una partición completa.
+  El único `ALLOW FILTERING` (Q09, Q10) está acotado a una partición y solo audita; la aplicación no lo usa.
 - `fecha_hora DESC`: la consulta más común es "lo más reciente primero" (Q03 con `LIMIT`). Para el
   recorrido cronológico se usa `ORDER BY fecha_hora ASC` (Q07).
 - `id_lectura` en el clustering: dos lecturas en el mismo instante no se pisan.
-- Compactación `TimeWindowCompactionStrategy` (ventana de 1 día) en las tablas de historial: datos de
-  serie temporal que no se actualizan.
+- Compactación `UnifiedCompactionStrategy` (UCS) en las tablas de historial: es la estrategia de Cassandra 5.0.
 - Retención (C05): sin TTL por ahora, porque las anomalías (R32) y los reportes usan el histórico.
   Se puede agregar `default_time_to_live` cuando se acuerde la ventana.
 
@@ -58,9 +57,9 @@ Además `id_lectura uuid`, `fecha_hora timestamp`, `dia date` y la referencia cr
 | Regla | Cómo se garantiza |
 |---|---|
 | Lectura duplicada (reenvío) no duplica (D04) | `INSERT` = upsert por clave primaria; `id_lectura` determinístico. Q01 lo demuestra |
-| Lectura tardía no pisa la última (C03) | Tablas `ultima_*` escritas con `USING TIMESTAMP` = instante de la lectura (µs): last-write-wins por **tiempo de evento**. Q05 lo demuestra |
+| Lectura tardía no pisa la última (C03) | Tablas `ultima_*` escritas con `USING TIMESTAMP` = instante de la lectura (µs): last write wins por **tiempo de evento**. La sintaxis está fuera de clase; el concepto de timestamp por columna se vio. Q05 lo demuestra |
 | Sin GPS no se inventa posición (C04) | Solo se escribe en `posiciones_*` / `ultima_posicion_*` si hay latitud y longitud |
-| Las 5 escrituras de una lectura van juntas | `BEGIN BATCH` (logged) en la ingesta (Q01) |
+| Las 5 escrituras de una lectura | `INSERT` separados. Si uno falla, las tablas quedan distintas hasta reintentar: se reenvía la lectura con el mismo `id_lectura` y el upsert no duplica (Q01) |
 | Sensor / contenedor válidos y asignación vigente | Lo valida la aplicación contra PostgreSQL antes de escribir |
 | Columnas nulas | No se escriben (evita tombstones) |
 

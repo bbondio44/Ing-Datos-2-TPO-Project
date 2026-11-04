@@ -38,9 +38,7 @@ CREATE TABLE IF NOT EXISTS lecturas_por_sensor_dia (
     bateria        double,
     PRIMARY KEY ((id_sensor, dia), fecha_hora, id_lectura)
 ) WITH CLUSTERING ORDER BY (fecha_hora DESC, id_lectura ASC)
-  AND compaction = {'class': 'TimeWindowCompactionStrategy',
-                    'compaction_window_unit': 'DAYS',
-                    'compaction_window_size': 1}
+  AND compaction = {'class': 'UnifiedCompactionStrategy'}
   AND comment = 'Historial por sensor y dia';
 
 -- ---------------------------------------------------------------------
@@ -62,9 +60,7 @@ CREATE TABLE IF NOT EXISTS lecturas_por_contenedor_dia (
     bateria        double,
     PRIMARY KEY ((id_contenedor, dia), fecha_hora, id_sensor, id_lectura)
 ) WITH CLUSTERING ORDER BY (fecha_hora DESC, id_sensor ASC, id_lectura ASC)
-  AND compaction = {'class': 'TimeWindowCompactionStrategy',
-                    'compaction_window_unit': 'DAYS',
-                    'compaction_window_size': 1}
+  AND compaction = {'class': 'UnifiedCompactionStrategy'}
   AND comment = 'Historial conjunto de sensores por contenedor y dia';
 
 -- ---------------------------------------------------------------------
@@ -82,9 +78,7 @@ CREATE TABLE IF NOT EXISTS posiciones_por_contenedor_dia (
     longitud       double,
     PRIMARY KEY ((id_contenedor, dia), fecha_hora, id_sensor, id_lectura)
 ) WITH CLUSTERING ORDER BY (fecha_hora DESC, id_sensor ASC, id_lectura ASC)
-  AND compaction = {'class': 'TimeWindowCompactionStrategy',
-                    'compaction_window_unit': 'DAYS',
-                    'compaction_window_size': 1}
+  AND compaction = {'class': 'UnifiedCompactionStrategy'}
   AND comment = 'Historico de posiciones GPS';
 
 -- ---------------------------------------------------------------------

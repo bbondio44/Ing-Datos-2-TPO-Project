@@ -85,6 +85,8 @@ def datos_prueba(lecturas: list[Lectura], tardia: Lectura, nombres: dict[str, st
         "-- Cassandra · DATOS DE PRUEBA (GENERADO por generador/generar.py, no editar a mano)",
         "-- Uso: cqlsh -f cassandra/02_datos_prueba.cql      (después de 01_schema.cql)",
         "-- Re-ejecutable: los INSERT de Cassandra son upserts sobre la misma PK -> no duplica.",
+        "-- FUERA DE CLASE: BATCH. Se usa solo para cargar este dataset más rápido, agrupando filas de",
+        "-- una misma partición. No es parte del modelo: la ingesta de la aplicación usa INSERT separados.",
         "--",
         f"-- Lecturas: {len(lecturas) + 1} (incluye 1 lectura tardía) · sensores con datos: {len(ult_s)} de 40",
         f"-- Posiciones GPS: {len(gps) + 1} · contenedores con última posición: {len(ult_p)}",
@@ -106,7 +108,8 @@ def datos_prueba(lecturas: list[Lectura], tardia: Lectura, nombres: dict[str, st
             "-- Solo lecturas con GPS válido (la de SEN-001 del 2026-10-22 06:00 no tiene fix y no se escribe)."]
     out += _por_particion(gps, lambda l: (l.cod_contenedor, l.dia), fila_posicion)
     out += ["", "-- ---------------------------------------------------------------- T4 ultima_lectura_por_sensor",
-            "-- USING TIMESTAMP = fecha_hora de la lectura en microsegundos (last-write-wins por tiempo de evento).",
+            "-- FUERA DE CLASE: USING TIMESTAMP = fecha_hora de la lectura en microsegundos.",
+            "-- El timestamp por columna y last write wins se vieron; esta es la sintaxis para proveerlo.",
             "-- SEN-040 no tiene fila: nunca reportó (la aplicación lo informa como SIN_DATOS)."]
     for cod in sorted(ult_s):
         out.append(f"-- {cod}")

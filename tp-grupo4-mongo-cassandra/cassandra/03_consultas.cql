@@ -25,21 +25,21 @@ USE logistica_iot;
 
 -- =====================================================================
 -- Q01 · Registrar lectura (escritura desnormalizada)                [R18]
--- Una lectura nueva se escribe en las 5 tablas. Se usa LOGGED BATCH porque las
--- filas van a particiones/tablas distintas y deben quedar todas o ninguna.
--- Las tablas 'ultima_*' usan USING TIMESTAMP = instante de la lectura.
+-- Una lectura nueva se escribe en las 5 tablas con INSERT separados. Si una escritura
+-- falla, las tablas quedan distintas hasta reintentar: se reenvía la lectura con el mismo
+-- id_lectura y, como el INSERT es un upsert por clave primaria, no se duplica.
+-- FUERA DE CLASE: USING TIMESTAMP. El timestamp por columna y last write wins se vieron;
+-- esta sintaxis permite que la aplicación provea el timestamp = instante de la lectura.
 -- =====================================================================
 SELECT COUNT(*) AS antes FROM lecturas_por_sensor_dia
   WHERE id_sensor = d9e437b3-519e-5123-badd-eabc293e132b AND dia = '2026-10-22';
 -- ESPERADO: antes = 24  (25 si este script ya se corrió antes: la fila de prueba queda guardada)
 
-BEGIN BATCH
-  INSERT INTO lecturas_por_sensor_dia (id_sensor, dia, fecha_hora, id_lectura, id_contenedor, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, '2026-10-22', '2026-10-22 23:30:00.000+0000', 5f458b90-403a-5c62-bed0-aae030708053, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
-  INSERT INTO lecturas_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
-  INSERT INTO posiciones_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, -29.23328, -52.30551);
-  INSERT INTO ultima_lectura_por_sensor (id_sensor, id_contenedor, id_lectura, fecha_hora, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1) USING TIMESTAMP 1792711800000000;
-  INSERT INTO ultima_posicion_por_contenedor (id_contenedor, id_sensor, id_lectura, fecha_hora, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', -29.23328, -52.30551) USING TIMESTAMP 1792711800000000;
-APPLY BATCH;
+INSERT INTO lecturas_por_sensor_dia (id_sensor, dia, fecha_hora, id_lectura, id_contenedor, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, '2026-10-22', '2026-10-22 23:30:00.000+0000', 5f458b90-403a-5c62-bed0-aae030708053, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
+INSERT INTO lecturas_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
+INSERT INTO posiciones_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, -29.23328, -52.30551);
+INSERT INTO ultima_lectura_por_sensor (id_sensor, id_contenedor, id_lectura, fecha_hora, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1) USING TIMESTAMP 1792711800000000;
+INSERT INTO ultima_posicion_por_contenedor (id_contenedor, id_sensor, id_lectura, fecha_hora, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', -29.23328, -52.30551) USING TIMESTAMP 1792711800000000;
 
 SELECT COUNT(*) AS despues FROM lecturas_por_sensor_dia
   WHERE id_sensor = d9e437b3-519e-5123-badd-eabc293e132b AND dia = '2026-10-22';
@@ -47,13 +47,11 @@ SELECT COUNT(*) AS despues FROM lecturas_por_sensor_dia
 
 -- R18 · Duplicados: se reenvía EXACTAMENTE la misma lectura (mismo id_lectura e instante).
 -- En Cassandra el INSERT es un upsert sobre la misma clave primaria: no se crea otra fila.
-BEGIN BATCH
-  INSERT INTO lecturas_por_sensor_dia (id_sensor, dia, fecha_hora, id_lectura, id_contenedor, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, '2026-10-22', '2026-10-22 23:30:00.000+0000', 5f458b90-403a-5c62-bed0-aae030708053, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
-  INSERT INTO lecturas_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
-  INSERT INTO posiciones_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, -29.23328, -52.30551);
-  INSERT INTO ultima_lectura_por_sensor (id_sensor, id_contenedor, id_lectura, fecha_hora, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1) USING TIMESTAMP 1792711800000000;
-  INSERT INTO ultima_posicion_por_contenedor (id_contenedor, id_sensor, id_lectura, fecha_hora, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', -29.23328, -52.30551) USING TIMESTAMP 1792711800000000;
-APPLY BATCH;
+INSERT INTO lecturas_por_sensor_dia (id_sensor, dia, fecha_hora, id_lectura, id_contenedor, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, '2026-10-22', '2026-10-22 23:30:00.000+0000', 5f458b90-403a-5c62-bed0-aae030708053, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
+INSERT INTO lecturas_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1);
+INSERT INTO posiciones_por_contenedor_dia (id_contenedor, dia, fecha_hora, id_sensor, id_lectura, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, '2026-10-22', '2026-10-22 23:30:00.000+0000', d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, -29.23328, -52.30551);
+INSERT INTO ultima_lectura_por_sensor (id_sensor, id_contenedor, id_lectura, fecha_hora, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (d9e437b3-519e-5123-badd-eabc293e132b, 5ce5419b-847b-5ecc-b70d-03b18c5c0003, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', 4.72, 79.1, 0.41, -29.23328, -52.30551, 93.1) USING TIMESTAMP 1792711800000000;
+INSERT INTO ultima_posicion_por_contenedor (id_contenedor, id_sensor, id_lectura, fecha_hora, latitud, longitud) VALUES (5ce5419b-847b-5ecc-b70d-03b18c5c0003, d9e437b3-519e-5123-badd-eabc293e132b, 5f458b90-403a-5c62-bed0-aae030708053, '2026-10-22 23:30:00.000+0000', -29.23328, -52.30551) USING TIMESTAMP 1792711800000000;
 SELECT COUNT(*) AS despues_de_reenvio FROM lecturas_por_sensor_dia
   WHERE id_sensor = d9e437b3-519e-5123-badd-eabc293e132b AND dia = '2026-10-22';
 -- ESPERADO: despues_de_reenvio = 25  (sin duplicar)
@@ -143,8 +141,8 @@ SELECT id_contenedor, fecha_hora, latitud, longitud FROM ultima_posicion_por_con
 
 -- =====================================================================
 -- Q09 · Lecturas que superan un umbral (regla REG-01: temperatura > 8)  [R09, R26, R32]
--- ALLOW FILTERING está acotado a UNA partición (24 filas): costo controlado.
--- La evaluación en línea la hace la aplicación al ingerir; esta consulta audita.
+-- FUERA DE CLASE: ALLOW FILTERING. Acotado a UNA partición (24 filas): costo controlado.
+-- Solo se usa para auditar: la aplicación evalúa la regla en Java al ingerir la lectura.
 -- =====================================================================
 SELECT fecha_hora, temperatura FROM lecturas_por_sensor_dia
   WHERE id_sensor = 12330766-e3ec-52b9-b9c0-b400c16274f6 AND dia = '2026-10-21' AND temperatura > 8.0
@@ -154,6 +152,7 @@ SELECT fecha_hora, temperatura FROM lecturas_por_sensor_dia
 
 -- =====================================================================
 -- Q10 · Batería: estado actual y lecturas bajo el umbral (REG-03 < 15 %)  [R22, R23]
+-- FUERA DE CLASE: ALLOW FILTERING. Acotado a UNA partición y solo para auditar, igual que Q09.
 -- =====================================================================
 SELECT id_sensor, fecha_hora, bateria FROM ultima_lectura_por_sensor
   WHERE id_sensor = 5f9d963d-5c94-598d-9f99-83906ed03b7b;

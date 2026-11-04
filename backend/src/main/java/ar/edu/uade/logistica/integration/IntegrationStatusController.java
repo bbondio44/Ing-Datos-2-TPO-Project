@@ -72,6 +72,8 @@ public class IntegrationStatusController {
             // getIfAvailable crea la sesión diferida; si Cassandra no responde, lanza una excepción.
             CqlSession session = cqlSession.getIfAvailable();
             if (session == null) return store("NO_CONFIGURADA", null);
+            // FUERA DE CLASE: SELECT sin WHERE sobre la partition key y con LIMIT. Solo verifica que la
+            // tabla responde leyendo una fila; no es una consulta del modelo.
             boolean hasRows = session.execute("SELECT id_sensor FROM " + CASSANDRA_TABLE + " LIMIT 1").one() != null;
             return store("OPERATIVA", readDetail(CASSANDRA_TABLE, hasRows));
         } catch (RuntimeException exception) {

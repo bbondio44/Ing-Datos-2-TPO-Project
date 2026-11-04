@@ -2,6 +2,8 @@
 -- Cassandra · DATOS DE PRUEBA (GENERADO por generador/generar.py, no editar a mano)
 -- Uso: cqlsh -f cassandra/02_datos_prueba.cql      (después de 01_schema.cql)
 -- Re-ejecutable: los INSERT de Cassandra son upserts sobre la misma PK -> no duplica.
+-- FUERA DE CLASE: BATCH. Se usa solo para cargar este dataset más rápido, agrupando filas de
+-- una misma partición. No es parte del modelo: la ingesta de la aplicación usa INSERT separados.
 --
 -- Lecturas: 2772 (incluye 1 lectura tardía) · sensores con datos: 39 de 40
 -- Posiciones GPS: 1763 · contenedores con última posición: 25
@@ -8544,7 +8546,8 @@ BEGIN UNLOGGED BATCH
 APPLY BATCH;
 
 -- ---------------------------------------------------------------- T4 ultima_lectura_por_sensor
--- USING TIMESTAMP = fecha_hora de la lectura en microsegundos (last-write-wins por tiempo de evento).
+-- FUERA DE CLASE: USING TIMESTAMP = fecha_hora de la lectura en microsegundos.
+-- El timestamp por columna y last write wins se vieron; esta es la sintaxis para proveerlo.
 -- SEN-040 no tiene fila: nunca reportó (la aplicación lo informa como SIN_DATOS).
 -- SEN-001
 INSERT INTO ultima_lectura_por_sensor (id_sensor, id_contenedor, id_lectura, fecha_hora, temperatura, humedad, vibracion, latitud, longitud, bateria) VALUES (101231a8-af8f-53ec-bfb0-f4d579ba7455, 42d867d9-d7a4-5248-9681-33e2c0cdb123, 98b95961-ed63-5b24-b6eb-5095877a33a1, '2026-10-22 23:00:00.000+0000', 3.83, 81.4, 0.69, -29.2729, -52.35262, 92.1) USING TIMESTAMP 1792710000000000;
