@@ -22,8 +22,13 @@ public final class IoTSimulator {
         long intervalMillis = Long.parseLong(System.getenv().getOrDefault("SIM_INTERVAL_MS", "3000"));
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         HttpClient client = HttpClient.newHttpClient();
+        double latitud = Double.parseDouble(System.getenv().getOrDefault("SIM_LATITUD", "-34.6037"));
+        double longitud = Double.parseDouble(System.getenv().getOrDefault("SIM_LONGITUD", "-58.3816"));
 
         while (!Thread.currentThread().isInterrupted()) {
+            // El contenedor avanza un poco en cada lectura, para que el recorrido se vea en el mapa.
+            latitud += ThreadLocalRandom.current().nextDouble(0.002, 0.01);
+            longitud += ThreadLocalRandom.current().nextDouble(0.002, 0.01);
             Map<String, Object> reading = Map.of(
                     "idLectura", UUID.randomUUID(),
                     "idSensor", UUID.fromString(sensorId),
@@ -31,7 +36,9 @@ public final class IoTSimulator {
                     "temperatura", ThreadLocalRandom.current().nextDouble(2, 9),
                     "humedad", ThreadLocalRandom.current().nextDouble(35, 70),
                     "vibracion", ThreadLocalRandom.current().nextDouble(0, 1.5),
-                    "bateria", ThreadLocalRandom.current().nextDouble(35, 100));
+                    "bateria", ThreadLocalRandom.current().nextDouble(35, 100),
+                    "latitud", latitud,
+                    "longitud", longitud);
             HttpRequest request = HttpRequest.newBuilder(URI.create(baseUrl + "/api/v1/iot/lecturas"))
                     .header("Authorization", "Bearer " + token)
                     .header("Content-Type", "application/json")

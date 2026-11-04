@@ -607,6 +607,11 @@ public class MainController {
     }
 
     @FXML
+    private void showIotMonitoring() {
+        MonitoreoIotWindow.show();
+    }
+
+    @FXML
     private void logout() {
         AppContext.get().api().logout().whenComplete((ignored, error) -> Platform.runLater(() -> {
             AppContext.get().setSession(null);

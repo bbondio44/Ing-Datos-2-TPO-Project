@@ -13,6 +13,9 @@ import ar.edu.uade.logistica.contracts.master.LocationRequest;
 import ar.edu.uade.logistica.contracts.master.LocationResponse;
 import ar.edu.uade.logistica.contracts.master.VehicleRequest;
 import ar.edu.uade.logistica.contracts.master.VehicleResponse;
+import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
+import ar.edu.uade.logistica.contracts.iot.PosicionResponse;
+import ar.edu.uade.logistica.contracts.iot.SensorEstadoResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +28,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -126,6 +130,25 @@ public class ApiClient {
 
     public CompletableFuture<Void> deactivateVehicle(UUID id) {
         return send("DELETE", "/api/v1/vehiculos/" + id, null, Void.class, true);
+    }
+
+    public CompletableFuture<List<SensorEstadoResponse>> sensorStates() {
+        return send("GET", "/api/v1/iot/sensores/estado", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<LecturaHistoricaResponse>> readings(String resource, UUID id, Instant from, Instant to) {
+        return send("GET", "/api/v1/iot/" + resource + "/" + id + "/lecturas" + range(from, to), null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<PosicionResponse>> route(UUID containerId, Instant from, Instant to) {
+        return send("GET", "/api/v1/iot/contenedores/" + containerId + "/recorrido" + range(from, to), null,
+                new TypeReference<>() {}, true);
+    }
+
+    private String range(Instant from, Instant to) {
+        return "?desde=" + URLEncoder.encode(from.toString(), StandardCharsets.UTF_8)
+                + "&hasta=" + URLEncoder.encode(to.toString(), StandardCharsets.UTF_8);
     }
 
     public CompletableFuture<Void> logout() {

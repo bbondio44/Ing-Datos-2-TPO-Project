@@ -68,6 +68,11 @@ public class GlobalExceptionHandler {
                 "La operación entra en conflicto con un dato existente o una regla de integridad", Map.of(), request);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    ResponseEntity<ApiError> badRequest(BadRequestException exception, HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "SOLICITUD_INVALIDA", exception.getMessage(), Map.of(), request);
+    }
+
     @ExceptionHandler(ServiceUnavailableException.class)
     ResponseEntity<ApiError> unavailable(ServiceUnavailableException exception, HttpServletRequest request) {
         LOGGER.warn("{} correlationId={}", exception.getMessage(),
