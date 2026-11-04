@@ -1,0 +1,6 @@
+﻿create  eventos_logisticos
+create  alertas
+create  conversaciones
+create  mensajes
+create  reportes_generados
+Esquema MongoDB aplicado.

@@ -27,13 +27,13 @@ Estados permitidos: `PENDIENTE`, `IMPLEMENTADO`, `PROBADO`. La existencia de SQL
 | R21 | GPS | Mapa | última posición e histórico | Punto actual y trayectoria | PENDIENTE |
 | R22 | Estado sensores | Sensores | última lectura Cassandra | Activo, inactivo y batería | PENDIENTE |
 | R23 | Alertas sensor | Alertas | reglas y Mongo | Batería, inactividad y umbral | PENDIENTE |
-| R24 | Trayectos | Tramos | tramo y Neo4j | Orden, medio, vehículo y operador | PENDIENTE |
+| R24 | Trayectos | Tramos | tramo y Neo4j | Proyección Neo4j validada; CRUD/API de tramos pendiente | PENDIENTE |
 | R25 | Incidentes | Incidentes | incidente PG | Evento genera incidente relacionado | PENDIENTE |
 | R26 | Ciclo alerta | Alertas | MongoDB | Abrir, reconocer, cerrar y deduplicar | PENDIENTE |
 | R27 | Ranking rutas | Analítica | vista PG | Conteos manuales coinciden | PENDIENTE |
 | R28 | Ranking clientes | Analítica | vista PG | Volumen no cancelado coincide | PENDIENTE |
 | R29 | Predicción atrasos | Predicciones | baseline PG | Envío activo con ETA y evaluación | PENDIENTE |
-| R30 | Red relaciones | Grafo | Neo4j | Cypher de cliente concreto | PENDIENTE |
+| R30 | Red relaciones | Grafo | Neo4j | Cypher probado con cliente `cli-001` del backup real | PROBADO |
 | R31 | Histórico desempeño | Analítica | vista PG | Dos períodos y denominadores | PENDIENTE |
 | R32 | Anomalía temperatura | IoT y alertas | Cassandra Mongo PG | Lectura anómala visible | PENDIENTE |
 | R33 | Reportes facturables | Reportes | PG Mongo exportación | Filtros, artefacto y factura | PENDIENTE |

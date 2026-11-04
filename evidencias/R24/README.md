@@ -1,6 +1,6 @@
 # R24 — Trayectos y maestros logísticos
 
-Estado: `PENDIENTE` con prerrequisitos parciales verificados.
+Estado: `PENDIENTE`. La consulta de trayecto sobre el backup Neo4j real fue probada; el CRUD completo de envíos y tramos aún falta.
 
 ## Cobertura disponible
 
@@ -26,4 +26,8 @@ Resultado ejecutado:
 
 ## Pendiente para completar R24
 
-Falta implementar el envío y sus tramos ordenados con origen/destino, medio, fechas, operador, vehículo y proveedores; también falta la consulta de recorrido lógico en Neo4j.
+Falta implementar el envío y sus tramos ordenados con origen/destino, medio, fechas, operador, vehículo y proveedores en la API y persistencia operativa.
+
+## Verificación Neo4j
+
+Se restauró el backup real en la base `82cf1a53` con Neo4j Enterprise 2026.10.1. La consulta de solo lectura devolvió el tramo `trm-01` del envío `env-101`, orden `1`, medio `Terrestre`, vehículo `veh-801` y operador `op-501`. El resultado confirma la proyección Neo4j de los campos R24, pero no sustituye el CRUD faltante.

@@ -1,6 +1,11 @@
 spring:
   application:
     name: logistica-iot-backend
+  # Lee el .env local si existe: desde la raíz del repo o desde backend/.
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
