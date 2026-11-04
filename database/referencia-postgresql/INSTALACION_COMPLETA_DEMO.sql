@@ -77,10 +77,13 @@ CREATE TABLE rol_permiso (
 CREATE TABLE usuario (
  id_usuario uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  id_cliente uuid REFERENCES cliente(id_cliente) ON DELETE RESTRICT,
+ id_proveedor uuid REFERENCES proveedor(id_proveedor) ON DELETE RESTRICT,
+ id_operador uuid REFERENCES operador_logistico(id_operador) ON DELETE RESTRICT,
  nombre varchar(100) NOT NULL, apellido varchar(100) NOT NULL,
  email varchar(254) NOT NULL, password_hash text NOT NULL,
  estado varchar(20) NOT NULL DEFAULT 'ACTIVO',
  fecha_registro timestamptz NOT NULL DEFAULT now(),
+ CONSTRAINT usuario_entidad_ck CHECK (num_nonnulls(id_cliente,id_proveedor,id_operador) <= 1),
  CONSTRAINT usuario_estado_ck CHECK (estado IN ('ACTIVO','BLOQUEADO','INACTIVO'))
 );
 CREATE UNIQUE INDEX usuario_email_unico ON usuario(lower(email));
@@ -226,7 +229,7 @@ CREATE TABLE regla_alerta (
  severidad varchar(15) NOT NULL DEFAULT 'MEDIA',
  activa boolean NOT NULL DEFAULT true,
  fecha_creacion timestamptz NOT NULL DEFAULT now(),
- CONSTRAINT regla_tipo_ck CHECK (tipo_regla IN ('TEMPERATURA','HUMEDAD','BATERIA','INACTIVIDAD','VIBRACION')),
+ CONSTRAINT regla_tipo_ck CHECK (tipo_regla IN ('TEMPERATURA','HUMEDAD','BATERIA','INACTIVIDAD','VIBRACION','ANOMALIA_TEMPERATURA')),
  CONSTRAINT regla_operador_ck CHECK (operador IN ('>','>=','<','<=','=')),
  CONSTRAINT regla_severidad_ck CHECK (severidad IN ('BAJA','MEDIA','ALTA','CRITICA')),
  CONSTRAINT regla_umbral_ck CHECK ((tipo_regla='INACTIVIDAD' AND minutos_inactividad > 0 AND umbral IS NULL)
@@ -1231,4 +1234,3 @@ SELECT * FROM tp_logistica.v_saldo_factura ORDER BY numero_factura;
 SELECT * FROM tp_logistica.cierre_cuenta;
 SELECT * FROM tp_logistica.prediccion_envio;
 SELECT * FROM tp_logistica.outbox_evento ORDER BY fecha_creacion DESC LIMIT 20;
-
