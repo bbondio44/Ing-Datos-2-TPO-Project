@@ -1,0 +1,7 @@
+app:
+  neo4j:
+    enabled: true
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    username: ${NEO4J_USERNAME:neo4j}
+    password: ${NEO4J_PASSWORD:logistica_dev_neo4j}
+    database: ${NEO4J_DATABASE:82cf1a53}
