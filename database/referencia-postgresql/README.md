@@ -9,6 +9,8 @@
 
 En una **base nueva y exclusivamente para demostración**, ejecutar `INSTALACION_COMPLETA_DEMO.sql` en el SQL Editor de Supabase. Contiene en orden el esquema, procedimientos, vistas, datos de muestra y consultas de aceptación. **No** ejecutar este archivo sobre una base existente o de producción.
 
+Para sumar también los UUID del catálogo compartido, ejecutar `06_datos_catalogo.sql` después de la instalación completa.
+
 ### 1. Archivos y orden de ejecución
 
 1. `00_esquema.sql`: tablas, PK, FK, restricciones, índices, CUIT válido, permisos y outbox.
@@ -20,12 +22,19 @@ En una **base nueva y exclusivamente para demostración**, ejecutar `INSTALACION
 7. `ids_compartidos.csv`: UUID exactos de las entidades de ejemplo para el resto del equipo.
 8. `MATRIZ_40_REQUISITOS.md`: responsabilidades y límites por cada requisito.
 9. `CONTRATO_INTEGRACION.md`: estructura recomendada para conectar motores.
+10. `06_datos_catalogo.sql`: dataset con los UUID compartidos del catálogo Mongo/Cassandra.
 
 **Supabase:** crear un proyecto PostgreSQL > SQL Editor > ejecutar cada archivo completo, en orden. El esquema elegido es **`tp_logistica`**, no `public`. En SQL externos usar prefijo `tp_logistica.*` o configurar `search_path` en la conexión del backend. Para accesos a PostgreSQL desde el servidor, utilizar conexión segura con SSL, credenciales en variables de entorno y un usuario con privilegios mínimos. **Nunca colocar la cadena de conexión o una clave privilegiada en React.**
 
 **PostgreSQL local:** crear una base nueva y ejecutar los mismos SQL en el orden indicado (`psql -v ON_ERROR_STOP=1 -f ...`), o conectarse con DBeaver y ejecutar cada archivo.
 
 Los scripts de esquema, procesos y vistas se envuelven en transacción para no dejar la instalación parcial ante errores. **El seed se ejecuta una sola vez sobre una instalación nueva.**
+
+### Carga del catálogo compartido
+
+En una base nueva, ejecutar `00_esquema.sql`, `01_reglas_y_procesos.sql`, `02_vistas_y_analitica.sql`, `03_datos_demo.sql`, `04_pruebas_aceptacion.sql` y finalmente `06_datos_catalogo.sql`. La prueba de aceptación va antes del catálogo porque verifica los totales del dataset chico. `06_datos_catalogo.sql` agrega los UUID de `../../tp-grupo4-mongo-cassandra/catalogo_ids.csv` sin alterar `03_datos_demo.sql`; no cargarlo dos veces ni sobre una base que ya contenga el catálogo.
+
+El seed usa nombres de país completos, CUIT válidos, emails únicos y fechas fijas. Los estados de los envíos se calculan al `2026-10-22T23:30Z`; los contenedores y sensores quedan asignados en el intervalo `[2026-10-20T00:00Z, 2026-10-23T00:00Z)`. Los usuarios internos no tienen entidad asociada; los usuarios de clientes, proveedores y operadores se vinculan mediante su FK correspondiente. Los hashes de contraseña son deliberadamente aleatorios y no permiten iniciar sesión con las cuentas del catálogo.
 
 ### 2. Diseño y decisiones relevantes
 
@@ -34,6 +43,7 @@ Los scripts de esquema, procesos y vistas se envuelven en transacción para no d
 **Entidades y estructuras incorporadas para la promoción:** permiso, rol_permiso, ubicacion, asignacion_sensor_contenedor, regla_alerta, factura_detalle, tarifa_servicio, cierre_cuenta, solicitud_reporte, prediccion_envio, outbox_evento y auditoria_operacion.
 
 - Todas las entidades primarias usan UUID. Los mismos identificadores se almacenan como `String` en Neo4j, `UUID` en Cassandra y string UUID en MongoDB.
+- `usuario` referencia como máximo una entidad entre cliente, proveedor u operador; los usuarios internos no tienen entidad asociada. Los roles del usuario se asignan por separado en `usuario_rol`.
 - No hay lectura continua, posicionamiento GPS histórico ni mensajes duplicados en PostgreSQL: pertenecen a Cassandra y MongoDB.
 - Los **sensores pueden moverse entre contenedores**. Por eso se reemplaza el `sensor_iot.id_contenedor` fijo del DER por `asignacion_sensor_contenedor` con fechas. La consulta histórica debe seleccionar la asociación vigente **en el timestamp de cada lectura**.
 - `envio_contenedor` también guarda inicio/fin y sus triggers impiden asignaciones solapadas del mismo contenedor.

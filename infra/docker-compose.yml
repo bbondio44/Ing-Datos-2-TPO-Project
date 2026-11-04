@@ -4,9 +4,9 @@ services:
   postgres:
     image: postgres:17.6-alpine
     environment:
-      POSTGRES_DB: logistica
-      POSTGRES_USER: logistica
-      POSTGRES_PASSWORD: logistica_dev
+      POSTGRES_DB: ${POSTGRES_DB:-logistica}
+      POSTGRES_USER: ${POSTGRES_USER:-logistica}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-logistica_dev}
       TZ: UTC
     ports:
       - "5432:5432"
@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ../database/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U logistica -d logistica"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-logistica} -d ${POSTGRES_DB:-logistica}"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -23,8 +23,8 @@ services:
     image: mongo:8.0.4
     profiles: ["polyglot"]
     environment:
-      MONGO_INITDB_ROOT_USERNAME: logistica
-      MONGO_INITDB_ROOT_PASSWORD: logistica_dev
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-logistica}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-logistica_dev}
       MONGO_INITDB_DATABASE: logistica_documental
     ports:
       - "27017:27017"
@@ -59,7 +59,7 @@ services:
     image: neo4j:5.26.5-community
     profiles: ["polyglot"]
     environment:
-      NEO4J_AUTH: neo4j/logistica_dev_neo4j
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-logistica_dev_neo4j}
       NEO4J_server_memory_heap_initial__size: 256m
       NEO4J_server_memory_heap_max__size: 512m
     ports:
@@ -78,4 +78,3 @@ volumes:
   mongo_data:
   cassandra_data:
   neo4j_data:
-
