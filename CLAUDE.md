@@ -59,9 +59,12 @@ Modelo físico detallado de MongoDB y Cassandra: @docs/modelo-fisico-mongodb-cas
 
 ## Quién trabaja qué
 
-- Persona 1 — PostgreSQL y finanzas: R01–R08, R10, R12–R16.
-- Persona 2 — Cassandra, MongoDB e IoT: R09, R17–R26, R32, R40.
-- Persona 3 — Neo4j, reportes y analítica: R11, R27–R31, R33–R39.
+- Persona 1 — PostgreSQL, ABM, trayectos, finanzas y reportes SQL: R01–R08, R10, R12–R16, R24,
+  R35–R39. Además: `docker-compose.yml` único y seguridad (roles, permisos, propiedad del envío).
+- Persona 2 — Cassandra, MongoDB, Neo4j, IoT, alertas, mensajería y reportes: R09, R11, R17–R23,
+  R25–R34, R40. Además: conexión de MongoDB/Cassandra y worker del outbox hacia Neo4j.
+- Persona 3 — Testing de los 40 requisitos: catálogo de UUID, dataset, pruebas automatizadas,
+  casos adversos, evidencias, README y demo. Además: conexión de Neo4j a Spring Boot.
 - No modificar código, configuración ni datos del módulo de otra persona sin avisar antes y esperar
   confirmación. Los puntos compartidos (UUID, alertas ↔ incidentes, reportes facturables) se coordinan.
 

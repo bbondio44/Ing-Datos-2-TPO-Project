@@ -51,7 +51,7 @@ cruza dos fechas, mostrar las lecturas ordenadas y reconstruir las posiciones GP
 
 ---
 
-## Persona 1 — PostgreSQL y finanzas
+## Persona 1 — PostgreSQL, ABM, trayectos, finanzas y reportes SQL
 
 | Nº | Requisito | Qué desarrollar | Prueba de aceptación | Estado 04/11 |
 |---|---|---|---|---|
@@ -63,48 +63,56 @@ cruza dos fechas, mostrar las lecturas ordenadas y reconstruir las posiciones GP
 | R06 | ABM envíos → contenedores → sensores | CRUD y navegación relacional completa | Un envío muestra sus contenedores y sus sensores | PARCIAL: pantalla de envíos deshabilitada |
 | R07 | ABM contenedores de un envío | Asociar/desasociar con vigencia histórica | Asociación activa e histórica verificables | PARCIAL: falta pantalla y prueba histórica |
 | R08 | ABM sensores de un contenedor | Asociar/desasociar, controlar pertenencia temporal | Sensores correctos por contenedor y por fecha | PARCIAL: falta interfaz y casos límite |
+| R24 | Gestión de trayectos de cada envío (seguimiento) | Orden, vehículo, operador, fechas y estados de los tramos | Un envío devuelve sus tramos en secuencia correcta | PARCIAL: tramos y vistas en PostgreSQL, falta flujo en la app |
 | R10 | Cuenta corriente: facturación y cobros a clientes | Factura + detalle + pago + movimiento/conciliación | Cobro parcial/total modifica el saldo sin duplicar | NO: hay funciones SQL, falta backend y pantalla |
 | R12 | Facturación automática | Tarifa + servicio que crea la factura según un hito | Dos ejecuciones del lote generan una sola factura | NO |
 | R13 | Registro de pagos | CRUD de pago e imputación verificable | El pago figura en factura, cuenta y movimientos | NO |
 | R14 | Gestión de cuentas corrientes | Débitos, créditos, saldo y trazabilidad | Saldo = suma de movimientos | NO |
 | R15 | Cierre mensual de cuentas corrientes | `cierre_cuenta` + consolidación + bloqueo | El cierre reproduce el saldo; no se duplica | NO |
 | R16 | Facturación y pagos a proveedores y operadores | Distinguir terceros y egresos | Factura y pago de cada tercero se reflejan en su cuenta | NO |
-
-## Persona 2 — Cassandra, MongoDB e IoT
-
-| Nº | Requisito | Qué desarrollar | Prueba de aceptación | Estado 04/11 |
-|---|---|---|---|---|
-| R09 | ABM reglas y alertas | `regla_alerta` en PostgreSQL + alerta ejecutada y guardada en MongoDB | Una regla nueva superada por una lectura genera una alerta | NO: falta ABM de reglas, evaluación de lecturas, persistencia en Mongo y pantalla |
-| R17 | Monitoreo de envíos, sensores, contenedores y eventos | Vista integrada PostgreSQL + Cassandra + MongoDB | Se ve un envío con sus lecturas y eventos asociados | NO: no hay consulta conjunta ni pantalla |
-| R18 | Registro continuo de lecturas IoT | Ingesta y escritura en las tablas desnormalizadas | Serie de lecturas consecutivas consultable | NO: el simulador llama a `POST /api/v1/iot/lecturas`, que no existe |
-| R19 | Consulta histórica de lecturas (contenedor y sensor) | Consultas por rango uniendo días | Histórico de ambos en un intervalo de dos días | NO: falta servicio por rango y vista |
-| R20 | Reconstrucción del recorrido de un contenedor | Ordenar posiciones GPS y armar la secuencia | Mapa dibuja el itinerario con puntos en el tiempo | NO |
-| R21 | Visualización geográfica de posiciones GPS | Última posición y múltiples posiciones válidas | Mapa muestra ubicación y trayectoria | NO: no hay pantalla de mapa (propuesta: WebView con mapa embebido) |
-| R22 | Control de estado de sensores | Estado por última lectura, batería e inactividad | Sensor sin lecturas queda marcado inactivo | NO: falta calcular online/offline, batería y última señal |
-| R23 | Alertas de estado de los sensores | Umbrales de batería baja y sin conexión, tarea periódica | Alerta visible con condición y timestamp | NO |
-| R24 | Gestión de trayectos de cada envío (seguimiento) | Orden, vehículo, operador, fechas y estados de los tramos | Un envío devuelve sus tramos en secuencia correcta | PARCIAL: tramos y vistas en PostgreSQL, falta flujo en la app |
-| R25 | Detección de incidentes | Reglas/eventos que crean un incidente (tramo opcional) | Un evento de prueba crea un incidente consultable | NO: falta el detector que convierte lecturas anómalas en incidentes |
-| R26 | Generación de alertas | Evaluar, persistir, consultar y cerrar alertas | Una regla activa produce una alerta que cambia de estado | NO: falta crear, reconocer, cerrar y deduplicar desde la app |
-| R32 | Detección de anomalías de temperatura | Umbral o salida anómala sobre lecturas históricas | Lectura fuera de rango produce detección (alerta/incidente) inspeccionable | NO |
-| R40 | Mensajería con clientes, proveedores y operadores | Conversaciones privadas y grupales con permisos | Cliente, proveedor y operador envían y consultan; un ajeno no ve nada | NO: falta API de chat, permisos e interfaz |
-
-## Persona 3 — Neo4j, reportes y analítica
-
-| Nº | Requisito | Qué desarrollar | Prueba de aceptación | Estado 04/11 |
-|---|---|---|---|---|
-| R11 | Solicitud de reportes | Solicitud parametrizada con estado y resultado | El usuario solicita y descarga/visualiza el reporte | NO |
-| R27 | Ranking de rutas con más incidentes | Agrupar incidentes por ruta/tramo definido | Ranking ordenado con recuentos comprobables | NO: hay vista SQL |
-| R28 | Ranking de clientes por volumen transportado | `SUM(volumen_m3)` con criterio de envíos válido | Orden descendente coincide con el dataset | NO: hay vista SQL |
-| R29 | Predicción de atrasos | ETA/riesgo sobre históricos + validación | Pronóstico para un envío aún no entregado | NO: hay función baseline SQL |
-| R30 | Red de relaciones clientes–operadores–envíos | Grafo sincronizado con IDs compartidos | Cypher obtiene la red de un cliente concreto | NO |
-| R31 | Análisis histórico de desempeño | KPI por período y entidad | Comparar dos períodos con resultados distintos | NO: hay vista SQL mensual |
-| R33 | Reportes operativos y analíticos parametrizados (facturables) | Parámetros, resultado, tarifa y cargo | Reporte con filtros genera precio y factura vinculada | NO |
-| R34 | Reportes predictivos (atrasos y riesgos) | Guardar predicción, riesgo y explicación | Reporte incluye ETA/score de envíos actuales | NO |
 | R35 | Reporte de envíos (país, estado, cliente, demorados, incidentes abiertos) | Filtros combinables | Cada filtro y combinación da la salida correcta | NO: hay vista SQL |
 | R36 | Tiempos máximo y mínimo de envío por cliente | Fechas reales, excluir envíos sin entrega | Mín/máx consistentes con el dataset | NO: hay vista SQL |
 | R37 | Promedio de incidentes por país / estado / cliente | Denominador explícito | Promedios reproducibles por dimensión | NO: hay vista SQL |
 | R38 | Tiempo promedio de entrega | Duración real solo de envíos finalizados | La media manual coincide con el reporte | NO: hay vista SQL |
 | R39 | Costos por tipo de transporte | Agrupar `costo_real` de tramos por medio | Totales aéreo/marítimo/terrestre coinciden | NO: hay vista SQL |
+
+Además: `docker-compose.yml` único con los cuatro motores y seguridad (roles, permisos, propiedad del envío en las escrituras).
+
+## Persona 2 — Cassandra, MongoDB, Neo4j, IoT, alertas, mensajería y reportes
+
+| Nº | Requisito | Qué desarrollar | Prueba de aceptación | Estado 04/11 |
+|---|---|---|---|---|
+| R18 | Registro continuo de lecturas IoT | Ingesta y escritura en las tablas desnormalizadas | Serie de lecturas consecutivas consultable | NO: el simulador llama a `POST /api/v1/iot/lecturas`, que no existe |
+| R19 | Consulta histórica de lecturas (contenedor y sensor) | Consultas por rango uniendo días | Histórico de ambos en un intervalo de dos días | NO: falta servicio por rango y vista |
+| R20 | Reconstrucción del recorrido de un contenedor | Ordenar posiciones GPS y armar la secuencia | Mapa dibuja el itinerario con puntos en el tiempo | NO |
+| R21 | Visualización geográfica de posiciones GPS | Última posición y múltiples posiciones válidas | Mapa muestra ubicación y trayectoria | NO: no hay pantalla de mapa (propuesta: WebView con mapa embebido) |
+| R22 | Control de estado de sensores | Estado por última lectura, batería e inactividad | Sensor sin lecturas queda marcado inactivo | NO: falta calcular online/offline, batería y última señal |
+| R09 | ABM reglas y alertas | `regla_alerta` en PostgreSQL + alerta ejecutada y guardada en MongoDB | Una regla nueva superada por una lectura genera una alerta | NO: falta ABM de reglas, evaluación de lecturas, persistencia en Mongo y pantalla |
+| R23 | Alertas de estado de los sensores | Umbrales de batería baja y sin conexión, tarea periódica | Alerta visible con condición y timestamp | NO |
+| R26 | Generación de alertas | Evaluar, persistir, consultar y cerrar alertas | Una regla activa produce una alerta que cambia de estado | NO: falta crear, reconocer, cerrar y deduplicar desde la app |
+| R25 | Detección de incidentes | Reglas/eventos que crean un incidente (tramo opcional) | Un evento de prueba crea un incidente consultable | NO: falta el detector que convierte lecturas anómalas en incidentes |
+| R32 | Detección de anomalías de temperatura | Umbral o salida anómala sobre lecturas históricas | Lectura fuera de rango produce detección (alerta/incidente) inspeccionable | NO |
+| R17 | Monitoreo de envíos, sensores, contenedores y eventos | Vista integrada PostgreSQL + Cassandra + MongoDB | Se ve un envío con sus lecturas y eventos asociados | NO: no hay consulta conjunta ni pantalla |
+| R40 | Mensajería con clientes, proveedores y operadores | Conversaciones privadas y grupales con permisos | Cliente, proveedor y operador envían y consultan; un ajeno no ve nada | NO: falta API de chat, permisos e interfaz |
+| R30 | Red de relaciones clientes–operadores–envíos | Grafo sincronizado con IDs compartidos | Cypher obtiene la red de un cliente concreto | NO |
+| R29 | Predicción de atrasos | ETA/riesgo sobre históricos + validación | Pronóstico para un envío aún no entregado | NO: hay función baseline SQL |
+| R34 | Reportes predictivos (atrasos y riesgos) | Guardar predicción, riesgo y explicación | Reporte incluye ETA/score de envíos actuales | NO |
+| R11 | Solicitud de reportes | Solicitud parametrizada con estado y resultado | El usuario solicita y descarga/visualiza el reporte | NO |
+| R33 | Reportes operativos y analíticos parametrizados (facturables) | Parámetros, resultado, tarifa y cargo | Reporte con filtros genera precio y factura vinculada | NO |
+| R27 | Ranking de rutas con más incidentes | Agrupar incidentes por ruta/tramo definido | Ranking ordenado con recuentos comprobables | NO: hay vista SQL |
+| R28 | Ranking de clientes por volumen transportado | `SUM(volumen_m3)` con criterio de envíos válido | Orden descendente coincide con el dataset | NO: hay vista SQL |
+| R31 | Análisis histórico de desempeño | KPI por período y entidad | Comparar dos períodos con resultados distintos | NO: hay vista SQL mensual |
+
+Además: conectar MongoDB y Cassandra a Spring Boot con health check real, y el worker que lee `outbox_evento` y actualiza Neo4j sin duplicar.
+
+## Persona 3 — Testing de los 40 requisitos
+
+- Catálogo único de UUID y dataset que carga las cuatro bases desde cero.
+- Conexión de Neo4j a Spring Boot con health check real.
+- Una prueba de aceptación automatizada por requisito + chequeo desde JavaFX.
+- Casos adversos (sección de arriba) y analítica contra cálculos manuales.
+- Evidencias en `evidencias/R01`–`R40`, README de arranque y guion de la demo.
+- Solo Persona 3 marca un requisito como terminado.
 
 ---
 
