@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: ${PG_JDBC_URL}
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
+    hikari:
+      maximum-pool-size: ${PG_POOL_SIZE:6}
+      data-source-properties:
+        sslmode: ${PG_SSL_MODE:require}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: INFO
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ar.edu.uade.logistica.desktop.controller.MainController" styleClass="app-root">
+    <left>
+        <VBox prefWidth="240" spacing="8" styleClass="sidebar">
+            <padding><Insets top="28" right="18" bottom="22" left="18"/></padding>
+            <Label text="LOGÍSTICA IoT" styleClass="sidebar-brand"/>
+            <Label text="Grupo 4" styleClass="sidebar-caption"/>
+            <Separator/>
+            <Button text="Panel general" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Clientes" maxWidth="Infinity" styleClass="nav-button-active"/>
+            <Button text="Proveedores" onAction="#showSuppliers" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Operadores" onAction="#showOperators" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Ubicaciones" onAction="#showLocations" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Vehículos" onAction="#showVehicles" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Envíos" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Monitoreo IoT" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Alertas" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Facturación" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Reportes" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label fx:id="userLabel" styleClass="sidebar-user" wrapText="true"/>
+            <Button text="Sesiones activas" onAction="#showSessions" maxWidth="Infinity" styleClass="secondary-button"/>
+            <Button text="Cerrar sesión" onAction="#logout" maxWidth="Infinity" styleClass="secondary-button"/>
+        </VBox>
+    </left>
+    <center>
+        <VBox spacing="18" styleClass="content">
+            <padding><Insets top="28" right="34" bottom="28" left="34"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="3">
+                    <Label text="Clientes" styleClass="screen-title"/>
+                    <Label text="Altas, consulta y estado de las organizaciones." styleClass="muted"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="editButton" text="Editar" onAction="#editClient" styleClass="secondary-button"/>
+                <Button fx:id="deactivateButton" text="Desactivar" onAction="#deactivateClient" styleClass="secondary-button"/>
+                <Button text="Nuevo cliente" onAction="#createClient" styleClass="primary-button"/>
+            </HBox>
+            <HBox spacing="10">
+                <TextField fx:id="searchField" promptText="Buscar por razón social o CUIT" HBox.hgrow="ALWAYS"/>
+                <Button text="Buscar" onAction="#refresh" styleClass="secondary-button"/>
+            </HBox>
+            <TableView fx:id="clientsTable" VBox.vgrow="ALWAYS" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN">
+                <columns>
+                    <TableColumn fx:id="nameColumn" text="Razón social" prefWidth="300"/>
+                    <TableColumn fx:id="cuitColumn" text="CUIT" prefWidth="160"/>
+                    <TableColumn fx:id="countryColumn" text="País" prefWidth="180"/>
+                    <TableColumn fx:id="stateColumn" text="Estado" prefWidth="130"/>
+                </columns>
+                <placeholder><Label text="No hay clientes para mostrar" styleClass="muted"/></placeholder>
+            </TableView>
+            <Label fx:id="statusLabel" text="Listo" styleClass="status-label"/>
+        </VBox>
+    </center>
+</BorderPane>
+

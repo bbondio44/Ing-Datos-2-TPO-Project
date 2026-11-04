@@ -1,0 +1,557 @@
+{
+  "proyecto": "Ingeniería de Datos II - TP Persistencia Políglota - Grupo 4",
+  "motor": "MongoDB",
+  "base_de_datos": "logistica_documental",
+  "version_modelo": "1.1",
+  "descripcion": "Modelo físico documental de MongoDB para la plataforma logística IoT: únicamente definición de colecciones, campos, tipos, obligatoriedad, índices, restricciones y referencias lógicas; sin documentos ni valores de ejemplo.",
+  "origen_y_alcance": {
+    "primera_entrega_aprobada": [
+      "eventos_logisticos",
+      "alertas",
+      "mensajes",
+      "reportes",
+      "reclamos"
+    ],
+    "colecciones_de_soporte_o_extension": [
+      "conversaciones",
+      "predicciones_riesgo"
+    ],
+    "nota": "Conversaciones implementa también GrupoDeTrabajo de la consigna. Predicciones de riesgo se añade para cubrir la entidad y los análisis predictivos del enunciado.",
+    "otras_bases": "PostgreSQL conserva clientes, usuarios, envíos, tramos, sensores, incidentes y facturación. Cassandra almacena lecturas IoT. Neo4j mantiene el grafo logístico."
+  },
+  "convenciones": {
+    "_id": "Identificador interno de MongoDB, tipo ObjectId.",
+    "fechas": "Tipo BSON Date.",
+    "referencias_postgresql": "UUID representados como string; su correspondencia se valida desde la aplicación.",
+    "referencias_mongodb": "ObjectId que apunta lógicamente a otra colección.",
+    "referencias_cassandra": "Identificador de lectura compartido, referenciado lógicamente; no existe clave foránea entre motores.",
+    "sin_fk": "Las referencias cruzadas no tienen integridad referencial automática.",
+    "indices": "Declaración de índices que deberán crearse durante la implementación.",
+    "proposito": "Documento de modelado, no contiene datos de ejemplo ni inserta registros."
+  },
+  "colecciones": {
+    "eventos_logisticos": {
+      "descripcion": "Historial de eventos de cada envío, con detalles variables según el tipo (retraso, aduana, carga, entrega).",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_envio": "uuid_string",
+          "id_contenedor": "uuid_string|null",
+          "id_tramo": "uuid_string|null",
+          "id_incidente": "uuid_string|null",
+          "tipo_evento": "string",
+          "fecha_hora": "date",
+          "ubicacion": "object{pais:string,ciudad:string,latitud:double,longitud:double}",
+          "descripcion": "string",
+          "id_usuario_registro": "uuid_string|null",
+          "detalles": "object (estructura variable según tipo_evento)"
+        },
+        "requeridos": [
+          "_id",
+          "id_envio",
+          "tipo_evento",
+          "fecha_hora",
+          "ubicacion",
+          "descripcion"
+        ]
+      },
+      "reglas_de_validacion": {
+        "tipo_evento_permitidos": [
+          "CARGA_INICIADA",
+          "EN_TRANSITO",
+          "ADUANA",
+          "RETRASO",
+          "DESCARGA",
+          "ENTREGADO",
+          "OTRO"
+        ],
+        "fecha_hora": "date válido"
+      },
+      "referencias_logicas": [
+        "id_envio -> PostgreSQL.envio.id_envio",
+        "id_contenedor -> PostgreSQL.contenedor.id_contenedor",
+        "id_tramo -> PostgreSQL.tramo.id_tramo",
+        "id_incidente -> PostgreSQL.incidente.id_incidente",
+        "id_usuario_registro -> PostgreSQL.usuario.id_usuario"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_eventos_envio_fecha",
+          "campos": {
+            "id_envio": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_eventos_tipo_fecha",
+          "campos": {
+            "tipo_evento": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_eventos_contenedor_fecha",
+          "campos": {
+            "id_contenedor": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "alertas": {
+      "descripcion": "Alertas producidas a partir de lecturas IoT, incidentes o eventos del negocio.",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_sensor": "uuid_string|null",
+          "id_contenedor": "uuid_string|null",
+          "id_envio": "uuid_string|null",
+          "id_evento": "objectId|null",
+          "id_lectura": "uuid_string|null",
+          "tipo": "string",
+          "severidad": "string",
+          "estado": "string",
+          "fecha": "date",
+          "descripcion": "string",
+          "condicion_detectada": "object{metrica:string,operador:string,umbral:double,valor_registrado:double,unidad:string}|null",
+          "id_usuario_atendio": "uuid_string|null",
+          "fecha_resolucion": "date|null"
+        },
+        "requeridos": [
+          "_id",
+          "tipo",
+          "severidad",
+          "estado",
+          "fecha",
+          "descripcion"
+        ]
+      },
+      "reglas_de_validacion": {
+        "severidad": [
+          "BAJA",
+          "MEDIA",
+          "ALTA",
+          "CRITICA"
+        ],
+        "estado": [
+          "ABIERTA",
+          "EN_REVISION",
+          "RESUELTA",
+          "DESCARTADA"
+        ],
+        "tipo": "Definido por reglas de monitoreo; al menos un origen (sensor/lectura o evento) debe respaldar la alerta."
+      },
+      "referencias_logicas": [
+        "id_sensor -> PostgreSQL.sensor_iot.id_sensor",
+        "id_contenedor -> PostgreSQL.contenedor.id_contenedor",
+        "id_envio -> PostgreSQL.envio.id_envio",
+        "id_evento -> MongoDB.eventos_logisticos._id",
+        "id_lectura -> Cassandra.lecturas_por_sensor_dia.id_lectura",
+        "id_usuario_atendio -> PostgreSQL.usuario.id_usuario"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_alertas_sensor_fecha",
+          "campos": {
+            "id_sensor": 1,
+            "fecha": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_alertas_envio_fecha",
+          "campos": {
+            "id_envio": 1,
+            "fecha": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_alertas_estado_severidad_fecha",
+          "campos": {
+            "estado": 1,
+            "severidad": 1,
+            "fecha": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_alertas_evento",
+          "campos": {
+            "id_evento": 1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "conversaciones": {
+      "descripcion": "Canales privados, grupales y públicos. Una conversación grupal materializa GrupoDeTrabajo (nombre e integrantes).",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "tipo": "string",
+          "nombre": "string|null",
+          "descripcion": "string|null",
+          "integrantes": "array<uuid_string>",
+          "id_creador": "uuid_string",
+          "id_envio": "uuid_string|null",
+          "fecha_creacion": "date",
+          "estado": "string",
+          "configuracion": "object{solo_administradores_escriben:boolean,visibilidad:string}"
+        },
+        "requeridos": [
+          "_id",
+          "tipo",
+          "integrantes",
+          "id_creador",
+          "fecha_creacion",
+          "estado"
+        ]
+      },
+      "reglas_de_validacion": {
+        "tipo": [
+          "PRIVADA",
+          "GRUPAL",
+          "PUBLICA"
+        ],
+        "estado": [
+          "ACTIVA",
+          "ARCHIVADA"
+        ],
+        "integrantes": "En PRIVADA se esperan dos IDs distintos; GRUPAL debe tener nombre e integrantes; PUBLICA se rige por permisos del sistema."
+      },
+      "referencias_logicas": [
+        "integrantes[] -> PostgreSQL.usuario.id_usuario",
+        "id_creador -> PostgreSQL.usuario.id_usuario",
+        "id_envio -> PostgreSQL.envio.id_envio"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_conversaciones_integrantes_fecha",
+          "campos": {
+            "integrantes": 1,
+            "fecha_creacion": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_conversaciones_tipo_estado",
+          "campos": {
+            "tipo": 1,
+            "estado": 1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_conversaciones_envio",
+          "campos": {
+            "id_envio": 1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "mensajes": {
+      "descripcion": "Mensajería privada, grupal y pública con historial por conversación.",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_conversacion": "objectId",
+          "id_remitente": "uuid_string",
+          "id_destinatario": "uuid_string|null",
+          "tipo": "string",
+          "fecha_hora": "date",
+          "contenido": "string",
+          "tipo_contenido": "string",
+          "adjuntos": "array<object{nombre:string,url:string,tipo_mime:string}>",
+          "leido_por": "array<object{id_usuario:uuid_string,fecha_lectura:date}>",
+          "estado": "string",
+          "fecha_edicion": "date|null"
+        },
+        "requeridos": [
+          "_id",
+          "id_conversacion",
+          "id_remitente",
+          "tipo",
+          "fecha_hora",
+          "contenido",
+          "tipo_contenido",
+          "estado"
+        ]
+      },
+      "reglas_de_validacion": {
+        "tipo": [
+          "PRIVADO",
+          "GRUPAL",
+          "PUBLICO"
+        ],
+        "tipo_contenido": [
+          "TEXTO",
+          "ARCHIVO",
+          "SISTEMA"
+        ],
+        "estado": [
+          "ENVIADO",
+          "EDITADO",
+          "ELIMINADO"
+        ],
+        "id_destinatario": "Requerido en mensaje PRIVADO; null en GRUPAL/PUBLICO."
+      },
+      "referencias_logicas": [
+        "id_conversacion -> MongoDB.conversaciones._id",
+        "id_remitente -> PostgreSQL.usuario.id_usuario",
+        "id_destinatario -> PostgreSQL.usuario.id_usuario",
+        "leido_por[].id_usuario -> PostgreSQL.usuario.id_usuario"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_mensajes_conversacion_fecha",
+          "campos": {
+            "id_conversacion": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_mensajes_destinatario_fecha",
+          "campos": {
+            "id_destinatario": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_mensajes_remitente_fecha",
+          "campos": {
+            "id_remitente": 1,
+            "fecha_hora": -1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "reportes": {
+      "descripcion": "Solicitudes de reportes operativos y analíticos; parámetros y resultados variables según el tipo.",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_usuario": "uuid_string",
+          "tipo": "string",
+          "categoria": "string",
+          "formato": "string",
+          "estado": "string",
+          "fecha_solicitud": "date",
+          "fecha_generacion": "date|null",
+          "parametros": "object{fecha_desde:date|null,fecha_hasta:date|null,id_cliente:uuid_string|null,pais:string|null,estado_envio:string|null}",
+          "resultado": "object (resumen, indicadores, filas de ejemplo o ubicación de archivo)",
+          "archivo_url": "string|null",
+          "error": "string|null"
+        },
+        "requeridos": [
+          "_id",
+          "id_usuario",
+          "tipo",
+          "categoria",
+          "formato",
+          "estado",
+          "fecha_solicitud",
+          "parametros"
+        ]
+      },
+      "reglas_de_validacion": {
+        "categoria": [
+          "OPERATIVO",
+          "ANALITICO"
+        ],
+        "formato": [
+          "PDF",
+          "CSV",
+          "JSON",
+          "XLSX"
+        ],
+        "estado": [
+          "SOLICITADO",
+          "PROCESANDO",
+          "GENERADO",
+          "ERROR"
+        ],
+        "tipo": "Los tipos concretos deben cubrir los reportes operativos y analíticos indicados en la consigna."
+      },
+      "referencias_logicas": [
+        "id_usuario -> PostgreSQL.usuario.id_usuario",
+        "parametros.id_cliente -> PostgreSQL.cliente.id_cliente"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_reportes_usuario_fecha",
+          "campos": {
+            "id_usuario": 1,
+            "fecha_solicitud": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_reportes_estado_fecha",
+          "campos": {
+            "estado": 1,
+            "fecha_solicitud": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_reportes_tipo_fecha",
+          "campos": {
+            "tipo": 1,
+            "fecha_generacion": -1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "reclamos": {
+      "descripcion": "Reclamos de clientes asociados a envíos con observaciones, adjuntos y seguimiento del caso.",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_cliente": "uuid_string",
+          "id_envio": "uuid_string|null",
+          "id_usuario_reportante": "uuid_string",
+          "tipo": "string",
+          "asunto": "string",
+          "descripcion": "string",
+          "prioridad": "string",
+          "estado": "string",
+          "fecha_creacion": "date",
+          "fecha_cierre": "date|null",
+          "adjuntos": "array<object{nombre:string,url:string,tipo_mime:string}>",
+          "comentarios": "array<object{id_usuario:uuid_string,fecha:date,mensaje:string}>",
+          "resolucion": "string|null",
+          "id_usuario_responsable": "uuid_string|null"
+        },
+        "requeridos": [
+          "_id",
+          "id_cliente",
+          "id_usuario_reportante",
+          "tipo",
+          "asunto",
+          "descripcion",
+          "prioridad",
+          "estado",
+          "fecha_creacion"
+        ]
+      },
+      "reglas_de_validacion": {
+        "prioridad": [
+          "BAJA",
+          "MEDIA",
+          "ALTA",
+          "URGENTE"
+        ],
+        "estado": [
+          "ABIERTO",
+          "EN_GESTION",
+          "RESUELTO",
+          "CERRADO"
+        ],
+        "fecha_cierre": "Se completa cuando se cierra el reclamo."
+      },
+      "referencias_logicas": [
+        "id_cliente -> PostgreSQL.cliente.id_cliente",
+        "id_envio -> PostgreSQL.envio.id_envio",
+        "id_usuario_reportante -> PostgreSQL.usuario.id_usuario",
+        "id_usuario_responsable -> PostgreSQL.usuario.id_usuario"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_reclamos_cliente_fecha",
+          "campos": {
+            "id_cliente": 1,
+            "fecha_creacion": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_reclamos_envio_fecha",
+          "campos": {
+            "id_envio": 1,
+            "fecha_creacion": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_reclamos_estado_prioridad",
+          "campos": {
+            "estado": 1,
+            "prioridad": 1
+          },
+          "unico": false
+        }
+      ]
+    },
+    "predicciones_riesgo": {
+      "descripcion": "Historial de predicciones de riesgo por envío para el análisis predictivo solicitado en el trabajo.",
+      "esquema": {
+        "campos": {
+          "_id": "objectId",
+          "id_envio": "uuid_string",
+          "fecha_calculo": "date",
+          "fecha_horizonte": "date",
+          "probabilidad_demora": "double (0..1)",
+          "riesgo_climatico": "string",
+          "riesgo_operativo": "string",
+          "retraso_estimado_minutos": "int32",
+          "factores": "array<object{nombre:string,peso:double,descripcion:string}>",
+          "modelo": "object{nombre:string,version:string}",
+          "recomendacion": "string"
+        },
+        "requeridos": [
+          "_id",
+          "id_envio",
+          "fecha_calculo",
+          "probabilidad_demora",
+          "riesgo_climatico",
+          "riesgo_operativo",
+          "modelo"
+        ]
+      },
+      "reglas_de_validacion": {
+        "probabilidad_demora": "Valor en [0,1].",
+        "riesgo_climatico": [
+          "BAJO",
+          "MEDIO",
+          "ALTO",
+          "CRITICO"
+        ],
+        "riesgo_operativo": [
+          "BAJO",
+          "MEDIO",
+          "ALTO",
+          "CRITICO"
+        ]
+      },
+      "referencias_logicas": [
+        "id_envio -> PostgreSQL.envio.id_envio"
+      ],
+      "indices": [
+        {
+          "nombre": "idx_predicciones_envio_fecha",
+          "campos": {
+            "id_envio": 1,
+            "fecha_calculo": -1
+          },
+          "unico": false
+        },
+        {
+          "nombre": "idx_predicciones_fecha",
+          "campos": {
+            "fecha_calculo": -1
+          },
+          "unico": false
+        }
+      ]
+    }
+  }
+}

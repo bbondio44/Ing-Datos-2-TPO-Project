@@ -1,0 +1,48 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: #172033;
+}
+.login-root, .app-root, .content { -fx-background-color: #f4f7fb; }
+.brand-panel, .sidebar { -fx-background-color: #13233f; }
+.brand-title { -fx-font-size: 38px; -fx-font-weight: 700; -fx-text-fill: white; }
+.brand-copy { -fx-font-size: 17px; -fx-line-spacing: 4px; -fx-text-fill: #cbd6e8; }
+.brand-footer, .sidebar-caption { -fx-text-fill: #91a4c2; }
+.eyebrow { -fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #69d5c5; }
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-padding: 34px;
+    -fx-effect: dropshadow(gaussian, rgba(31,49,78,0.14), 28, 0.12, 0, 8);
+}
+.screen-title { -fx-font-size: 29px; -fx-font-weight: 700; -fx-text-fill: #172033; }
+.muted, .status-label { -fx-text-fill: #66748a; }
+.field-label { -fx-font-weight: 600; -fx-text-fill: #34435a; }
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-border-color: #cfd8e6;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+    -fx-padding: 10px 12px;
+}
+.text-field:focused, .password-field:focused { -fx-border-color: #2779e2; }
+.button { -fx-cursor: hand; -fx-padding: 9px 16px; -fx-background-radius: 7px; }
+.primary-button { -fx-background-color: #1769d2; -fx-text-fill: white; -fx-font-weight: 700; }
+.primary-button:hover { -fx-background-color: #105ab9; }
+.secondary-button { -fx-background-color: #e7edf6; -fx-text-fill: #223451; -fx-font-weight: 600; }
+.error-label { -fx-text-fill: #ba2d3d; }
+.sidebar-brand { -fx-font-size: 21px; -fx-font-weight: 800; -fx-text-fill: white; }
+.sidebar .separator .line { -fx-border-color: #314464; }
+.nav-button, .nav-button-active {
+    -fx-alignment: CENTER_LEFT;
+    -fx-background-color: transparent;
+    -fx-text-fill: #b9c7db;
+    -fx-padding: 11px 12px;
+}
+.nav-button-active { -fx-background-color: #1d75d9; -fx-text-fill: white; -fx-font-weight: 700; }
+.sidebar-user { -fx-text-fill: white; -fx-font-weight: 600; }
+.table-view { -fx-background-color: white; -fx-background-radius: 10px; -fx-border-color: #dce3ee; -fx-border-radius: 10px; }
+.table-view .column-header-background { -fx-background-color: #eaf0f8; }
+.table-view .column-header { -fx-background-color: transparent; -fx-padding: 9px; }
+.table-row-cell { -fx-cell-size: 44px; -fx-border-color: transparent transparent #edf1f6 transparent; }
+

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ar.edu.uade.logistica.desktop.controller.LoginController" styleClass="login-root">
+    <left>
+        <VBox prefWidth="500" alignment="CENTER_LEFT" spacing="18" styleClass="brand-panel">
+            <padding><Insets top="70" right="60" bottom="70" left="60"/></padding>
+            <Label text="LOGÍSTICA INTERNACIONAL" styleClass="eyebrow"/>
+            <Label text="Control operativo y monitoreo IoT" wrapText="true" styleClass="brand-title"/>
+            <Label text="Envíos, telemetría, alertas y finanzas en una aplicación de escritorio segura." wrapText="true" styleClass="brand-copy"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label text="Ingeniería de Datos II · Grupo 4" styleClass="brand-footer"/>
+        </VBox>
+    </left>
+    <center>
+        <StackPane>
+            <VBox maxWidth="390" spacing="14" styleClass="login-card">
+                <Label text="Ingresar" styleClass="screen-title"/>
+                <Label text="Use un usuario habilitado por el administrador." styleClass="muted" wrapText="true"/>
+                <Label text="Email" styleClass="field-label"/>
+                <TextField fx:id="emailField" promptText="nombre@organizacion.com" onAction="#login"/>
+                <Label text="Contraseña" styleClass="field-label"/>
+                <PasswordField fx:id="passwordField" promptText="Contraseña" onAction="#login"/>
+                <Label fx:id="errorLabel" wrapText="true" styleClass="error-label" minHeight="22"/>
+                <HBox spacing="12" alignment="CENTER_RIGHT">
+                    <ProgressIndicator fx:id="progress" visible="false" prefWidth="28" prefHeight="28"/>
+                    <Button fx:id="loginButton" text="Iniciar sesión" onAction="#login" defaultButton="true" styleClass="primary-button"/>
+                </HBox>
+            </VBox>
+        </StackPane>
+    </center>
+</BorderPane>
+

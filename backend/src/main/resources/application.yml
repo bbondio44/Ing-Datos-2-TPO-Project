@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: logistica-iot-backend
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.neo4j.Neo4jAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    url: ${PG_JDBC_URL:jdbc:postgresql://localhost:5432/logistica}
+    username: ${PG_USERNAME:logistica}
+    password: ${PG_PASSWORD:logistica_dev}
+    hikari:
+      maximum-pool-size: ${PG_POOL_SIZE:8}
+      minimum-idle: 1
+      connection-timeout: 10000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${PG_SCHEMA:tp_logistica}
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: false
+    schemas: ${PG_SCHEMA:tp_logistica}
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${API_PORT:8080}
+  error:
+    include-message: never
+
+app:
+  session-ttl: ${APP_SESSION_TTL:PT8H}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  pattern:
+    level: "%5p [correlationId=%X{correlationId:-}]"
+  level:
+    ar.edu.uade.logistica: INFO
+

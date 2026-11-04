@@ -1,0 +1,81 @@
+name: logistica-iot-grupo4
+
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: logistica
+      POSTGRES_USER: logistica
+      POSTGRES_PASSWORD: logistica_dev
+      TZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logistica -d logistica"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mongodb:
+    image: mongo:8.0.4
+    profiles: ["polyglot"]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: logistica
+      MONGO_INITDB_ROOT_PASSWORD: logistica_dev
+      MONGO_INITDB_DATABASE: logistica_documental
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  cassandra:
+    image: cassandra:5.0.2
+    profiles: ["polyglot"]
+    environment:
+      CASSANDRA_CLUSTER_NAME: logistica-grupo4
+      CASSANDRA_DC: datacenter1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      MAX_HEAP_SIZE: 1024M
+      HEAP_NEWSIZE: 256M
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE CLUSTER'"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+
+  neo4j:
+    image: neo4j:5.26.5-community
+    profiles: ["polyglot"]
+    environment:
+      NEO4J_AUTH: neo4j/logistica_dev_neo4j
+      NEO4J_server_memory_heap_initial__size: 256m
+      NEO4J_server_memory_heap_max__size: 512m
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  postgres_data:
+  mongo_data:
+  cassandra_data:
+  neo4j_data:
+
