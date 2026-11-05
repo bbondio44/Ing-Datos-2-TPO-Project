@@ -245,6 +245,8 @@ def exportar_mongosh() -> str:
         "// Re-ejecutable: si la colección existe se actualiza el validador (collMod).",
         "// =====================================================================",
         "",
+        "// FUERA DE CLASE: validador $jsonSchema (collMod). Se usa para que MongoDB rechace documentos",
+        "// inválidos (D03), porque no tiene CHECK ni FK. Alternativa vista: validar solo en la aplicación.",
         "const existentes = db.getCollectionNames();",
         "function asegurarColeccion(nombre, esquema) {",
         "  const opciones = { validator: { $jsonSchema: esquema }, validationLevel: 'strict', validationAction: 'error' };",

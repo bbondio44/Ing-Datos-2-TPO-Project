@@ -352,6 +352,8 @@ def a_js(pasos: list[Paso]) -> str:
         "// Uso: mongosh \"mongodb://localhost:27017/logistica_docs\" mongodb/03_consultas.js",
         "// Correr después de 01_schema.js y 02_datos_prueba.js. Cada paso imprime OK/FALLA",
         "// comparando el resultado obtenido contra el esperado (sirve como evidencia).",
+        "// FUERA DE CLASE: aggregate ($match, $group, $lookup), $setOnInsert, $addToSet, $pull. Solo en estas",
+        "// consultas de verificación, para contar y cruzar colecciones; la aplicación no los usa.",
         "// Las pruebas de escritura (R09, R40) limpian lo que crean, se puede repetir.",
         "// =====================================================================",
         "",

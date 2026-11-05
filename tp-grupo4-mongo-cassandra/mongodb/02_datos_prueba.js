@@ -4,6 +4,8 @@
 // Re-ejecutable: cada documento se carga con replaceOne(upsert) por _id ->
 // vuelve el dataset a su estado inicial sin duplicar ni borrar otros datos.
 // Las referencias (id_envio, id_sensor, id_cliente, ...) son los UUID de catalogo_ids.csv.
+// FUERA DE CLASE: replaceOne y bulkWrite. Solo en esta carga: reponen el dataset sin duplicar.
+// Alternativa vista: updateOne con {upsert: true}, documento por documento.
 // "Ahora" de referencia de la demo: 2026-10-22 23:30 UTC
 // =====================================================================
 
