@@ -13,6 +13,14 @@ import ar.edu.uade.logistica.contracts.master.LocationRequest;
 import ar.edu.uade.logistica.contracts.master.LocationResponse;
 import ar.edu.uade.logistica.contracts.master.VehicleRequest;
 import ar.edu.uade.logistica.contracts.master.VehicleResponse;
+import ar.edu.uade.logistica.contracts.alertas.AlertaResponse;
+import ar.edu.uade.logistica.contracts.alertas.CambioEstadoAlertaRequest;
+import ar.edu.uade.logistica.contracts.alertas.MonitoreoEnvioResponse;
+import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaRequest;
+import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaResponse;
+import ar.edu.uade.logistica.contracts.mensajeria.ConversacionResponse;
+import ar.edu.uade.logistica.contracts.mensajeria.MensajeRequest;
+import ar.edu.uade.logistica.contracts.mensajeria.MensajeResponse;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
 import ar.edu.uade.logistica.contracts.iot.PosicionResponse;
 import ar.edu.uade.logistica.contracts.iot.SensorEstadoResponse;
@@ -144,6 +152,49 @@ public class ApiClient {
     public CompletableFuture<List<PosicionResponse>> route(UUID containerId, Instant from, Instant to) {
         return send("GET", "/api/v1/iot/contenedores/" + containerId + "/recorrido" + range(from, to), null,
                 new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<AlertaResponse>> alerts(String state) {
+        String filter = state == null || state.isBlank() ? "" : "?estado=" + state;
+        return send("GET", "/api/v1/alertas" + filter, null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<Void> acknowledgeAlert(String id) {
+        return send("POST", "/api/v1/alertas/" + id + "/reconocer", new CambioEstadoAlertaRequest(null), Void.class, true);
+    }
+
+    public CompletableFuture<Void> closeAlert(String id) {
+        return send("POST", "/api/v1/alertas/" + id + "/cerrar", new CambioEstadoAlertaRequest(null), Void.class, true);
+    }
+
+    public CompletableFuture<List<ReglaAlertaResponse>> alertRules() {
+        return send("GET", "/api/v1/reglas", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<ReglaAlertaResponse> createAlertRule(ReglaAlertaRequest rule) {
+        return send("POST", "/api/v1/reglas", rule, ReglaAlertaResponse.class, true);
+    }
+
+    public CompletableFuture<Void> deactivateAlertRule(UUID id) {
+        return send("DELETE", "/api/v1/reglas/" + id, null, Void.class, true);
+    }
+
+    public CompletableFuture<MonitoreoEnvioResponse> shipmentMonitoring(UUID id) {
+        return send("GET", "/api/v1/monitoreo/envios/" + id, null, MonitoreoEnvioResponse.class, true);
+    }
+
+    public CompletableFuture<List<ConversacionResponse>> conversations() {
+        return send("GET", "/api/v1/mensajeria/conversaciones", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<MensajeResponse>> messages(String conversationId) {
+        return send("GET", "/api/v1/mensajeria/conversaciones/" + conversationId + "/mensajes", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<MensajeResponse> sendMessage(String conversationId, String text) {
+        return send("POST", "/api/v1/mensajeria/conversaciones/" + conversationId + "/mensajes",
+                new MensajeRequest(UUID.randomUUID(), text), MensajeResponse.class, true);
     }
 
     private String range(Instant from, Instant to) {

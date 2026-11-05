@@ -17,7 +17,7 @@
             <Button text="Vehículos" onAction="#showVehicles" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Envíos" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Button text="Monitoreo IoT" onAction="#showIotMonitoring" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Alertas" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Alertas" onAction="#showOperations" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Facturación" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Button text="Reportes" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Region VBox.vgrow="ALWAYS"/>
