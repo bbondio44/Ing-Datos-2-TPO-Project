@@ -42,6 +42,10 @@ $env:APP_BOOTSTRAP_ADMIN_PASSWORD='una-clave-larga-y-unica'
 
 El bootstrap no contiene una contraseña predeterminada. Si las variables no están definidas, no crea usuarios. La carga de datos de demostración es opt-in y nunca se ejecuta contra Supabase de forma automática.
 
+## Arranque rápido
+
+Con Docker Desktop abierto y el JDK 21 instalado, hacer doble clic en `iniciar.bat`. La primera vez crea el `.env` con claves propias y muestra el usuario para entrar. Levanta las cuatro bases, carga los datos si están vacías, arranca el backend y abre la aplicación. Al cerrar la aplicación se apaga el backend; las bases se apagan con `docker compose stop`.
+
 ## Arranque con las cuatro bases
 
 1. Copiar `.env.example` a `.env` y completar las claves. `MONGO_URI` va sin comillas y con la misma clave que `MONGO_PASSWORD`.
@@ -74,7 +78,7 @@ mvn -pl simulator exec:java "-Dexec.mainClass=ar.edu.uade.logistica.simulator.Io
 
 Las pruebas de aceptación contra las bases reales están en `scripts/pruebas`, y los pasos manuales por requisito en `docs/notas-testing-persona2.md`.
 
-Las tareas de Persona 1 y sus casos de aceptación están detallados en [docs/requisitos-persona1.md](docs/requisitos-persona1.md). La facturación automática programada se habilita con `APP_BILLING_AUTO_ENABLED=true`; también puede ejecutarse manualmente desde la pantalla de Facturación.
+Las tareas de Persona 1 y sus casos de aceptación están detallados en [docs/requisitos-persona1.md](docs/requisitos-persona1.md). La facturación automática programada se habilita con `APP_BILLING_AUTO_ENABLED=true`; también puede ejecutarse manualmente desde la pantalla de Facturación. El cierre mensual programado se habilita con `APP_CIERRE_AUTO_ENABLED=true` y corre el primer día de cada mes; también está el botón "Cerrar todas las cuentas".
 
 ## Validación
 
