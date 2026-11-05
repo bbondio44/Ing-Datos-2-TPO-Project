@@ -10,11 +10,14 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ar.edu.uade.logistica.alertas.AlertaMongoRepository;
+import ar.edu.uade.logistica.alertas.EventoDesdeOutbox;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.SessionConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,8 +26,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Patrón outbox: cada cambio en PostgreSQL deja una fila en outbox_evento dentro de la misma transacción.
- * Este worker la lee, actualiza Neo4j y la marca procesada. Si Neo4j está caído no se pierde nada: el
- * evento queda en ERROR con un próximo intento. Es consistencia eventual: el grafo se pone al día después.
+ * Este worker la lee, actualiza Neo4j, registra en MongoDB el evento logístico si cambió un estado y la
+ * marca procesada. Si un motor está caído no se pierde nada: el evento queda en ERROR con un próximo
+ * intento. Es consistencia eventual: el grafo y el historial se ponen al día después.
  */
 @Component
 @ConditionalOnProperty(prefix = "app.neo4j", name = "enabled", havingValue = "true")
@@ -37,6 +41,10 @@ public class OutboxNeo4jWorker {
             "Cliente", "id_cliente", "Envio", "id_envio", "Contenedor", "id_contenedor", "Tramo", "id_tramo",
             "Ubicacion", "id_ubicacion", "Vehiculo", "id_vehiculo", "Operador", "id_operador",
             "Incidente", "id_incidente");
+    private static final List<String> INDICES = List.of(
+            "CREATE INDEX envio_estado IF NOT EXISTS FOR (n:Envio) ON (n.estado)",
+            "CREATE INDEX tramo_medio IF NOT EXISTS FOR (n:Tramo) ON (n.medio_transporte)",
+            "CREATE INDEX incidente_tipo IF NOT EXISTS FOR (n:Incidente) ON (n.tipo)");
 
     // FOR UPDATE SKIP LOCKED: bloqueo exclusivo por fila; un segundo worker salta las filas ya tomadas.
     // El NOT EXISTS mantiene el orden por entidad: si un evento anterior de la misma entidad sigue sin
@@ -62,13 +70,16 @@ public class OutboxNeo4jWorker {
     private final Driver driver;
     private final String database;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectProvider<AlertaMongoRepository> eventos;
     private boolean preparado;
 
     public OutboxNeo4jWorker(JdbcTemplate jdbcTemplate, Driver driver,
-                             @Value("${app.neo4j.database:neo4j}") String database) {
+                             @Value("${app.neo4j.database:neo4j}") String database,
+                             ObjectProvider<AlertaMongoRepository> eventos) {
         this.jdbcTemplate = jdbcTemplate;
         this.driver = driver;
         this.database = database;
+        this.eventos = eventos;
     }
 
     @Scheduled(fixedDelayString = "${app.outbox.intervalo-ms:5000}", initialDelayString = "${app.outbox.intervalo-ms:5000}")
@@ -100,6 +111,7 @@ public class OutboxNeo4jWorker {
             RESTRICCIONES.forEach((etiqueta, propiedad) -> session.run("CREATE CONSTRAINT "
                     + etiqueta.toLowerCase() + "_id IF NOT EXISTS FOR (n:" + etiqueta + ") REQUIRE n." + propiedad
                     + " IS UNIQUE").consume());
+            INDICES.forEach(indice -> session.run(indice).consume());
         }
         preparado = true;
     }
@@ -117,11 +129,17 @@ public class OutboxNeo4jWorker {
         Map<String, Object> payload = mapper.readValue(evento.payload(), new TypeReference<>() { });
         List<ProyeccionGrafo.Sentencia> sentencias =
                 ProyeccionGrafo.sentencias(evento.agregado(), evento.tipo(), payload);
-        if (sentencias.isEmpty()) return;
-        // Una transacción por evento: o se aplica entero o no se aplica.
-        try (Session session = driver.session(SessionConfig.forDatabase(database))) {
-            session.executeWriteWithoutResult(transaccion -> sentencias.forEach(
-                    sentencia -> transaccion.run(sentencia.cypher(), sentencia.parametros()).consume()));
+        if (!sentencias.isEmpty()) {
+            // Una transacción por evento: o se aplica entero o no se aplica.
+            try (Session session = driver.session(SessionConfig.forDatabase(database))) {
+                session.executeWriteWithoutResult(transaccion -> sentencias.forEach(
+                        sentencia -> transaccion.run(sentencia.cypher(), sentencia.parametros()).consume()));
+            }
+        }
+        AlertaMongoRepository mongo = eventos.getIfAvailable();
+        if (mongo != null) {
+            EventoDesdeOutbox.desde(evento.agregado(), evento.tipo(), payload)
+                    .ifPresent(cambio -> mongo.registrarCambio(cambio, evento.fecha(), evento.id().toString()));
         }
     }
 

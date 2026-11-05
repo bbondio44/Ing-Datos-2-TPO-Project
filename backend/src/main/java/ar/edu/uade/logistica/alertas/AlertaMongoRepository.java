@@ -125,6 +125,33 @@ public class AlertaMongoRepository {
         insertarSiNoExiste(eventos, evento);
     }
 
+    /**
+     * Registra el evento de un cambio de estado. Si ya hay uno de ese tipo para el envío o tramo no agrega
+     * otro: una edición que no cambia el estado, o reprocesar el outbox, no ensucian el historial.
+     *
+     * @return true si escribió un evento nuevo.
+     */
+    public boolean registrarCambio(EventoDesdeOutbox.Cambio cambio, Instant fecha, String correlacion) {
+        Bson mismo = cambio.idTramo() == null
+                ? and(eq("id_envio", cambio.idEnvio()), eq("tipo", cambio.tipo()))
+                : and(eq("id_tramo", cambio.idTramo()), eq("tipo", cambio.tipo()));
+        if (ejecutar(() -> eventos.find(mismo).first()) != null) return false;
+        Document ubicacion = new Document("nombre", cambio.lugar());
+        if (cambio.pais() != null) ubicacion.append("pais", cambio.pais());
+        Date momento = Date.from(fecha);
+        return insertarSiNoExiste(eventos, new Document("_id", cambio.id())
+                .append("id_envio", cambio.idEnvio())
+                .append("id_tramo", cambio.idTramo())
+                .append("tipo", cambio.tipo())
+                .append("fecha", momento)
+                .append("ubicacion", ubicacion)
+                .append("descripcion", cambio.descripcion())
+                .append("payload", new Document("estado", cambio.estado()))
+                .append("origen", "SISTEMA")
+                .append("id_correlacion", correlacion)
+                .append("creado_en", momento));
+    }
+
     public List<AlertaResponse> listar(String estado, String idCliente) {
         List<Bson> filtros = new ArrayList<>();
         if (estado != null && !estado.isBlank()) filtros.add(eq("estado", estado));
