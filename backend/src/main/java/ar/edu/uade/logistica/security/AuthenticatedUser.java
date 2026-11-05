@@ -7,6 +7,8 @@ import java.util.UUID;
 public record AuthenticatedUser(
         UUID userId,
         UUID clientId,
+        UUID supplierId,
+        UUID operatorId,
         String email,
         String displayName,
         Set<String> roles,

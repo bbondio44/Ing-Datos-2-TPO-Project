@@ -10,7 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -20,7 +23,9 @@ public class AdminBootstrapRunner implements ApplicationRunner {
             "CLIENTES_LEER_TODOS", "CLIENTES_ESCRIBIR", "SESIONES_GESTIONAR_TODAS",
             "PROVEEDORES_LEER", "PROVEEDORES_ESCRIBIR", "OPERADORES_LEER", "OPERADORES_ESCRIBIR",
             "MAESTROS_LEER", "MAESTROS_ESCRIBIR", "ENVIOS_LEER_TODOS", "ENVIOS_ESCRIBIR",
-            "LOGISTICA_LEER", "LOGISTICA_ESCRIBIR");
+            "LOGISTICA_LEER", "LOGISTICA_ESCRIBIR", "USUARIOS_GESTIONAR", "ROLES_GESTIONAR",
+            "FINANZAS_LEER", "FINANZAS_LEER_TODAS", "FINANZAS_ESCRIBIR",
+            "REPORTES_LEER", "REPORTES_LEER_TODOS");
 
     private final Environment environment;
     private final JdbcTemplate jdbcTemplate;
@@ -37,6 +42,7 @@ public class AdminBootstrapRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        transactionTemplate.executeWithoutResult(status -> ensureSecurityCatalog());
         String email = environment.getProperty("APP_BOOTSTRAP_ADMIN_EMAIL");
         String password = environment.getProperty("APP_BOOTSTRAP_ADMIN_PASSWORD");
         if (email == null || email.isBlank()) return;
@@ -44,6 +50,44 @@ public class AdminBootstrapRunner implements ApplicationRunner {
             throw new IllegalStateException("APP_BOOTSTRAP_ADMIN_PASSWORD debe tener al menos 12 caracteres");
         }
         transactionTemplate.executeWithoutResult(status -> bootstrap(email.strip().toLowerCase(), password));
+    }
+
+    private void ensureSecurityCatalog() {
+        for (String code : PERMISSIONS) {
+            jdbcTemplate.update("""
+                    INSERT INTO tp_logistica.permiso(id_permiso, codigo, descripcion)
+                    VALUES (?, ?, ?) ON CONFLICT (codigo) DO NOTHING
+                    """, UUID.randomUUID(), code, "Permiso " + code);
+        }
+
+        Map<String, Set<String>> roles = new LinkedHashMap<>();
+        roles.put("ADMIN", Set.copyOf(PERMISSIONS));
+        roles.put("OPERADOR", Set.of(
+                "CLIENTES_LEER_TODOS", "PROVEEDORES_LEER", "OPERADORES_LEER", "MAESTROS_LEER",
+                "MAESTROS_ESCRIBIR", "ENVIOS_LEER_TODOS", "ENVIOS_ESCRIBIR", "LOGISTICA_LEER",
+                "LOGISTICA_ESCRIBIR", "FINANZAS_LEER", "FINANZAS_LEER_TODAS", "FINANZAS_ESCRIBIR",
+                "REPORTES_LEER", "REPORTES_LEER_TODOS"));
+        roles.put("CLIENTE", Set.of("FINANZAS_LEER", "REPORTES_LEER"));
+        roles.put("PROVEEDOR", Set.of("FINANZAS_LEER"));
+        roles.put("TRANSPORTISTA", Set.of("FINANZAS_LEER", "LOGISTICA_LEER"));
+
+        int level = 100;
+        for (Map.Entry<String, Set<String>> entry : roles.entrySet()) {
+            jdbcTemplate.update("""
+                    INSERT INTO tp_logistica.rol(id_rol, descripcion, nivel_permisos)
+                    VALUES (?, ?, ?) ON CONFLICT (descripcion) DO NOTHING
+                    """, UUID.randomUUID(), entry.getKey(), level);
+            UUID roleId = jdbcTemplate.queryForObject(
+                    "SELECT id_rol FROM tp_logistica.rol WHERE descripcion=?", UUID.class, entry.getKey());
+            for (String code : entry.getValue()) {
+                jdbcTemplate.update("""
+                        INSERT INTO tp_logistica.rol_permiso(id_rol,id_permiso)
+                        SELECT ?, id_permiso FROM tp_logistica.permiso WHERE codigo=?
+                        ON CONFLICT DO NOTHING
+                        """, roleId, code);
+            }
+            level = Math.max(10, level - 20);
+        }
     }
 
     private void bootstrap(String email, String password) {

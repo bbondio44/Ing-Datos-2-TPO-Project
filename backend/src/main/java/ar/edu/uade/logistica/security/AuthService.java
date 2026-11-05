@@ -24,7 +24,8 @@ import java.util.UUID;
 @Service
 public class AuthService {
     private static final String USER_SQL = """
-            SELECT id_usuario, id_cliente, nombre, apellido, email, password_hash
+            SELECT id_usuario, id_cliente, id_proveedor, id_operador,
+                   nombre, apellido, email, password_hash
               FROM tp_logistica.usuario
              WHERE lower(email) = lower(?) AND estado = 'ACTIVO'
             """;
@@ -70,7 +71,7 @@ public class AuthService {
                 WHERE ur.id_usuario = ? ORDER BY p.codigo
                 """, String.class, user.id()));
 
-        return new LoginResponse(token, expiresAt, user.id(), user.clientId(),
+        return new LoginResponse(token, expiresAt, user.id(), user.clientId(), user.supplierId(), user.operatorId(),
                 (user.firstName() + " " + user.lastName()).strip(), roles, permissions);
     }
 
@@ -124,11 +125,14 @@ public class AuthService {
         return new UserRow(
                 rs.getObject("id_usuario", UUID.class),
                 rs.getObject("id_cliente", UUID.class),
+                rs.getObject("id_proveedor", UUID.class),
+                rs.getObject("id_operador", UUID.class),
                 rs.getString("nombre"), rs.getString("apellido"), rs.getString("email"),
                 rs.getString("password_hash"));
     }
 
-    private record UserRow(UUID id, UUID clientId, String firstName, String lastName,
+    private record UserRow(UUID id, UUID clientId, UUID supplierId, UUID operatorId,
+                           String firstName, String lastName,
                            String email, String passwordHash) {
     }
 }

@@ -5,8 +5,16 @@ import ar.edu.uade.logistica.contracts.PageResponse;
 import ar.edu.uade.logistica.contracts.auth.LoginRequest;
 import ar.edu.uade.logistica.contracts.auth.LoginResponse;
 import ar.edu.uade.logistica.contracts.auth.SessionResponse;
+import ar.edu.uade.logistica.contracts.admin.RoleRequest;
+import ar.edu.uade.logistica.contracts.admin.RoleResponse;
+import ar.edu.uade.logistica.contracts.admin.PermissionResponse;
+import ar.edu.uade.logistica.contracts.admin.UserRequest;
+import ar.edu.uade.logistica.contracts.admin.UserResponse;
+import ar.edu.uade.logistica.contracts.admin.UserStateRequest;
 import ar.edu.uade.logistica.contracts.client.ClientRequest;
 import ar.edu.uade.logistica.contracts.client.ClientResponse;
+import ar.edu.uade.logistica.contracts.finance.*;
+import ar.edu.uade.logistica.contracts.logistics.*;
 import ar.edu.uade.logistica.contracts.organization.OrganizationRequest;
 import ar.edu.uade.logistica.contracts.organization.OrganizationResponse;
 import ar.edu.uade.logistica.contracts.master.LocationRequest;
@@ -27,6 +35,9 @@ import ar.edu.uade.logistica.contracts.mensajeria.MensajeResponse;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
 import ar.edu.uade.logistica.contracts.iot.PosicionResponse;
 import ar.edu.uade.logistica.contracts.iot.SensorEstadoResponse;
+import ar.edu.uade.logistica.contracts.report.*;
+import ar.edu.uade.logistica.contracts.route.RouteLegRequest;
+import ar.edu.uade.logistica.contracts.route.RouteLegResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -238,8 +249,208 @@ public class ApiClient {
                 + "&hasta=" + URLEncoder.encode(to.toString(), StandardCharsets.UTF_8);
     }
 
+    public CompletableFuture<PageResponse<UserResponse>> users(String search) {
+        String encoded = encode(search);
+        return send("GET", "/api/v1/admin/usuarios?buscar=" + encoded + "&pagina=0&tamanio=100", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<RoleResponse>> roles() {
+        return send("GET", "/api/v1/admin/roles", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<PermissionResponse>> permissions() {
+        return send("GET", "/api/v1/admin/permisos", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<UserResponse> createUser(UserRequest request) {
+        return send("POST", "/api/v1/admin/usuarios", request, UserResponse.class, true);
+    }
+
+    public CompletableFuture<UserResponse> updateUser(UUID id, UserRequest request) {
+        return send("PUT", "/api/v1/admin/usuarios/" + id, request, UserResponse.class, true);
+    }
+
+    public CompletableFuture<UserResponse> changeUserState(UUID id, String state) {
+        return send("PATCH", "/api/v1/admin/usuarios/" + id + "/estado", new UserStateRequest(state),
+                UserResponse.class, true);
+    }
+
+    public CompletableFuture<RoleResponse> createRole(RoleRequest request) {
+        return send("POST", "/api/v1/admin/roles", request, RoleResponse.class, true);
+    }
+
+    public CompletableFuture<RoleResponse> updateRole(UUID id, RoleRequest request) {
+        return send("PUT", "/api/v1/admin/roles/" + id, request, RoleResponse.class, true);
+    }
+
+    public CompletableFuture<Void> deleteRole(UUID id) {
+        return send("DELETE", "/api/v1/admin/roles/" + id, null, Void.class, true);
+    }
+
+    public CompletableFuture<PageResponse<ShipmentResponse>> shipments(String search) {
+        return send("GET", "/api/v1/envios?buscar=" + encode(search) + "&pagina=0&tamanio=100", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<ShipmentDetailResponse> shipment(UUID id) {
+        return send("GET", "/api/v1/envios/" + id, null, ShipmentDetailResponse.class, true);
+    }
+
+    public CompletableFuture<ShipmentResponse> createShipment(ShipmentRequest request) {
+        return send("POST", "/api/v1/envios", request, ShipmentResponse.class, true);
+    }
+
+    public CompletableFuture<ShipmentResponse> updateShipment(UUID id, ShipmentRequest request) {
+        return send("PUT", "/api/v1/envios/" + id, request, ShipmentResponse.class, true);
+    }
+
+    public CompletableFuture<ShipmentResponse> changeShipmentState(UUID id, ShipmentStateRequest request) {
+        return send("PATCH", "/api/v1/envios/" + id + "/estado", request, ShipmentResponse.class, true);
+    }
+
+    public CompletableFuture<PageResponse<ContainerResponse>> containers(String search) {
+        return send("GET", "/api/v1/contenedores?buscar=" + encode(search) + "&pagina=0&tamanio=100", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<ContainerResponse> createContainer(ContainerRequest request) {
+        return send("POST", "/api/v1/contenedores", request, ContainerResponse.class, true);
+    }
+
+    public CompletableFuture<ContainerResponse> updateContainer(UUID id, ContainerRequest request) {
+        return send("PUT", "/api/v1/contenedores/" + id, request, ContainerResponse.class, true);
+    }
+
+    public CompletableFuture<PageResponse<SensorResponse>> sensors(String search) {
+        return send("GET", "/api/v1/sensores?buscar=" + encode(search) + "&pagina=0&tamanio=100", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<SensorResponse> createSensor(SensorRequest request) {
+        return send("POST", "/api/v1/sensores", request, SensorResponse.class, true);
+    }
+
+    public CompletableFuture<SensorResponse> updateSensor(UUID id, SensorRequest request) {
+        return send("PUT", "/api/v1/sensores/" + id, request, SensorResponse.class, true);
+    }
+
+    public CompletableFuture<List<ContainerAssignmentResponse>> shipmentContainers(UUID shipmentId) {
+        return send("GET", "/api/v1/envios/" + shipmentId + "/contenedores", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<ContainerAssignmentResponse> assignContainer(
+            UUID shipmentId, ContainerAssignmentRequest request) {
+        return send("POST", "/api/v1/envios/" + shipmentId + "/contenedores", request,
+                ContainerAssignmentResponse.class, true);
+    }
+
+    public CompletableFuture<Void> unassignContainer(UUID shipmentId, UUID containerId, Instant startAt) {
+        return send("DELETE", "/api/v1/envios/" + shipmentId + "/contenedores/" + containerId
+                + "?inicio=" + encode(startAt.toString()), null, Void.class, true);
+    }
+
+    public CompletableFuture<List<SensorAssignmentResponse>> containerSensors(UUID containerId, Instant at) {
+        String query = at == null ? "" : "?fecha=" + encode(at.toString());
+        return send("GET", "/api/v1/contenedores/" + containerId + "/sensores" + query, null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<SensorAssignmentResponse> assignSensor(SensorAssignmentRequest request) {
+        return send("POST", "/api/v1/asignaciones-sensor", request, SensorAssignmentResponse.class, true);
+    }
+
+    public CompletableFuture<Void> unassignSensor(UUID assignmentId) {
+        return send("DELETE", "/api/v1/asignaciones-sensor/" + assignmentId, null, Void.class, true);
+    }
+
+    public CompletableFuture<List<RouteLegResponse>> routeLegs(UUID shipmentId) {
+        return send("GET", "/api/v1/trayectos?envioId=" + shipmentId, null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<RouteLegResponse> createRouteLeg(RouteLegRequest request) {
+        return send("POST", "/api/v1/trayectos", request, RouteLegResponse.class, true);
+    }
+
+    public CompletableFuture<RouteLegResponse> updateRouteLeg(UUID id, RouteLegRequest request) {
+        return send("PUT", "/api/v1/trayectos/" + id, request, RouteLegResponse.class, true);
+    }
+
+    public CompletableFuture<Void> deleteRouteLeg(UUID id) {
+        return send("DELETE", "/api/v1/trayectos/" + id, null, Void.class, true);
+    }
+
+    public CompletableFuture<List<AccountResponse>> accounts() {
+        return send("GET", "/api/v1/finanzas/cuentas", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<InvoiceResponse>> invoices(UUID accountId) {
+        String query = accountId == null ? "" : "?cuentaId=" + accountId;
+        return send("GET", "/api/v1/finanzas/facturas" + query, null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<InvoiceResponse> createInvoice(InvoiceRequest request) {
+        return send("POST", "/api/v1/finanzas/facturas", request, InvoiceResponse.class, true);
+    }
+
+    public CompletableFuture<InvoiceResponse> issueInvoice(UUID id) {
+        return send("POST", "/api/v1/finanzas/facturas/" + id + "/emitir", null, InvoiceResponse.class, true);
+    }
+
+    public CompletableFuture<PaymentResponse> registerPayment(UUID invoiceId, PaymentRequest request) {
+        return send("POST", "/api/v1/finanzas/facturas/" + invoiceId + "/pagos", request,
+                PaymentResponse.class, true);
+    }
+
+    public CompletableFuture<AccountCloseResponse> closeAccount(UUID accountId, CloseAccountRequest request) {
+        return send("POST", "/api/v1/finanzas/cuentas/" + accountId + "/cierres", request,
+                AccountCloseResponse.class, true);
+    }
+
+    public CompletableFuture<List<TariffResponse>> tariffs() {
+        return send("GET", "/api/v1/finanzas/tarifas", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<AutomaticInvoiceResponse> runAutomaticBilling(UUID tariffId) {
+        return send("POST", "/api/v1/finanzas/facturacion-automatica", new AutomaticInvoiceRequest(tariffId),
+                AutomaticInvoiceResponse.class, true);
+    }
+
+    public CompletableFuture<List<ShipmentReportResponse>> shipmentReport(
+            String country, String state, Boolean delayed, Boolean openIncidents) {
+        String path = "/api/v1/reportes/envios?pais=" + encode(country) + "&estado=" + encode(state);
+        if (delayed != null) path += "&demorado=" + delayed;
+        if (openIncidents != null) path += "&incidentesAbiertos=" + openIncidents;
+        return send("GET", path, null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<ClientDeliveryTimeResponse>> clientDeliveryTimes() {
+        return send("GET", "/api/v1/reportes/tiempos-entrega-clientes", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<IncidentAverageResponse>> incidentAverages() {
+        return send("GET", "/api/v1/reportes/promedio-incidentes", null,
+                new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<DeliveryAverageResponse> deliveryAverage() {
+        return send("GET", "/api/v1/reportes/tiempo-promedio-entrega", null,
+                DeliveryAverageResponse.class, true);
+    }
+
+    public CompletableFuture<List<TransportCostResponse>> transportCosts() {
+        return send("GET", "/api/v1/reportes/costos-transporte", null,
+                new TypeReference<>() {}, true);
+    }
+
     public CompletableFuture<Void> logout() {
         return send("POST", "/api/v1/auth/logout", null, Void.class, true).thenApply(ignored -> null);
+    }
+
+    private static String encode(String value) {
+        return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
     }
 
     private <T> CompletableFuture<T> send(String method, String path, Object body, Class<T> responseType, boolean auth) {

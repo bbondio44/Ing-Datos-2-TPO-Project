@@ -16,17 +16,29 @@ El repositorio está en construcción por fases. El estado verificable y las bre
 
 ## Arranque local
 
-1. Iniciar PostgreSQL vacío con `docker compose -f infra/docker-compose.yml up -d postgres`.
-2. Definir un administrador inicial solo para el primer arranque:
+1. Crear el archivo local de secretos y reemplazar todos los valores de ejemplo:
 
 ```powershell
+Copy-Item .env.example .env
+```
+
+2. Iniciar los cuatro motores desde el único Compose:
+
+```powershell
+docker compose --env-file .env -f infra/docker-compose.yml up -d
+```
+
+3. Cargar en la consola las variables de PostgreSQL del mismo `.env` y definir un administrador inicial solo para el primer arranque:
+
+```powershell
+$env:PG_PASSWORD='el-mismo-secreto-de-POSTGRES_PASSWORD'
 $env:APP_BOOTSTRAP_ADMIN_EMAIL='admin@grupo4.local'
 $env:APP_BOOTSTRAP_ADMIN_PASSWORD='una-clave-larga-y-unica'
 ```
 
-3. Instalar los módulos locales una vez con `./mvnw.cmd install -DskipTests`.
-4. Ejecutar `./mvnw.cmd -pl backend spring-boot:run`.
-5. En otra consola ejecutar `./mvnw.cmd -pl desktop javafx:run`.
+4. Instalar los módulos locales una vez con `./mvnw.cmd install -DskipTests`.
+5. Ejecutar `./mvnw.cmd -pl backend spring-boot:run`.
+6. En otra consola ejecutar `./mvnw.cmd -pl desktop javafx:run`.
 
 El bootstrap no contiene una contraseña predeterminada. Si las variables no están definidas, no crea usuarios. La carga de datos de demostración es opt-in y nunca se ejecuta contra Supabase de forma automática.
 
@@ -38,7 +50,7 @@ El bootstrap no contiene una contraseña predeterminada. Si las variables no est
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\cargar-postgres.ps1
-powershell -ExecutionPolicy Bypass -File .	p-grupo4-mongo-cassandra\cargar_todo.ps1
+powershell -ExecutionPolicy Bypass -File .\tp-grupo4-mongo-cassandra\cargar_todo.ps1
 ```
 
 4. Compilar con `mvn -B -DskipTests install`.
@@ -61,6 +73,8 @@ mvn -pl simulator exec:java "-Dexec.mainClass=ar.edu.uade.logistica.simulator.Io
 ```
 
 Las pruebas de aceptación contra las bases reales están en `scripts/pruebas`, y los pasos manuales por requisito en `docs/notas-testing-persona2.md`.
+
+Las tareas de Persona 1 y sus casos de aceptación están detallados en [docs/requisitos-persona1.md](docs/requisitos-persona1.md). La facturación automática programada se habilita con `APP_BILLING_AUTO_ENABLED=true`; también puede ejecutarse manualmente desde la pantalla de Facturación.
 
 ## Validación
 

@@ -17,7 +17,7 @@ spring:
   datasource:
     url: ${PG_JDBC_URL:jdbc:postgresql://localhost:5432/logistica}
     username: ${PG_USERNAME:logistica}
-    password: ${PG_PASSWORD:logistica_dev}
+    password: ${PG_PASSWORD}
     hikari:
       maximum-pool-size: ${PG_POOL_SIZE:8}
       minimum-idle: 1
@@ -44,6 +44,10 @@ server:
 
 app:
   session-ttl: ${APP_SESSION_TTL:PT8H}
+  billing:
+    auto-enabled: ${APP_BILLING_AUTO_ENABLED:false}
+    cron: ${APP_BILLING_CRON:0 0 2 * * *}
+    zone: ${APP_BILLING_ZONE:America/Buenos_Aires}
 
 management:
   endpoints:

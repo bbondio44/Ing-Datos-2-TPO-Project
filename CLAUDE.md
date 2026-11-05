@@ -36,7 +36,7 @@ Los 40 requisitos, su prueba de aceptación, el estado de cada uno y la definici
 - Levantar bases: `docker compose up -d`
 - Estado de las bases: `docker compose ps`
 - Cargar PostgreSQL desde cero: `powershell -ExecutionPolicy Bypass -File .\scripts\cargar-postgres.ps1`
-- Cargar MongoDB y Cassandra: `powershell -ExecutionPolicy Bypass -File .	p-grupo4-mongo-cassandra\cargar_todo.ps1`
+- Cargar MongoDB y Cassandra: `powershell -ExecutionPolicy Bypass -File .\tp-grupo4-mongo-cassandra\cargar_todo.ps1`
 - Build: `mvn -B -DskipTests install`
 - Tests: `mvn -B test`
 - Backend: `$env:SPRING_PROFILES_ACTIVE='dev,polyglot'; mvn -pl backend spring-boot:run`

@@ -5,6 +5,8 @@ Cumplimiento (qué desarrollar y prueba de aceptación) y auditoría de código 
 (commit 56354b9). El **estado** es una foto de ese día: verificar contra el código actual antes de
 asumirlo.
 
+El detalle de implementación de Persona 1 está en `docs/requisitos-persona1.md`.
+
 ## Definición de terminado
 
 Un requisito está terminado solo si cumple las cinco condiciones:
