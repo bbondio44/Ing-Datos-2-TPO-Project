@@ -1,6 +1,6 @@
 ﻿param([string]$Scratch)
 $ErrorActionPreference = 'Continue'
-$PG = (docker ps -aq --filter name=postgres); $CA = (docker ps -aq --filter name=cassandra); $NJ = (docker ps -aq --filter name=neo4j); $MO = (docker ps -aq --filter name=mongo)
+$PG = (docker ps -q --filter name=postgres); $CA = (docker ps -q --filter name=cassandra); $NJ = (docker ps -q --filter name=neo4j); $MO = (docker ps -q --filter name=mongo)
 $base = 'http://localhost:8080'
 $jar = Get-ChildItem backend\target\backend-*.jar | Where-Object { $_.Name -notmatch 'original' } | Select-Object -First 1
 $env:SPRING_PROFILES_ACTIVE = 'dev,polyglot'
@@ -129,7 +129,8 @@ try {
     Ver 'ALTA/CRITICA sin incidente' 0 $sin.Count
 
     '=== R09 baja logica y Mongo caido'
-    $antes = @(AlertasDe $s1 $regla | Where-Object { $_.activa })[0].ocurrencias
+    $lista = AlertasDe $s1 $regla
+    $antes = @($lista | Where-Object { $_.activa })[0].ocurrencias
     $lCaida = Lectura $s1 (Get-Date) @{ temperatura = 70.0 } $null
     docker stop $MO 2>$null | Out-Null
     Ver 'pide reintentar con Mongo caido' 503 (Req POST '/api/v1/iot/lecturas' $lCaida)
@@ -137,7 +138,8 @@ try {
     docker start $MO 2>$null | Out-Null
     $res = $null; for ($i = 0; $i -lt 20; $i++) { Start-Sleep -Seconds 3; $res = Req POST '/api/v1/iot/lecturas' $lCaida; if ($res -eq 201) { break } }
     Ver 'el reintento funciona al volver Mongo' 201 $res
-    Ver 'la alerta no se perdio' ($antes + 1) (@(AlertasDe $s1 $regla | Where-Object { $_.activa })[0].ocurrencias)
+    $lista = AlertasDe $s1 $regla
+    Ver 'la alerta no se perdio' ($antes + 1) (@($lista | Where-Object { $_.activa })[0].ocurrencias)
     Ver 'desactivar regla' 204 (Req DELETE "/api/v1/reglas/$regla" $null)
     Ver 'regla inactiva' 'f' (Sql "select activa from tp_logistica.regla_alerta where id_regla='$regla';")
     "incidentes nuevos: $([int](Sql 'select count(*) from tp_logistica.incidente;') - $inc0)"

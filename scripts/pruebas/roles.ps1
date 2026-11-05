@@ -1,7 +1,7 @@
 param([string]$Scratch)
 # Comprueba con un usuario de rol CLIENTE real que cada uno ve solo lo suyo. Usa el cliente C02.
 $ErrorActionPreference = 'Continue'
-$PG = (docker ps -aq --filter name=postgres); $base = 'http://localhost:8080'
+$PG = (docker ps -q --filter name=postgres); $base = 'http://localhost:8080'
 $jar = Get-ChildItem backend\target\backend-*.jar | Where-Object { $_.Name -notmatch 'original' } | Select-Object -First 1
 $correo = "prueba-rol-$([guid]::NewGuid().ToString('N').Substring(0,8))@ejemplo.test"
 $env:SPRING_PROFILES_ACTIVE = 'dev,polyglot'; $env:APP_BOOTSTRAP_ADMIN_EMAIL = $correo; $env:APP_BOOTSTRAP_ADMIN_PASSWORD = [guid]::NewGuid().ToString('N')

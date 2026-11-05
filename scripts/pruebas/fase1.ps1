@@ -1,6 +1,6 @@
 ﻿param([string]$Scratch)
 $ErrorActionPreference = 'Continue'
-$PG = (docker ps -aq --filter name=postgres); $CA = (docker ps -aq --filter name=cassandra); $NJ = (docker ps -aq --filter name=neo4j); $MO = (docker ps -aq --filter name=mongo)
+$PG = (docker ps -q --filter name=postgres); $CA = (docker ps -q --filter name=cassandra); $NJ = (docker ps -q --filter name=neo4j); $MO = (docker ps -q --filter name=mongo)
 $base = 'http://localhost:8080'
 $jar = Get-ChildItem backend\target\backend-*.jar | Where-Object { $_.Name -notmatch 'original' } | Select-Object -First 1
 $env:SPRING_PROFILES_ACTIVE = 'dev,polyglot'
