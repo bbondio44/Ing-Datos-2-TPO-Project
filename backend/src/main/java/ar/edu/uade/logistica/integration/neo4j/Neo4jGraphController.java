@@ -1,6 +1,5 @@
 package ar.edu.uade.logistica.integration.neo4j;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,8 +24,8 @@ public class Neo4jGraphController {
 
     @GetMapping("/clientes/{clientId}/red")
     @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
-    public List<Map<String, Object>> graphForClient(@PathVariable String clientId,
-                                                     @AuthenticationPrincipal AuthenticatedUser user) {
+    public Map<String, Object> graphForClient(@PathVariable String clientId,
+                                              @AuthenticationPrincipal AuthenticatedUser user) {
         return service.graphForClient(clientId, user);
     }
 }

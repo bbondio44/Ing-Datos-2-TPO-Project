@@ -32,6 +32,14 @@ históricas del catálogo son del 20 al 22/10/2026.
 | R32 | Alertas | Sensor con 10 lecturas o más y una temperatura muy alejada | Alerta `ANOMALIA_TEMPERATURA` con la lectura que la causó |
 | R17 | Alertas → Monitoreo de envío | UUID del envío E002: `ec22d634-96cd-5267-b7bd-accdce959d92` | Datos de Postgres, lecturas de Cassandra y eventos de Mongo |
 | R40 | Alertas → Mensajería, API en `/api/v1/mensajeria/conversaciones` | Entrar con usuarios de distintos clientes | Cada uno ve solo sus conversaciones; lo ajeno responde 404 |
+| R27 | Reportes → Rankings y desempeño | Elegir "Rutas con más incidentes" | Orden descendente; solo cuenta incidentes con tramo |
+| R28 | Reportes → Rankings y desempeño | Elegir "Clientes por volumen" | Suma de `volumen_m3`, sin envíos cancelados |
+| R31 | Reportes → Rankings y desempeño | Elegir "Desempeño por período" | Un renglón por mes, con resultados distintos |
+| R29 | Reportes → Predicción de atrasos | "Generar predicción del día" dos veces | La segunda no agrega nada; "Ver validación" muestra el error medio |
+| R34 | Reportes → Reportes | Tipo `PREDICTIVO`, cliente `0bca0b45-e7f6-59b2-a455-02191ee367f6` | ETA, riesgo y factores de sus envíos en tránsito |
+| R11 | Reportes → Reportes | Solicitar y elegir la fila | Estado `GENERADO` y el resultado a la derecha, leído de Mongo |
+| R33 | Reportes → Reportes | "Facturar" dos veces | Estado `FACTURADO` y una sola factura. Un cliente sin cuenta corriente da error |
+| R30 | Reportes → Red del cliente | UUID del cliente C02: `270823a9-7978-5eda-80f0-9ae673331b0b` | Sus envíos, tramos y operadores, iguales a Postgres |
 
 ## Casos adversos ya cubiertos
 
@@ -41,8 +49,11 @@ históricas del catálogo son del 20 al 22/10/2026.
 - Con Cassandra caída, la ingesta responde 503 y el reintento funciona.
 - Con Mongo caído, la lectura se guarda igual; las alertas de ese momento no se generan.
 - Un rango que cruza medianoche lee las dos particiones diarias.
+- Reprocesar todo el outbox deja los mismos nodos y relaciones en Neo4j.
+- Con Neo4j caído los eventos quedan en `ERROR` y se sincronizan solos al volver.
 
 ## Pendiente de definir
 
-- En la ventana JavaFX no hay un botón para crear conversaciones: se crean por la API.
+- Los incidentes que crean las alertas no tienen tramo, así que no aparecen en el ranking de rutas (R27).
+- Los clientes del catálogo no tienen cuenta corriente: sus reportes no se pueden facturar hasta tenerla.
 - Si Mongo estuvo caído, no se reevalúan después las lecturas de ese período.

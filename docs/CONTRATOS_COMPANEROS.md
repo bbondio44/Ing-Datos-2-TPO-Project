@@ -37,7 +37,7 @@ Se debe acordar el mapeo del ciclo de alerta. Contrato de aplicación propuesto:
 
 ## Neo4j
 
-Labels: `Cliente`, `Envio`, `Contenedor`, `Tramo`, `Ubicacion`, `Vehiculo`, `Operador`, `Incidente`. Todas las propiedades `id_*` son UUID String. Relaciones: `SOLICITA`, `ASIGNADO_A`, `COMPUESTO_POR`, `ORIGEN`, `DESTINO`, `EJECUTADO_POR`, `PERTENECE_A`, `REGISTRA`.
+Labels: `Cliente`, `Envio`, `Contenedor`, `Tramo`, `Ubicacion`, `Vehiculo`, `Operador`, `Incidente`. Todas las propiedades `id_*` son UUID String. Relaciones: `SOLICITA`, `ASIGNADO_A`, `COMPUESTO_POR`, `ORIGEN`, `DESTINO`, `EJECUTADO_POR`, `OPERADO_POR`, `PERTENECE_A`, `REGISTRA`.
 
 `ASIGNADO_A` incluye `fecha_asociacion` y `fecha_desasociacion`; `COMPUESTO_POR` incluye `orden`. Los consumidores usan `MERGE` con parámetros y deduplican por `eventId`.
 

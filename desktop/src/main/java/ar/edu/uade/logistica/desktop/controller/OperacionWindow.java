@@ -5,8 +5,10 @@ import ar.edu.uade.logistica.contracts.alertas.EventoResponse;
 import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaRequest;
 import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaResponse;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
+import ar.edu.uade.logistica.contracts.mensajeria.ConversacionRequest;
 import ar.edu.uade.logistica.contracts.mensajeria.ConversacionResponse;
 import ar.edu.uade.logistica.contracts.mensajeria.MensajeResponse;
+import ar.edu.uade.logistica.contracts.mensajeria.ParticipanteRequest;
 import ar.edu.uade.logistica.desktop.AppContext;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -29,6 +31,7 @@ import javafx.stage.Stage;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -64,6 +67,11 @@ public final class OperacionWindow {
     private final TableView<MensajeResponse> mensajes = new TableView<>();
     private final TextField nuevoMensaje = new TextField();
     private final Label estadoMensajes = new Label();
+    private final ComboBox<String> tipoConversacion = new ComboBox<>(FXCollections.observableArrayList("PRIVADA", "GRUPAL"));
+    private final ComboBox<String> tipoDestinatario = new ComboBox<>(FXCollections.observableArrayList(
+            "CLIENTE", "PROVEEDOR", "OPERADOR"));
+    private final TextField asunto = new TextField();
+    private final TextField destinatario = new TextField();
 
     public static void show() {
         new OperacionWindow().abrir();
@@ -154,7 +162,39 @@ public final class OperacionWindow {
         HBox tablas = new HBox(12, conversaciones, mensajes);
         HBox.setHgrow(conversaciones, Priority.ALWAYS);
         HBox.setHgrow(mensajes, Priority.ALWAYS);
-        return panel(new HBox(10, nuevoMensaje, boton("Enviar", this::enviarMensaje)), tablas, estadoMensajes);
+        asunto.setPromptText("Asunto");
+        destinatario.setPromptText("UUID del destinatario");
+        tipoConversacion.setValue("PRIVADA");
+        tipoDestinatario.setValue("CLIENTE");
+        HBox.setHgrow(destinatario, Priority.ALWAYS);
+        HBox nueva = new HBox(10, tipoConversacion, asunto, tipoDestinatario, destinatario,
+                boton("Nueva conversación", this::crearConversacion));
+        nueva.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        VBox.setVgrow(tablas, Priority.ALWAYS);
+        return panel(new HBox(10, nuevoMensaje, boton("Enviar", this::enviarMensaje)),
+                new VBox(10, nueva, tablas), estadoMensajes);
+    }
+
+    private void crearConversacion() {
+        UUID id;
+        try {
+            id = UUID.fromString(destinatario.getText().strip());
+        } catch (IllegalArgumentException exception) {
+            estadoMensajes.setText("El destinatario no es un UUID válido");
+            return;
+        }
+        if (asunto.getText().isBlank()) {
+            estadoMensajes.setText("Escribí un asunto");
+            return;
+        }
+        ConversacionRequest conversacion = new ConversacionRequest(tipoConversacion.getValue(), asunto.getText().strip(),
+                "GRUPAL".equals(tipoConversacion.getValue()) ? asunto.getText().strip() : null, null,
+                List.of(new ParticipanteRequest(tipoDestinatario.getValue(), id)));
+        al(AppContext.get().api().createConversation(conversacion), estadoMensajes, creada -> {
+            asunto.clear();
+            destinatario.clear();
+            cargarConversaciones();
+        });
     }
 
     private void cargarAlertas() {

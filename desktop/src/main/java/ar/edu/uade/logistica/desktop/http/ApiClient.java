@@ -18,7 +18,10 @@ import ar.edu.uade.logistica.contracts.alertas.CambioEstadoAlertaRequest;
 import ar.edu.uade.logistica.contracts.alertas.MonitoreoEnvioResponse;
 import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaRequest;
 import ar.edu.uade.logistica.contracts.alertas.ReglaAlertaResponse;
+import ar.edu.uade.logistica.contracts.mensajeria.ConversacionRequest;
 import ar.edu.uade.logistica.contracts.mensajeria.ConversacionResponse;
+import ar.edu.uade.logistica.contracts.reportes.ReporteRequest;
+import ar.edu.uade.logistica.contracts.reportes.ReporteResponse;
 import ar.edu.uade.logistica.contracts.mensajeria.MensajeRequest;
 import ar.edu.uade.logistica.contracts.mensajeria.MensajeResponse;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
@@ -38,6 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -195,6 +199,38 @@ public class ApiClient {
     public CompletableFuture<MensajeResponse> sendMessage(String conversationId, String text) {
         return send("POST", "/api/v1/mensajeria/conversaciones/" + conversationId + "/mensajes",
                 new MensajeRequest(UUID.randomUUID(), text), MensajeResponse.class, true);
+    }
+
+    public CompletableFuture<ConversacionResponse> createConversation(ConversacionRequest conversation) {
+        return send("POST", "/api/v1/mensajeria/conversaciones", conversation, ConversacionResponse.class, true);
+    }
+
+    public CompletableFuture<List<Map<String, Object>>> analytics(String resource) {
+        return send("GET", "/api/v1/analitica/" + resource, null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<Map<String, Object>> generatePredictions() {
+        return send("POST", "/api/v1/analitica/predicciones/generar", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<List<ReporteResponse>> reports() {
+        return send("GET", "/api/v1/reportes", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<ReporteResponse> requestReport(ReporteRequest report) {
+        return send("POST", "/api/v1/reportes", report, ReporteResponse.class, true);
+    }
+
+    public CompletableFuture<ReporteResponse> invoiceReport(UUID id) {
+        return send("POST", "/api/v1/reportes/" + id + "/facturar", null, ReporteResponse.class, true);
+    }
+
+    public CompletableFuture<Object> reportResult(UUID id) {
+        return send("GET", "/api/v1/reportes/" + id + "/resultado", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<Map<String, Object>> clientNetwork(UUID clientId) {
+        return send("GET", "/api/v1/grafo/clientes/" + clientId + "/red", null, new TypeReference<>() {}, true);
     }
 
     private String range(Instant from, Instant to) {

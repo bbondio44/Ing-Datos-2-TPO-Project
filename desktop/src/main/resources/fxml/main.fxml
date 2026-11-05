@@ -19,7 +19,7 @@
             <Button text="Monitoreo IoT" onAction="#showIotMonitoring" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Alertas" onAction="#showOperations" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Facturación" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
-            <Button text="Reportes" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Reportes" onAction="#showAnalytics" maxWidth="Infinity" styleClass="nav-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Label fx:id="userLabel" styleClass="sidebar-user" wrapText="true"/>
             <Button text="Sesiones activas" onAction="#showSessions" maxWidth="Infinity" styleClass="secondary-button"/>

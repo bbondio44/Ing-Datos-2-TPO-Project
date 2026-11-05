@@ -617,6 +617,11 @@ public class MainController {
     }
 
     @FXML
+    private void showAnalytics() {
+        AnaliticaWindow.show();
+    }
+
+    @FXML
     private void logout() {
         AppContext.get().api().logout().whenComplete((ignored, error) -> Platform.runLater(() -> {
             AppContext.get().setSession(null);
