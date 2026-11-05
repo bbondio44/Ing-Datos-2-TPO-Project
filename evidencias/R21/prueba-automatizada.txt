@@ -1,0 +1,3 @@
+﻿=== R21 ultima posicion
+     fecha=2026-10-22T23:00:00Z lat=-29.2729 lon=-52.35262
+OK    contenedor sin posicion: esperado=404 obtenido=404

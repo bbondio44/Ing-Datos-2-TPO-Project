@@ -1,0 +1,4 @@
+﻿=== R28 ranking de clientes contra calculo manual
+     1ro: AgroExport Litoral S.A. 201.800 m3
+OK    volumen del primero: esperado=201.8 obtenido=201.8
+OK    orden descendente: esperado=201,8,201,8,201,8,201,8,99,6,66,4,66,4,66,4,55,2,52,3,13,3,0 obtenido=201,8,201,8,201,8,201,8,99,6,66,4,66,4,66,4,55,2,52,3,13,3,0

@@ -1,0 +1,3 @@
+﻿=== R20 recorrido
+OK    posiciones (solo con GPS): esperado=5 obtenido=5
+     primera=(-33.28027,-56.88948) ultima=(-32.9529,-56.51672)

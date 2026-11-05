@@ -1,0 +1,21 @@
+﻿sensores: 18f369fe-9f0b-5ee1-8c0f-bf271eac908f / a752087b-202f-56ff-9b1c-83ac9d6dc748 / cb6a673c-14a5-5469-a365-30fe9700c80b
+=== R09 ABM de reglas
+regla creada 875effb6-7bb7-448e-bbd9-a6d3a9c2ae26
+OK    regla invalida (INACTIVIDAD con umbral): esperado=400 obtenido=400
+OK    editar regla: esperado=200 obtenido=200
+OK    regla inexistente: esperado=404 obtenido=404
+=== R09/R26/R25 lectura que supera la regla
+OK    POST lectura 60 C: esperado=201 obtenido=201
+OK    una alerta para la regla: esperado=1 obtenido=1
+OK    guarda la lectura que la causo: esperado=d420707d-6cdf-4868-a8ed-9ee55b9ed4c2 obtenido=d420707d-6cdf-4868-a8ed-9ee55b9ed4c2
+OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
+OK    alerta ALTA con incidente: esperado=True obtenido=True
+OK    incidente existe en Postgres: esperado=1 obtenido=1
+OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
+=== R09 baja logica y Mongo caido
+OK    desactivar regla: esperado=204 obtenido=204
+OK    regla inactiva: esperado=f obtenido=f
+OK    lectura se guarda con Mongo caido: esperado=201 obtenido=201
+OK    listar alertas con Mongo caido: esperado=503 obtenido=503
+incidentes nuevos: 2
+usuario temporal borrado: 1

@@ -1,0 +1,13 @@
+﻿=== R11, R34, R33 reportes
+OK    reporte generado: esperado=GENERADO obtenido=GENERADO
+     precio=15000.00
+     resultado en Mongo: 1 filas; riesgo=0.0
+OK    filas del cliente: esperado=1 obtenido=1
+OK    estado facturado: esperado=FACTURADO obtenido=FACTURADO
+OK    facturar dos veces da la misma factura: esperado=ffe18638-56e4-4cfc-817f-408cd5b14509 obtenido=ffe18638-56e4-4cfc-817f-408cd5b14509
+OK    una sola factura: esperado=1 obtenido=1
+OK    otro tipo: desempeno: esperado=GENERADO obtenido=GENERADO
+OK    tipo invalido: esperado=400 obtenido=400
+OK    sin cliente: esperado=400 obtenido=400
+OK    reporte inexistente: esperado=404 obtenido=404
+     facturar cliente del catalogo: 200

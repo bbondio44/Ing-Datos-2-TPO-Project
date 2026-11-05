@@ -1,0 +1,14 @@
+﻿=== R19 historico cruzando medianoche
+OK    lecturas de SEN-001: esperado=5 obtenido=5
+     primera=2026-10-20T22:00:00Z ultima=2026-10-21T02:00:00Z
+OK    ordenadas por fecha: esperado=True obtenido=True
+OK    lecturas del contenedor (2 sensores): esperado=10 obtenido=10
+OK    rango invertido: esperado=400 obtenido=400
+OK    rango de mas de 31 dias: esperado=400 obtenido=400
+=== R19 R30 usuario con rol CLIENTE: no ve lo ajeno
+OK    envio de otro cliente: esperado=404 obtenido=404
+OK    grafo de otro cliente: esperado=404 obtenido=404
+OK    contenedor de otro cliente: esperado=404 obtenido=404
+OK    ranking global: esperado=403 obtenido=403
+OK    crear una regla: esperado=403 obtenido=403
+OK    registrar una lectura: esperado=403 obtenido=403
