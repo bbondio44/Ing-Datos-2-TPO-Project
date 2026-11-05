@@ -6,6 +6,7 @@
 // comparando el resultado obtenido contra el esperado (sirve como evidencia).
 // FUERA DE CLASE: aggregate ($match, $group, $lookup), $setOnInsert, $addToSet, $pull. Solo en estas
 // consultas de verificación, para contar y cruzar colecciones; la aplicación no los usa.
+// FUERA DE CLASE: también $in, $project, $unwind, $near y $geoWithin, solo en estas consultas.
 // Las pruebas de escritura (R09, R40) limpian lo que crean, se puede repetir.
 // =====================================================================
 

@@ -2,6 +2,8 @@
 -- Cassandra · CONSULTAS Q01–Q12 (flujo del ModeladoCassandraGrupo4.drawio)
 -- GENERADO por generador/generar.py con los UUID reales del dataset.
 -- Uso: cqlsh -f cassandra/03_consultas.cql    (después de 01_schema y 02_datos_prueba)
+-- FUERA DE CLASE: IN en el WHERE. Pide varias particiones en una sentencia; la aplicación hace una
+-- consulta por partición diaria, que es lo visto. Alternativa: repetir la consulta por cada día.
 -- Cada bloque indica el requisito de promoción que respalda y el RESULTADO ESPERADO.
 -- Instante de referencia de la demo ("ahora"): 2026-10-22 23:30 UTC
 -- =====================================================================

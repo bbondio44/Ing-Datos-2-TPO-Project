@@ -157,11 +157,12 @@ alertas.id_lectura       ──► Cassandra lecturas_* (id_lectura)
 
 - **Fuente de verdad única por dato:** maestros, reglas, incidentes y dinero en PostgreSQL; Mongo y
   Cassandra solo referencian por UUID y nunca son fuente competidora de un estado crítico.
-- **Escrituras idempotentes:** IDs determinísticos (`id_lectura`, `id_evento`), upserts por `_id`
-  (`replaceOne`/`$setOnInsert`), índice único parcial en alertas y único en reportes ⇒ reintentar un
+- **Escrituras idempotentes:** IDs determinísticos (`id_lectura`, `id_evento`), inserciones por `_id`
+  (`insertOne`, que ignora el duplicado), índice único parcial en alertas y único en reportes ⇒ reintentar un
   evento procesado dos veces no duplica.
-- **Outbox (PostgreSQL → Mongo/Neo4j):** el incidente se escribe en la transacción relacional junto
-  con un evento outbox; un worker lo lleva a MongoDB con reintentos. Si Mongo está caído, no se pierde.
+- **Outbox (PostgreSQL → Mongo/Neo4j):** cada cambio se escribe en la transacción relacional junto con
+  un evento outbox. Un worker lo lleva a Neo4j y, si cambió el estado de un envío o tramo, registra el
+  evento en `eventos_logisticos`. Si un motor está caído no se pierde: queda en `ERROR` y se reintenta.
 - **Problemas posibles:** lectura que llega tarde (resuelto con `USING TIMESTAMP`), alerta repetida
   (dedup), alerta sin incidente (control R25: alertas ALTA/CRITICA con `id_incidente: null` debe dar 0),
   referencias a IDs inexistentes (se valida contra PostgreSQL antes de escribir).

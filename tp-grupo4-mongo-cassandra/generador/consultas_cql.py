@@ -35,6 +35,8 @@ def generar(cat: Catalogo, lecturas: list[Lectura], tardia: Lectura) -> tuple[st
     w("-- Cassandra · CONSULTAS Q01–Q12 (flujo del ModeladoCassandraGrupo4.drawio)")
     w("-- GENERADO por generador/generar.py con los UUID reales del dataset.")
     w("-- Uso: cqlsh -f cassandra/03_consultas.cql    (después de 01_schema y 02_datos_prueba)")
+    w("-- FUERA DE CLASE: IN en el WHERE. Pide varias particiones en una sentencia; la aplicación hace una")
+    w("-- consulta por partición diaria, que es lo visto. Alternativa: repetir la consulta por cada día.")
     w("-- Cada bloque indica el requisito de promoción que respalda y el RESULTADO ESPERADO.")
     w(f"-- Instante de referencia de la demo (\"ahora\"): {AHORA_REFERENCIA:%Y-%m-%d %H:%M} UTC")
     w("-- =====================================================================")
