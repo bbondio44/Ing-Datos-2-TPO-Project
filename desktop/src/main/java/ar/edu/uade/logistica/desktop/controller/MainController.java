@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletionException;
 
 public class MainController {
+    private PersonaOneDialogs personaOneDialogs;
     @FXML private Label userLabel;
     @FXML private Label statusLabel;
     @FXML private TextField searchField;
@@ -56,6 +57,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        personaOneDialogs = new PersonaOneDialogs(AppContext.get().api(), AppContext.get().session());
         userLabel.setText(AppContext.get().session().displayName());
         nameColumn.setCellValueFactory(row -> new SimpleStringProperty(row.getValue().businessName()));
         cuitColumn.setCellValueFactory(row -> new SimpleStringProperty(value(row.getValue().cuit())));
@@ -69,6 +71,31 @@ public class MainController {
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
         searchField.setOnAction(event -> refresh());
         refresh();
+    }
+
+    @FXML
+    private void showAdministration() {
+        personaOneDialogs.showAdministration();
+    }
+
+    @FXML
+    private void showShipments() {
+        personaOneDialogs.showShipments();
+    }
+
+    @FXML
+    private void showRoutes() {
+        personaOneDialogs.showRoutes();
+    }
+
+    @FXML
+    private void showFinance() {
+        personaOneDialogs.showFinance();
+    }
+
+    @FXML
+    private void showReports() {
+        personaOneDialogs.showReports();
     }
 
     @FXML

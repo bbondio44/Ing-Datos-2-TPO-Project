@@ -11,15 +11,17 @@
             <Separator/>
             <Button text="Panel general" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Button text="Clientes" maxWidth="Infinity" styleClass="nav-button-active"/>
+            <Button text="Usuarios y roles" onAction="#showAdministration" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Proveedores" onAction="#showSuppliers" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Operadores" onAction="#showOperators" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Ubicaciones" onAction="#showLocations" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Vehículos" onAction="#showVehicles" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Envíos" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Envíos" onAction="#showShipments" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Trayectos" onAction="#showRoutes" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Monitoreo IoT" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Button text="Alertas" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
-            <Button text="Facturación" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
-            <Button text="Reportes" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
+            <Button text="Facturación" onAction="#showFinance" maxWidth="Infinity" styleClass="nav-button"/>
+            <Button text="Reportes" onAction="#showReports" maxWidth="Infinity" styleClass="nav-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Label fx:id="userLabel" styleClass="sidebar-user" wrapText="true"/>
             <Button text="Sesiones activas" onAction="#showSessions" maxWidth="Infinity" styleClass="secondary-button"/>

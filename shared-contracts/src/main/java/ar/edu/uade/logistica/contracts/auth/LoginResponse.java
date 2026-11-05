@@ -9,6 +9,8 @@ public record LoginResponse(
         Instant expiresAt,
         UUID userId,
         UUID clientId,
+        UUID supplierId,
+        UUID operatorId,
         String displayName,
         Set<String> roles,
         Set<String> permissions) {

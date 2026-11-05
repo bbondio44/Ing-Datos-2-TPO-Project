@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-logistica}
       POSTGRES_USER: ${POSTGRES_USER:-logistica}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-logistica_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD en el archivo .env}
       TZ: UTC
     ports:
       - "5432:5432"
@@ -21,24 +21,22 @@ services:
 
   mongodb:
     image: mongo:8.0.4
-    profiles: ["polyglot"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-logistica}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-logistica_dev}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?Defina MONGO_PASSWORD en el archivo .env}
       MONGO_INITDB_DATABASE: logistica_documental
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test: ["CMD-SHELL", "mongosh --quiet --username $$MONGO_INITDB_ROOT_USERNAME --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\""]
       interval: 10s
       timeout: 5s
       retries: 20
 
   cassandra:
     image: cassandra:5.0.2
-    profiles: ["polyglot"]
     environment:
       CASSANDRA_CLUSTER_NAME: logistica-grupo4
       CASSANDRA_DC: datacenter1
@@ -57,9 +55,8 @@ services:
 
   neo4j:
     image: neo4j:5.26.5-community
-    profiles: ["polyglot"]
     environment:
-      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-logistica_dev_neo4j}
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:?Defina NEO4J_PASSWORD en el archivo .env}
       NEO4J_server_memory_heap_initial__size: 256m
       NEO4J_server_memory_heap_max__size: 512m
     ports:

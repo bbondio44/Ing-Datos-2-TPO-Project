@@ -13,7 +13,8 @@ import java.util.Set;
 @Service
 public class SessionAuthenticationService {
     private static final String AUTH_SQL = """
-            SELECT u.id_usuario, u.id_cliente, u.email, concat_ws(' ', u.nombre, u.apellido) AS nombre,
+            SELECT u.id_usuario, u.id_cliente, u.id_proveedor, u.id_operador, u.email,
+                   concat_ws(' ', u.nombre, u.apellido) AS nombre,
                    array_remove(array_agg(DISTINCT r.descripcion), NULL) AS roles,
                    array_remove(array_agg(DISTINCT p.codigo), NULL) AS permisos
               FROM tp_logistica.sesion s
@@ -24,7 +25,8 @@ public class SessionAuthenticationService {
               LEFT JOIN tp_logistica.permiso p ON p.id_permiso = rp.id_permiso
              WHERE s.token_hash = ? AND s.estado = 'ACTIVA'
                AND s.fecha_expiracion > now() AND u.estado = 'ACTIVO'
-             GROUP BY u.id_usuario, u.id_cliente, u.email, u.nombre, u.apellido
+             GROUP BY u.id_usuario, u.id_cliente, u.id_proveedor, u.id_operador,
+                      u.email, u.nombre, u.apellido
             """;
 
     private final JdbcTemplate jdbcTemplate;
@@ -43,6 +45,8 @@ public class SessionAuthenticationService {
             return Optional.of(new AuthenticatedUser(
                     resultSet.getObject("id_usuario", java.util.UUID.class),
                     resultSet.getObject("id_cliente", java.util.UUID.class),
+                    resultSet.getObject("id_proveedor", java.util.UUID.class),
+                    resultSet.getObject("id_operador", java.util.UUID.class),
                     resultSet.getString("email"),
                     resultSet.getString("nombre"),
                     toSet(resultSet.getArray("roles")),
