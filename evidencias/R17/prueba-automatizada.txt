@@ -22,10 +22,17 @@ OK    envio pasa a EN_PREPARACION: esperado=200 obtenido=200
 OK    envio pasa a EN_TRANSITO: esperado=200 obtenido=200
 === R17 monitoreo integrado
 OK    PostgreSQL: estado del envio: esperado=EN_TRANSITO obtenido=EN_TRANSITO
-OK    Cassandra: ultima lectura del sensor: esperado=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08 obtenido=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08
+OK    Cassandra: ultima lectura del sensor: esperado=d5c67c79-98cc-4a7f-a783-1591df0c4ede obtenido=d5c67c79-98cc-4a7f-a783-1591df0c4ede
 OK    Cassandra: ultima posicion del contenedor: esperado=-32.5 obtenido=-32.5
 OK    MongoDB: evento de la alerta: esperado=1 obtenido=1
 OK    MongoDB: alerta: esperado=1 obtenido=1
 OK    PostgreSQL: incidente de la alerta: esperado=1 obtenido=1
 OK    R26 reconocer: esperado=204 obtenido=204
 OK    R26 cerrar: esperado=204 obtenido=204
+=== R17 R24 trazabilidad de los cambios de estado
+OK    tramo creado: esperado=201 obtenido=201
+OK    tramo en curso: esperado=200 obtenido=200
+OK    guardar de nuevo el tramo: esperado=200 obtenido=200
+OK    evento CARGA_INICIADA una sola vez: esperado=1 obtenido=1
+OK    evento EN_TRANSITO una sola vez: esperado=1 obtenido=1
+OK    evento SALIDA una sola vez: esperado=1 obtenido=1

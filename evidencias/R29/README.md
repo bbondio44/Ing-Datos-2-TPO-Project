@@ -5,7 +5,7 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 - **Pantalla:** Analítica → Predicción de atrasos
 - **Pasos:** Generar la predicción del día dos veces y ver la validación.
 - **Datos de origen:** `prediccion_envio`.
-- **Resultado esperado:** Una predicción por envío en tránsito; la segunda corrida no agrega nada.
+- **Resultado esperado:** Una predicción por envío en tránsito, con riesgo operativo y climático; la segunda corrida no agrega nada.
 
 ## Evidencia
 

@@ -2,8 +2,8 @@
 OK    alta del tramo 2: esperado=201 obtenido=201
 OK    alta del tramo 1: esperado=201 obtenido=201
 OK    tramos en secuencia: esperado=1,2 obtenido=1,2
-OK    R05 operador visible en el tramo: esperado=Operador 2e96fd obtenido=Operador 2e96fd
-OK    R04 proveedor visible en el tramo: esperado=Proveedor 2e96fd obtenido=Proveedor 2e96fd
+OK    R05 operador visible en el tramo: esperado=Operador 42dd07 obtenido=Operador 42dd07
+OK    R04 proveedor visible en el tramo: esperado=Proveedor 42dd07 obtenido=Proveedor 42dd07
 OK    vehiculo de otro operador: esperado=409 obtenido=409
 OK    fechas invertidas: esperado=409 obtenido=409
 OK    finalizado sin llegada real: esperado=409 obtenido=409
@@ -13,3 +13,10 @@ OK    edicion con dos proveedores: esperado=200 obtenido=200
 OK    el tramo conserva los dos proveedores: esperado=2 obtenido=2
 OK    baja de tramo: esperado=204 obtenido=204
 OK    CLIENTE no crea tramos: esperado=403 obtenido=403
+=== R17 R24 trazabilidad de los cambios de estado
+OK    tramo creado: esperado=201 obtenido=201
+OK    tramo en curso: esperado=200 obtenido=200
+OK    guardar de nuevo el tramo: esperado=200 obtenido=200
+OK    evento CARGA_INICIADA una sola vez: esperado=1 obtenido=1
+OK    evento EN_TRANSITO una sola vez: esperado=1 obtenido=1
+OK    evento SALIDA una sola vez: esperado=1 obtenido=1

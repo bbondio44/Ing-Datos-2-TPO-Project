@@ -50,15 +50,15 @@ OK    hay una fila con [Rutas Globales]
 OK    R16 la cuenta del operador tiene facturas
      R16/captura-02-cuenta-operador.png
      R05/captura-04-cuenta-operador.png
-OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    hay una fila con [Alta desde pantalla b5539b]
 OK    hay una fila con [state=BORRADOR]
 OK    hay una fila con [state=EMITIDA]
-OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    hay una fila con [Alta desde pantalla b5539b]
 OK    R10 el cobro parcial cambia el estado
      R10/captura-02-cobro-parcial.png
      R13/captura-01-cobro-parcial.png
 OK    hay una fila con [state=PARCIAL]
-OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    hay una fila con [Alta desde pantalla b5539b]
 OK    R10 el cobro total deja la factura pagada
      R10/captura-03-cobro-total.png
      R13/captura-02-cobro-total.png
@@ -79,7 +79,7 @@ OK    R22 estado de sensores (44 filas)
      R22/captura-01-estado-sensores.png
 OK    R19 historico de dos dias (48 filas)
      R19/captura-01-historico-dos-dias.png
-OK    R18 lecturas registradas (14 filas)
+OK    R18 lecturas registradas (13 filas)
      R18/captura-01-lecturas-registradas.png
      R20/captura-01-mapa-recorrido.png
      R21/captura-01-mapa-recorrido.png
@@ -93,10 +93,10 @@ OK    hay una fila con [tipoRegla=ANOMALIA_TEMPERATURA]
 OK    hay una fila con [tipoRegla=INACTIVIDAD]
      R23/captura-01-alerta-inactividad.png
 OK    hay una fila con [estado=ABIERTA]
-OK    hay una fila con [id=e69803c5-26a4-3bc1-b46b-bd37e43d3b9d,]
+OK    hay una fila con [id=5ff949d6-a673-3740-994d-7e5b6a8399ea,]
 OK    R26 la alerta pasa a RECONOCIDA
      R26/captura-02-alerta-reconocida.png
-OK    hay una fila con [id=e69803c5-26a4-3bc1-b46b-bd37e43d3b9d,]
+OK    hay una fila con [id=5ff949d6-a673-3740-994d-7e5b6a8399ea,]
 OK    R26 la alerta pasa a CERRADA
      R26/captura-03-alerta-cerrada.png
 OK    R09 reglas (11 filas)
@@ -115,9 +115,9 @@ OK    R28 analitica (14 filas)
      R28/captura-01-resultado.png
 OK    R31 analitica (4 filas)
      R31/captura-01-resultado.png
-OK    R29 predicciones (7 filas)
+OK    R29 predicciones (8 filas)
      R29/captura-01-predicciones.png
-OK    R11 solicitudes de reporte (7 filas)
+OK    R11 solicitudes de reporte (8 filas)
 OK    hay una fila con [PREDICTIVO]
      R34/captura-01-reporte-predictivo.png
      R11/captura-01-reporte-predictivo.png

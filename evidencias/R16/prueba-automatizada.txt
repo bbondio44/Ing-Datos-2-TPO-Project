@@ -1,9 +1,9 @@
 ﻿=== R16 terceros
 OK    PROVEEDOR factura: esperado=201 obtenido=201
 OK    PROVEEDOR naturaleza a pagar: esperado=PAGAR obtenido=PAGAR
-OK    PROVEEDOR cuenta del tercero: esperado=97a6d88a-7cdb-4a33-b20d-becfc5599b54 obtenido=97a6d88a-7cdb-4a33-b20d-becfc5599b54
+OK    PROVEEDOR cuenta del tercero: esperado=e58b5658-0446-4be2-b3d1-4edd5c405395 obtenido=e58b5658-0446-4be2-b3d1-4edd5c405395
 OK    PROVEEDOR saldo refleja factura y pago: esperado=300 obtenido=300
 OK    OPERADOR factura: esperado=201 obtenido=201
 OK    OPERADOR naturaleza a pagar: esperado=PAGAR obtenido=PAGAR
-OK    OPERADOR cuenta del tercero: esperado=e31b538a-4eb1-483b-a61c-0fc35b6bc790 obtenido=e31b538a-4eb1-483b-a61c-0fc35b6bc790
+OK    OPERADOR cuenta del tercero: esperado=83267f3c-a7f5-4325-90ba-14851702ac7e obtenido=83267f3c-a7f5-4325-90ba-14851702ac7e
 OK    OPERADOR saldo refleja factura y pago: esperado=300 obtenido=300

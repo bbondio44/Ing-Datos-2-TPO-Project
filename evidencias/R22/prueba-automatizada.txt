@@ -22,4 +22,4 @@ OK    R21 la tardia no pisa la ultima posicion: esperado=-32.5 obtenido=-32.5
 OK    R20 la tardia queda primera en el recorrido: esperado=-34.7 obtenido=-34.7
 OK    R22 sensor en linea: esperado=ONLINE obtenido=ONLINE
 OK    R22 bateria de la ultima lectura: esperado=75 obtenido=75
-OK    R22 contenedor del sensor: esperado=25cea743-bd6e-4608-9a13-620fb38a1f97 obtenido=25cea743-bd6e-4608-9a13-620fb38a1f97
+OK    R22 contenedor del sensor: esperado=f7591952-0f01-428d-82ce-daae0528dcbc obtenido=f7591952-0f01-428d-82ce-daae0528dcbc

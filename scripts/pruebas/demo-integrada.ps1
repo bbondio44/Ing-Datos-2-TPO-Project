@@ -120,6 +120,31 @@ try {
     Ver 'R26 reconocer' 204 (Api POST "/api/v1/alertas/$($alerta.id)/reconocer" @{ comentario = 'demo' }).s
     Ver 'R26 cerrar' 204 (Api POST "/api/v1/alertas/$($alerta.id)/cerrar" @{ comentario = 'demo' }).s
 
+    '=== R17 R24 trazabilidad de los cambios de estado'
+    $tramo = @{ shipmentId = $envio.id; order = 1; origin = 'Buenos Aires'; destination = 'Santos'; transportType = 'MARITIMO'
+        departureAt = (Fecha $ahora.AddHours(-1)); estimatedArrivalAt = (Fecha $ahora.AddDays(5)); estimatedCost = 100; state = 'PENDIENTE'; suppliers = @() }
+    $t = Api POST '/api/v1/trayectos' $tramo; Ver 'tramo creado' 201 $t.s
+    $tramo.state = 'EN_CURSO'
+    Ver 'tramo en curso' 200 (Api PUT "/api/v1/trayectos/$($t.d.id)" $tramo).s
+    Ver 'guardar de nuevo el tramo' 200 (Api PUT "/api/v1/trayectos/$($t.d.id)" $tramo).s
+    $tipos = @(); for ($i = 0; $i -lt 15; $i++) {
+        $tipos = @((Api GET "/api/v1/monitoreo/envios/$($envio.id)").d.eventos.tipo)
+        if ($tipos -contains 'SALIDA') { break }; Start-Sleep 2
+    }
+    foreach ($tipo in 'CARGA_INICIADA', 'EN_TRANSITO', 'SALIDA') { Ver "evento $tipo una sola vez" 1 @($tipos | Where-Object { $_ -eq $tipo }).Count }
+
+    '=== R29 R34 riesgos de la prediccion'
+    Ver 'generar predicciones' 200 (Api POST '/api/v1/analitica/predicciones/generar').s
+    $p = @((Api GET '/api/v1/analitica/predicciones').d) | Where-Object id_envio -eq $envio.id
+    Ver 'riesgo climatico por medio maritimo' 0.5 (Num $p.riesgo_climatico)
+    $abiertos = [int](Sql "select count(*) from tp_logistica.incidente where id_envio='$($envio.id)' and estado<>'CERRADO';")
+    $tasa = [double]::Parse((Sql "select coalesce(count(i.id_incidente)::numeric/nullif(count(distinct e.id_envio),0),0) from tp_logistica.envio e left join tp_logistica.incidente i on i.id_envio=e.id_envio where e.pais_origen='Argentina' and e.pais_destino='Brasil' and e.id_envio<>'$($envio.id)' and e.estado<>'CANCELADO';"), [Globalization.CultureInfo]::InvariantCulture)
+    Ver 'riesgo operativo contra calculo manual' ([math]::Round(0.6 * [math]::Min($abiertos, 3) / 3 + 0.4 * [math]::Min($tasa, 1), 2)) (Num $p.riesgo_operativo)
+    Ver 'todas las predicciones tienen riesgos' 0 @(@((Api GET '/api/v1/analitica/predicciones').d) | Where-Object { $null -eq $_.riesgo_operativo -or $null -eq $_.riesgo_climatico }).Count
+    $rp = (Api POST '/api/v1/reportes' @{ tipo = 'PREDICTIVO'; idCliente = $cliente.id }).d
+    $res = @((Api GET "/api/v1/reportes/$($rp.idSolicitud)/resultado").d)
+    Ver 'R34 el reporte incluye los riesgos' (Num $p.riesgo_operativo) (Num $res[0].riesgo_operativo)
+
     '=== R30 sincronizacion con el grafo'
     $n = 0; for ($i = 0; $i -lt 15; $i++) { $n = Cy "MATCH (:Cliente {id_cliente: '$($cliente.id)'})-[:SOLICITA]->(e:Envio {id_envio: '$($envio.id)'}) RETURN count(e);"; if ("$n" -eq '1') { break }; Start-Sleep 2 }
     Ver 'cliente y envio nuevos en Neo4j' 1 $n

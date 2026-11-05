@@ -1,7 +1,7 @@
 ﻿=== R09/R26/R25 lectura que supera la regla
 OK    POST lectura 60 C: esperado=201 obtenido=201
 OK    una alerta para la regla: esperado=1 obtenido=1
-OK    guarda la lectura que la causo: esperado=02d883e6-de67-4c7d-b423-02406fd28c9e obtenido=02d883e6-de67-4c7d-b423-02406fd28c9e
+OK    guarda la lectura que la causo: esperado=fbe98506-598c-456f-b1f6-a0199b283bc2 obtenido=fbe98506-598c-456f-b1f6-a0199b283bc2
 OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
 OK    alerta ALTA con incidente: esperado=True obtenido=True
 OK    incidente existe en Postgres: esperado=1 obtenido=1
@@ -31,5 +31,5 @@ OK    pedir un reporte propio: esperado=201 obtenido=201
 === R09 R25 R26 temperatura fuera de rango
 OK    lectura fuera de rango: esperado=201 obtenido=201
 OK    alerta generada: esperado=ABIERTA obtenido=ABIERTA
-OK    con la lectura que la causo: esperado=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08 obtenido=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08
+OK    con la lectura que la causo: esperado=d5c67c79-98cc-4a7f-a783-1591df0c4ede obtenido=d5c67c79-98cc-4a7f-a783-1591df0c4ede
 OK    incidente en PostgreSQL: esperado=1 obtenido=1

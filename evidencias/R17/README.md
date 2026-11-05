@@ -5,7 +5,7 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 - **Pantalla:** Alertas → Monitoreo de envío
 - **Pasos:** Consultar el envío E002: `ec22d634-96cd-5267-b7bd-accdce959d92`.
 - **Datos de origen:** PostgreSQL, Cassandra y MongoDB.
-- **Resultado esperado:** Datos del envío, última lectura de cada sensor, eventos, alertas e incidentes.
+- **Resultado esperado:** Datos del envío, última lectura de cada sensor, eventos (también los cambios de estado), alertas e incidentes.
 
 ## Evidencia
 

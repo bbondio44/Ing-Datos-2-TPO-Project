@@ -11,17 +11,17 @@ OK    posiciones_por_contenedor_dia +3: esperado=3 obtenido=3
 OK    POST reenvio: esperado=201 obtenido=201
 OK    no duplica: esperado=3 obtenido=3
 === 3. Lectura tardia, 2 horas atras
-OK    ultima = la mas nueva antes de la tardia: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
+OK    ultima = la mas nueva antes de la tardia: esperado=0ee410ea-ebd2-427c-8fce-8a410e31aa25 obtenido=0ee410ea-ebd2-427c-8fce-8a410e31aa25
 OK    POST tardia: esperado=201 obtenido=201
 OK    historial +1: esperado=4 obtenido=4
-OK    tardia no pisa ultima_lectura: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
-     fila:  0f9def4a-6913-45c1-ba27-23af070db8a5 |           6
-OK    tardia no pisa ultima_posicion: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
+OK    tardia no pisa ultima_lectura: esperado=0ee410ea-ebd2-427c-8fce-8a410e31aa25 obtenido=0ee410ea-ebd2-427c-8fce-8a410e31aa25
+     fila:  0ee410ea-ebd2-427c-8fce-8a410e31aa25 |           6
+OK    tardia no pisa ultima_posicion: esperado=0ee410ea-ebd2-427c-8fce-8a410e31aa25 obtenido=0ee410ea-ebd2-427c-8fce-8a410e31aa25
 === 4. Lectura sin GPS
 OK    POST sin GPS: esperado=201 obtenido=201
 OK    posiciones sin cambios: esperado=4 obtenido=4
-OK    ultima_posicion sin cambios: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
-OK    ultima_lectura se actualiza: esperado=53f8aadb-dab0-4b35-b608-8d09f574d1bd obtenido=53f8aadb-dab0-4b35-b608-8d09f574d1bd
+OK    ultima_posicion sin cambios: esperado=0ee410ea-ebd2-427c-8fce-8a410e31aa25 obtenido=0ee410ea-ebd2-427c-8fce-8a410e31aa25
+OK    ultima_lectura se actualiza: esperado=fe247acf-a171-4730-be2a-86e958a0f26f obtenido=fe247acf-a171-4730-be2a-86e958a0f26f
 === 5. Errores
 OK    sin token: esperado=401 obtenido=401
 OK    sensor inexistente: esperado=404 obtenido=404
@@ -34,8 +34,8 @@ OK    sin mediciones: esperado=400 obtenido=400
 OK    POST con Cassandra caida: esperado=503 obtenido=503
 OK    reintento con el mismo id: esperado=201 obtenido=201
 === 7. Simulador
-simulador envio 7 lecturas; estados: 201
-OK    lecturas del simulador guardadas: esperado=13 obtenido=13
+simulador envio 6 lecturas; estados: 201
+OK    lecturas del simulador guardadas: esperado=12 obtenido=12
 usuario de prueba borrado: 1
 === R18 R20 R21 R22 lecturas con GPS
 OK    lectura 0: esperado=201 obtenido=201
@@ -55,4 +55,4 @@ OK    R21 la tardia no pisa la ultima posicion: esperado=-32.5 obtenido=-32.5
 OK    R20 la tardia queda primera en el recorrido: esperado=-34.7 obtenido=-34.7
 OK    R22 sensor en linea: esperado=ONLINE obtenido=ONLINE
 OK    R22 bateria de la ultima lectura: esperado=75 obtenido=75
-OK    R22 contenedor del sensor: esperado=25cea743-bd6e-4608-9a13-620fb38a1f97 obtenido=25cea743-bd6e-4608-9a13-620fb38a1f97
+OK    R22 contenedor del sensor: esperado=f7591952-0f01-428d-82ce-daae0528dcbc obtenido=f7591952-0f01-428d-82ce-daae0528dcbc

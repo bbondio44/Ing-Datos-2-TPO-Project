@@ -5,7 +5,7 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 - **Pantalla:** Analítica → Reportes
 - **Pasos:** Tipo PREDICTIVO, cliente `0bca0b45-e7f6-59b2-a455-02191ee367f6`.
 - **Datos de origen:** `prediccion_envio` y `reportes_generados`.
-- **Resultado esperado:** ETA, probabilidad de atraso y factores de sus envíos en tránsito.
+- **Resultado esperado:** ETA, probabilidad de atraso, riesgos operativo y climático y factores de sus envíos en tránsito.
 
 ## Evidencia
 
