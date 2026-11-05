@@ -22,11 +22,11 @@ if ("$existe".Trim() -ne '0') {
 
 docker exec $c mkdir -p /tmp/tp_pg
 docker cp database/init/. "${c}:/tmp/tp_pg/" 2>$null | Out-Null
-foreach ($f in '03_datos_demo.sql', '04_pruebas_aceptacion.sql', '06_datos_catalogo.sql', '07_ajustes_catalogo.sql') {
+foreach ($f in '03_datos_demo.sql', '04_pruebas_aceptacion.sql', '06_datos_catalogo.sql', '07_ajustes_catalogo.sql', '08_incidentes_catalogo.sql') {
     docker cp "database/referencia-postgresql/$f" "${c}:/tmp/tp_pg/" 2>$null | Out-Null
 }
 # 04 va antes de 06 porque verifica los totales del dataset chico.
-foreach ($f in ($esquema + '03_datos_demo.sql', '04_pruebas_aceptacion.sql', '06_datos_catalogo.sql', '07_ajustes_catalogo.sql')) {
+foreach ($f in ($esquema + '03_datos_demo.sql', '04_pruebas_aceptacion.sql', '06_datos_catalogo.sql', '07_ajustes_catalogo.sql', '08_incidentes_catalogo.sql')) {
     docker exec $c sh -c "$psql -f /tmp/tp_pg/$f" *> $null
     if ($LASTEXITCODE -ne 0) { "ERROR al cargar $f"; exit 1 }
     "OK $f"

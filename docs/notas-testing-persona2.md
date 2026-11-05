@@ -40,7 +40,7 @@ históricas del catálogo son del 20 al 22/10/2026.
 | R29 | Analítica → Predicción de atrasos | "Generar predicción del día" dos veces | La segunda no agrega nada; "Ver validación" muestra el error medio |
 | R34 | Analítica → Reportes | Tipo `PREDICTIVO`, cliente `0bca0b45-e7f6-59b2-a455-02191ee367f6` | ETA, riesgo y factores de sus envíos en tránsito |
 | R11 | Analítica → Reportes | Solicitar y elegir la fila | Estado `GENERADO` y el resultado a la derecha, leído de Mongo |
-| R33 | Analítica → Reportes | "Facturar" dos veces | Estado `FACTURADO` y una sola factura. Un cliente sin cuenta corriente da error |
+| R33 | Analítica → Reportes | "Facturar" dos veces | Estado `FACTURADO` y una sola factura. Si el cliente no tiene cuenta corriente, se crea |
 | R30 | Analítica → Red del cliente | UUID del cliente C02: `270823a9-7978-5eda-80f0-9ae673331b0b` | Sus envíos, tramos y operadores, iguales a Postgres |
 
 El botón "Reportes" del menú abre los reportes SQL de Persona 1 (R35 a R39). Los de esta guía están en "Analítica".
