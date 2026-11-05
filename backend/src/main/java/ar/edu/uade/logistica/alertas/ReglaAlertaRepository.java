@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 public class ReglaAlertaRepository {
     private static final String COLUMNAS = """
             id_regla, id_cliente, id_sensor, nombre, tipo_regla, operador, umbral,
-            minutos_inactividad, severidad, activa
+            minutos_inactividad, severidad, activa, tipo_contenedor
             """;
 
     private final JdbcTemplate jdbcTemplate;
@@ -30,13 +30,15 @@ public class ReglaAlertaRepository {
                 this::mapear);
     }
 
-    /** Reglas activas que aplican a un sensor: las suyas, las de su cliente y las globales. */
-    public List<ReglaAlertaResponse> aplicables(UUID idSensor, UUID idCliente) {
+    /** Reglas activas que aplican a un sensor: las suyas, las de su cliente, su tipo de contenedor y las globales. */
+    public List<ReglaAlertaResponse> aplicables(UUID idSensor, UUID idCliente, UUID idContenedor) {
         return jdbcTemplate.query("SELECT " + COLUMNAS + """
                  FROM tp_logistica.regla_alerta
                  WHERE activa AND (id_sensor IS NULL OR id_sensor = ?)
                    AND (id_cliente IS NULL OR id_cliente = ?)
-                """, this::mapear, idSensor, idCliente);
+                   AND (tipo_contenedor IS NULL OR tipo_contenedor =
+                        (SELECT tipo FROM tp_logistica.contenedor WHERE id_contenedor = ?))
+                """, this::mapear, idSensor, idCliente, idContenedor);
     }
 
     public ReglaAlertaResponse crear(ReglaAlertaRequest regla) {
@@ -44,10 +46,10 @@ public class ReglaAlertaRepository {
         jdbcTemplate.update("""
                 INSERT INTO tp_logistica.regla_alerta
                   (id_regla, id_cliente, id_sensor, nombre, tipo_regla, operador, umbral,
-                   minutos_inactividad, severidad, activa)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                   minutos_inactividad, severidad, activa, tipo_contenedor)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, id, regla.idCliente(), regla.idSensor(), regla.nombre(), regla.tipoRegla(), regla.operador(),
-                regla.umbral(), regla.minutosInactividad(), regla.severidad(), regla.activa());
+                regla.umbral(), regla.minutosInactividad(), regla.severidad(), regla.activa(), regla.tipoContenedor());
         return buscar(id);
     }
 
@@ -55,10 +57,10 @@ public class ReglaAlertaRepository {
         int filas = jdbcTemplate.update("""
                 UPDATE tp_logistica.regla_alerta
                    SET id_cliente = ?, id_sensor = ?, nombre = ?, tipo_regla = ?, operador = ?, umbral = ?,
-                       minutos_inactividad = ?, severidad = ?, activa = ?
+                       minutos_inactividad = ?, severidad = ?, activa = ?, tipo_contenedor = ?
                  WHERE id_regla = ?
                 """, regla.idCliente(), regla.idSensor(), regla.nombre(), regla.tipoRegla(), regla.operador(),
-                regla.umbral(), regla.minutosInactividad(), regla.severidad(), regla.activa(), id);
+                regla.umbral(), regla.minutosInactividad(), regla.severidad(), regla.activa(), regla.tipoContenedor(), id);
         if (filas == 0) throw new NotFoundException("La regla no existe");
         return buscar(id);
     }
@@ -79,6 +81,7 @@ public class ReglaAlertaRepository {
                 rs.getObject("id_regla", UUID.class), rs.getObject("id_cliente", UUID.class),
                 rs.getObject("id_sensor", UUID.class), rs.getString("nombre"), rs.getString("tipo_regla"),
                 rs.getString("operador"), rs.getObject("umbral") == null ? null : rs.getDouble("umbral"),
-                rs.getObject("minutos_inactividad", Integer.class), rs.getString("severidad"), rs.getBoolean("activa"));
+                rs.getObject("minutos_inactividad", Integer.class), rs.getString("severidad"), rs.getBoolean("activa"),
+                rs.getString("tipo_contenedor"));
     }
 }

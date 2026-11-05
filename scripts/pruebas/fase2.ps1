@@ -96,6 +96,14 @@ try {
     Ver 'con la lectura que la causo' "$lA" $an[0].idLectura
     "     z=$($an[0].valorObservado) umbral=$($an[0].umbral) severidad=$($an[0].severidad)"
 
+    '=== R09 regla limitada a un tipo de contenedor'
+    $tipo = Sql "select tipo from tp_logistica.contenedor where id_contenedor=(select id_contenedor from tp_logistica.v_envio_contenedor_sensor_activo where id_sensor='$s2');"
+    $otra = (Invoke-RestMethod "$base/api/v1/reglas" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ idSensor = $s2; nombre = 'Prueba otro tipo'; tipoRegla = 'HUMEDAD'; operador = '>'; umbral = 1.0; severidad = 'BAJA'; activa = $true; tipoContenedor = 'TIPO_INEXISTENTE' } | ConvertTo-Json)).idRegla
+    $igual = (Invoke-RestMethod "$base/api/v1/reglas" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ idSensor = $s2; nombre = 'Prueba mismo tipo'; tipoRegla = 'HUMEDAD'; operador = '>'; umbral = 1.0; severidad = 'BAJA'; activa = $true; tipoContenedor = "$tipo" } | ConvertTo-Json)).idRegla
+    Req POST '/api/v1/iot/lecturas' (Lectura $s2 (Get-Date).ToUniversalTime().AddSeconds(-2) @{ humedad = 50.0 } $null) | Out-Null
+    Ver 'no aplica a otro tipo' 0 (AlertasDe $s2 $otra).Count
+    Ver 'aplica a su tipo' 1 (AlertasDe $s2 $igual).Count
+    Sql "delete from tp_logistica.regla_alerta where id_regla in ('$otra','$igual');" | Out-Null
     '=== R23 tarea periodica'
     $inact = (Invoke-RestMethod "$base/api/v1/reglas" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ idSensor = $s3; nombre = 'Prueba inactividad'; tipoRegla = 'INACTIVIDAD'; operador = '>'; minutosInactividad = 1; severidad = 'ALTA'; activa = $true } | ConvertTo-Json)).idRegla
     Req POST '/api/v1/iot/lecturas' (Lectura $s3 (Get-Date).ToUniversalTime().AddMinutes(-3) @{ temperatura = 5.0; bateria = 10.0 } $null) | Out-Null
@@ -121,12 +129,17 @@ try {
     Ver 'ALTA/CRITICA sin incidente' 0 $sin.Count
 
     '=== R09 baja logica y Mongo caido'
-    Ver 'desactivar regla' 204 (Req DELETE "/api/v1/reglas/$regla" $null)
-    Ver 'regla inactiva' 'f' (Sql "select activa from tp_logistica.regla_alerta where id_regla='$regla';")
+    $antes = @(AlertasDe $s1 $regla | Where-Object { $_.activa })[0].ocurrencias
+    $lCaida = Lectura $s1 (Get-Date) @{ temperatura = 70.0 } $null
     docker stop $MO 2>$null | Out-Null
-    Ver 'lectura se guarda con Mongo caido' 201 (Req POST '/api/v1/iot/lecturas' (Lectura $s2 (Get-Date) @{ temperatura = 5.0 } $null))
+    Ver 'pide reintentar con Mongo caido' 503 (Req POST '/api/v1/iot/lecturas' $lCaida)
     Ver 'listar alertas con Mongo caido' 503 (Req GET '/api/v1/alertas' $null)
     docker start $MO 2>$null | Out-Null
+    $res = $null; for ($i = 0; $i -lt 20; $i++) { Start-Sleep -Seconds 3; $res = Req POST '/api/v1/iot/lecturas' $lCaida; if ($res -eq 201) { break } }
+    Ver 'el reintento funciona al volver Mongo' 201 $res
+    Ver 'la alerta no se perdio' ($antes + 1) (@(AlertasDe $s1 $regla | Where-Object { $_.activa })[0].ocurrencias)
+    Ver 'desactivar regla' 204 (Req DELETE "/api/v1/reglas/$regla" $null)
+    Ver 'regla inactiva' 'f' (Sql "select activa from tp_logistica.regla_alerta where id_regla='$regla';")
     "incidentes nuevos: $([int](Sql 'select count(*) from tp_logistica.incidente;') - $inc0)"
 }
 finally {

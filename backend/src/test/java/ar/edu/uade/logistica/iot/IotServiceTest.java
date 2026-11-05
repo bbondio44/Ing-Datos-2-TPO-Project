@@ -7,6 +7,7 @@ import java.util.UUID;
 import ar.edu.uade.logistica.alertas.AlertaService;
 import ar.edu.uade.logistica.common.ConflictException;
 import ar.edu.uade.logistica.common.NotFoundException;
+import ar.edu.uade.logistica.common.ServiceUnavailableException;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +59,18 @@ class IotServiceTest {
         verify(lecturas).guardar(lectura, CONTENEDOR);
         assertThat(respuesta.idLectura()).isEqualTo(lectura.idLectura());
         assertThat(respuesta.idContenedor()).isEqualTo(CONTENEDOR);
+    }
+
+    @Test
+    void asksForARetryWhenTheReadingCouldNotBeEvaluated() {
+        sensorExiste(1);
+        when(jdbcTemplate.queryForList(anyString(), eq(UUID.class), any(), any(), any())).thenReturn(List.of(CONTENEDOR));
+        AlertaService evaluador = mock(AlertaService.class);
+        when(alertas.getIfAvailable()).thenReturn(evaluador);
+        doThrow(new IllegalStateException("Mongo caído")).when(evaluador).evaluar(lectura, CONTENEDOR);
+
+        assertThatThrownBy(() -> service.registrar(lectura)).isInstanceOf(ServiceUnavailableException.class);
+        verify(lecturas).guardar(lectura, CONTENEDOR);
     }
 
     @Test

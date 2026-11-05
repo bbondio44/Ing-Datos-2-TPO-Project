@@ -7,6 +7,7 @@ import java.util.UUID;
 import ar.edu.uade.logistica.alertas.AlertaService;
 import ar.edu.uade.logistica.common.ConflictException;
 import ar.edu.uade.logistica.common.NotFoundException;
+import ar.edu.uade.logistica.common.ServiceUnavailableException;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotRequest;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotResponse;
 import org.slf4j.Logger;
@@ -48,7 +49,10 @@ public class IotService {
         return new LecturaIotResponse(lectura.idLectura(), idContenedor);
     }
 
-    /** La lectura ya quedó guardada: si falla la evaluación, no se la rechaza al sensor. */
+    /**
+     * La lectura ya quedó guardada. Si falla la evaluación se responde 503 para que el emisor reintente con
+     * el mismo id: el INSERT no duplica y la lectura vuelve a evaluarse, así no se pierde la alerta.
+     */
     private void evaluarAlertas(LecturaIotRequest lectura, UUID idContenedor) {
         AlertaService servicio = alertas.getIfAvailable();
         if (servicio == null) return;
@@ -56,6 +60,7 @@ public class IotService {
             servicio.evaluar(lectura, idContenedor);
         } catch (RuntimeException exception) {
             log.warn("No se pudo evaluar la lectura {}", lectura.idLectura(), exception);
+            throw new ServiceUnavailableException("La lectura se guardó pero no se pudo evaluar: reintente", exception);
         }
     }
 

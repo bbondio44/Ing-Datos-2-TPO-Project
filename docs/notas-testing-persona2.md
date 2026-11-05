@@ -51,7 +51,7 @@ El botón "Reportes" del menú abre los reportes SQL de Persona 1 (R35 a R39). L
 - Una lectura tardía va al historial y no pisa `ultima_*`.
 - Una lectura sin GPS no cambia la última posición.
 - Con Cassandra caída, la ingesta responde 503 y el reintento funciona.
-- Con Mongo caído, la lectura se guarda igual; las alertas de ese momento no se generan.
+- Con Mongo caído, la lectura se guarda y la API responde 503. El reintento con el mismo id no duplica y genera la alerta.
 - Un rango que cruza medianoche lee las dos particiones diarias.
 - Un usuario con rol CLIENTE ve lo suyo; lo de otro cliente responde 404 y lo que no le corresponde, 403.
 - Reprocesar todo el outbox deja los mismos nodos y relaciones en Neo4j.
@@ -60,6 +60,3 @@ El botón "Reportes" del menú abre los reportes SQL de Persona 1 (R35 a R39). L
 ## Pendiente de definir
 
 - Un incidente solo tiene tramo si el envío estaba recorriendo uno en ese instante. Sin tramo, no suma en R27.
-- Las reglas de cadena de frío aplican a todos los sensores: `regla_alerta` no tiene un filtro por tipo de contenedor.
-- Los clientes del catálogo no tienen cuenta corriente: sus reportes no se pueden facturar hasta tenerla.
-- Si Mongo estuvo caído, no se reevalúan después las lecturas de ese período.

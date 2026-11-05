@@ -13,6 +13,9 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class IoTSimulator {
+    private static final int REINTENTOS = 5;
+    private static final long ESPERA_REINTENTO_MS = 2000;
+
     private IoTSimulator() { }
 
     public static void main(String[] args) throws Exception {
@@ -47,7 +50,12 @@ public final class IoTSimulator {
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(reading)))
                     .build();
+            // Un 5xx se reintenta con la misma lectura: el id no cambia, así no se duplica.
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            for (int intento = 1; intento <= REINTENTOS && response.statusCode() >= 500; intento++) {
+                Thread.sleep(ESPERA_REINTENTO_MS);
+                response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            }
             System.out.printf("%s lectura=%s estado=%d%n", Instant.now(), reading.get("idLectura"), response.statusCode());
             Thread.sleep(intervalMillis);
         }

@@ -56,6 +56,8 @@ public final class OperacionWindow {
     private final TextField valorRegla = new TextField();
     private final ComboBox<String> severidad = new ComboBox<>(FXCollections.observableArrayList(
             "BAJA", "MEDIA", "ALTA", "CRITICA"));
+    private final ComboBox<String> tipoContenedor = new ComboBox<>(FXCollections.observableArrayList(
+            "Todos", "REEFER", "DRY", "OPEN_TOP"));
     private final Label estadoReglas = new Label();
 
     private final TextField idEnvio = new TextField();
@@ -114,6 +116,7 @@ public final class OperacionWindow {
         reglas.getColumns().add(columna("Tipo", ReglaAlertaResponse::tipoRegla));
         reglas.getColumns().add(columna("Condición", r -> r.operador() + " " + (r.umbral() != null ? r.umbral() : r.minutosInactividad() + " min")));
         reglas.getColumns().add(columna("Severidad", ReglaAlertaResponse::severidad));
+        reglas.getColumns().add(columna("Contenedor", r -> r.tipoContenedor() == null ? "Todos" : r.tipoContenedor()));
         reglas.getColumns().add(columna("Activa", r -> r.activa() ? "Sí" : "No"));
         reglas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         nombreRegla.setPromptText("Nombre");
@@ -122,10 +125,11 @@ public final class OperacionWindow {
         tipoRegla.setValue("TEMPERATURA");
         operador.setValue(">");
         severidad.setValue("ALTA");
+        tipoContenedor.setValue("Todos");
         Button crear = boton("Crear regla", this::crearRegla);
         Button desactivar = boton("Desactivar", this::desactivarRegla);
         HBox.setHgrow(nombreRegla, Priority.ALWAYS);
-        return panel(new HBox(10, nombreRegla, tipoRegla, operador, valorRegla, severidad, crear, desactivar),
+        return panel(new HBox(10, nombreRegla, tipoRegla, operador, valorRegla, severidad, tipoContenedor, crear, desactivar),
                 reglas, estadoReglas);
     }
 
@@ -233,7 +237,8 @@ public final class OperacionWindow {
             return;
         }
         ReglaAlertaRequest regla = new ReglaAlertaRequest(null, null, nombreRegla.getText().strip(), tipoRegla.getValue(),
-                operador.getValue(), inactividad ? null : valor, inactividad ? (int) valor : null, severidad.getValue(), true);
+                operador.getValue(), inactividad ? null : valor, inactividad ? (int) valor : null, severidad.getValue(), true,
+                "Todos".equals(tipoContenedor.getValue()) ? null : tipoContenedor.getValue());
         al(AppContext.get().api().createAlertRule(regla), estadoReglas, creada -> cargarReglas());
     }
 

@@ -66,7 +66,7 @@ public class AlertaService {
         UUID idCliente = envios.isEmpty() ? null : envios.get(0)[1];
         Instant ahora = Instant.now();
 
-        for (ReglaAlertaResponse regla : reglas.aplicables(lectura.idSensor(), idCliente)) {
+        for (ReglaAlertaResponse regla : reglas.aplicables(lectura.idSensor(), idCliente, idContenedor)) {
             OptionalDouble valor = valorObservado(regla, lectura);
             if (valor.isPresent() && cumple(valor.getAsDouble(), regla.operador(), regla.umbral())) {
                 String mensaje = String.format(Locale.ROOT, "%s: valor %.2f %s %.2f",
@@ -87,7 +87,7 @@ public class AlertaService {
             UUID idCliente = rs.getObject("id_cliente", UUID.class);
             Optional<LecturaHistoricaResponse> ultima = lecturas.ultimaLectura(idSensor);
             if (ultima.isEmpty()) return;
-            for (ReglaAlertaResponse regla : reglas.aplicables(idSensor, idCliente)) {
+            for (ReglaAlertaResponse regla : reglas.aplicables(idSensor, idCliente, idContenedor)) {
                 evaluarEstado(regla, ultima.get(), idSensor, idContenedor, idEnvio, idCliente, ahora);
             }
         });

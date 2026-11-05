@@ -64,7 +64,7 @@ class AlertaServiceTest {
     }
 
     private ReglaAlertaResponse regla(String severidad) {
-        return new ReglaAlertaResponse(UUID.randomUUID(), null, null, "Regla", "TEMPERATURA", ">", 8.0, null, severidad, true);
+        return new ReglaAlertaResponse(UUID.randomUUID(), null, null, "Regla", "TEMPERATURA", ">", 8.0, null, severidad, true, null);
     }
 
     private AlertaNueva alerta(ReglaAlertaResponse regla, UUID sensor, UUID lectura, Instant instante, UUID envio) {

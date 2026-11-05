@@ -226,6 +226,7 @@ CREATE TABLE regla_alerta (
  tipo_regla varchar(30) NOT NULL,
  operador varchar(4) NOT NULL DEFAULT '>', umbral numeric(16,4),
  minutos_inactividad integer,
+ tipo_contenedor varchar(60),
  severidad varchar(15) NOT NULL DEFAULT 'MEDIA',
  activa boolean NOT NULL DEFAULT true,
  fecha_creacion timestamptz NOT NULL DEFAULT now(),

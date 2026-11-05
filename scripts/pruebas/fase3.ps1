@@ -112,7 +112,7 @@ try {
     Ver 'sin cliente' 400 (Req POST '/api/v1/reportes' @{ tipo = 'DESEMPENO' })
     Ver 'reporte inexistente' 404 (Req GET "/api/v1/reportes/$([guid]::NewGuid())/resultado" $null)
     $sinCuenta = Obj POST '/api/v1/reportes' @{ tipo = 'RANKING_RUTAS'; idCliente = (Id 'C01') }
-    "     facturar cliente del catalogo: $(Req POST "/api/v1/reportes/$($sinCuenta.idSolicitud)/facturar" $null)"
+    Ver 'facturar a un cliente del catalogo' 200 (Req POST "/api/v1/reportes/$($sinCuenta.idSolicitud)/facturar" $null)
 }
 finally {
     if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }

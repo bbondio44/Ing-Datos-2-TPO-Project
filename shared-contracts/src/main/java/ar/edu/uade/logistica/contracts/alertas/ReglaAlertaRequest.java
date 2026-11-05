@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
-/** Regla sobre la telemetría. Sin cliente ni sensor, aplica a todos. */
+/** Regla sobre la telemetría. Sin cliente, sensor ni tipo de contenedor, aplica a todos. */
 public record ReglaAlertaRequest(
         UUID idCliente,
         UUID idSensor,
@@ -19,7 +19,8 @@ public record ReglaAlertaRequest(
         Double umbral,
         @Positive Integer minutosInactividad,
         @NotBlank @Pattern(regexp = "BAJA|MEDIA|ALTA|CRITICA") String severidad,
-        @NotNull Boolean activa) {
+        @NotNull Boolean activa,
+        @Size(max = 60) String tipoContenedor) {
 
     @AssertTrue(message = "INACTIVIDAD usa minutos; el resto de las reglas usa umbral")
     public boolean isUmbralCoherente() {
