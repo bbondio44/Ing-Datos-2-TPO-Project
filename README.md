@@ -45,7 +45,7 @@ El bootstrap no contiene una contraseña predeterminada. Si las variables no est
 ## Arranque con las cuatro bases
 
 1. Copiar `.env.example` a `.env` y completar las claves. `MONGO_URI` va sin comillas y con la misma clave que `MONGO_PASSWORD`.
-2. Levantar las bases con `docker compose up -d` y esperar a que Cassandra figure `healthy` en `docker compose ps`.
+2. Levantar las bases con `docker compose --env-file .env -f infra/docker-compose.yml up -d --wait`. También funciona `docker compose up -d --wait` con el compose de la raíz; cada uno usa sus propios volúmenes, así que hay que cargar los datos en el que se use y no tener los dos prendidos a la vez.
 3. Cargar los datos:
 
 ```powershell

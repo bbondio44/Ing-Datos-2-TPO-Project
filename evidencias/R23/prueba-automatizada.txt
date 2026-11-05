@@ -1,5 +1,5 @@
 ﻿=== R23 tarea periodica
-     alertas del sensor: INACTIVIDADx1 TEMPERATURAx3 TEMPERATURAx3 INACTIVIDADx3 BATERIAx4 BATERIAx4
+     alertas del sensor: INACTIVIDADx1 BATERIAx1 BATERIAx1 TEMPERATURAx1
 OK    alerta de inactividad: esperado=True obtenido=True
 OK    alerta de bateria: esperado=True obtenido=True
      mensaje: Sensor sin lecturas hace 2 minutos

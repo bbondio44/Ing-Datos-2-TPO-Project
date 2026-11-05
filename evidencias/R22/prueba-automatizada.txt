@@ -1,6 +1,6 @@
 ﻿=== R22 estado de sensores
 OK    sensores en la lista: esperado=43 obtenido=43
-     ONLINE=3 OFFLINE=39 SIN_DATOS=1
+     SIN_DATOS=3 OFFLINE=39 ONLINE=1
 OK    SEN-040 nunca reporto: esperado=SIN_DATOS obtenido=SIN_DATOS
 OK    sensor demo con lecturas recientes: esperado=ONLINE obtenido=ONLINE
 usuario temporal borrado: 1
