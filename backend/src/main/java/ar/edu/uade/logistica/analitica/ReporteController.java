@@ -31,20 +31,20 @@ public class ReporteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public ReporteResponse solicitar(@Valid @RequestBody ReporteRequest pedido,
                                      @AuthenticationPrincipal AuthenticatedUser user) {
         return service.solicitar(pedido, user);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<ReporteResponse> listar(@AuthenticationPrincipal AuthenticatedUser user) {
         return service.listar(user);
     }
 
     @GetMapping("/{id}/resultado")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public Object resultado(@PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser user) {
         return service.resultado(id, user);
     }

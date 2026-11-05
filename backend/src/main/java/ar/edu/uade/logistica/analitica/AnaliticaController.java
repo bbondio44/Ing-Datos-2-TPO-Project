@@ -39,7 +39,7 @@ public class AnaliticaController {
     }
 
     @GetMapping("/desempeno")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<Map<String, Object>> desempeno(
             @RequestParam(required = false) UUID idCliente,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -49,7 +49,7 @@ public class AnaliticaController {
     }
 
     @GetMapping("/predicciones")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<Map<String, Object>> predicciones(@AuthenticationPrincipal AuthenticatedUser user) {
         return predicciones.vigentes(clienteVisible(null, user));
     }

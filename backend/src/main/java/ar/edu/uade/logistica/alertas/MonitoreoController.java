@@ -39,7 +39,7 @@ public class MonitoreoController {
     }
 
     @GetMapping("/envios/{id}")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public MonitoreoEnvioResponse envio(@PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser user) {
         List<Map<String, Object>> filas = jdbcTemplate.queryForList("""
                 SELECT id_cliente, origen, destino, estado FROM tp_logistica.envio WHERE id_envio = ?

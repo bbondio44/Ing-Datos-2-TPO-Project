@@ -12,36 +12,36 @@ Estados permitidos: `PENDIENTE`, `IMPLEMENTADO`, `PROBADO`. La existencia de SQL
 | R06 | Envíos contenedores sensores | Envíos | logística PG | Navegación completa con datos | IMPLEMENTADO |
 | R07 | Contenedores de envío | Envío detalle | envio_contenedor | Asociación vigente e histórica | IMPLEMENTADO |
 | R08 | Sensores de contenedor | Contenedor detalle | asignacion_sensor_contenedor | Consulta por fecha y solapamiento rechazado | IMPLEMENTADO |
-| R09 | Reglas y alertas | Alertas | regla PG, Cassandra, Mongo | Umbral real genera alerta | PENDIENTE |
+| R09 | Reglas y alertas | Alertas | regla PG, Cassandra, Mongo | Umbral real genera alerta | IMPLEMENTADO |
 | R10 | Facturación clientes | Finanzas | funciones PG | Parcial y total con saldo conciliado | IMPLEMENTADO |
-| R11 | Solicitud reportes | Reportes | solicitud PG y resultado Mongo | Solicitar, ejecutar y descargar | PENDIENTE |
+| R11 | Solicitud reportes | Reportes | solicitud PG y resultado Mongo | Solicitar, ejecutar y descargar | IMPLEMENTADO |
 | R12 | Facturación automática | Jobs | facturar_envio/reporte | Dos ejecuciones crean una factura | IMPLEMENTADO |
 | R13 | Pagos | Finanzas | registrar_pago | Imputación, duplicado y sobrepago | IMPLEMENTADO |
 | R14 | Cuentas corrientes | Cuentas | movimientos y conciliación | Saldo coincide con movimientos | IMPLEMENTADO |
 | R15 | Cierre mensual | Cuentas | cerrar_cuenta | Cierre único y retroactivo rechazado | IMPLEMENTADO |
 | R16 | Finanzas terceros | Cuentas terceros | PG naturaleza PAGAR | Proveedor y operador conciliados | IMPLEMENTADO |
-| R17 | Monitoreo integral | Dashboard IoT | PG Cassandra Mongo | Envío con lectura y eventos | PENDIENTE |
-| R18 | Ingesta continua | Simulador | Cassandra | Lecturas consecutivas persistidas | PENDIENTE |
-| R19 | Histórico lecturas | IoT histórico | Cassandra por días | Rango que cruza dos días | PENDIENTE |
-| R20 | Recorrido contenedor | Mapa | posiciones Cassandra | Trayectoria ordenada | PENDIENTE |
-| R21 | GPS | Mapa | última posición e histórico | Punto actual y trayectoria | PENDIENTE |
-| R22 | Estado sensores | Sensores | última lectura Cassandra | Activo, inactivo y batería | PENDIENTE |
-| R23 | Alertas sensor | Alertas | reglas y Mongo | Batería, inactividad y umbral | PENDIENTE |
+| R17 | Monitoreo integral | Dashboard IoT | PG Cassandra Mongo | Envío con lectura y eventos | IMPLEMENTADO |
+| R18 | Ingesta continua | Simulador | Cassandra | Lecturas consecutivas persistidas | IMPLEMENTADO |
+| R19 | Histórico lecturas | IoT histórico | Cassandra por días | Rango que cruza dos días | IMPLEMENTADO |
+| R20 | Recorrido contenedor | Mapa | posiciones Cassandra | Trayectoria ordenada | IMPLEMENTADO |
+| R21 | GPS | Mapa | última posición e histórico | Punto actual y trayectoria | IMPLEMENTADO |
+| R22 | Estado sensores | Sensores | última lectura Cassandra | Activo, inactivo y batería | IMPLEMENTADO |
+| R23 | Alertas sensor | Alertas | reglas y Mongo | Batería, inactividad y umbral | IMPLEMENTADO |
 | R24 | Trayectos | Tramos | tramo y Neo4j | Orden, medio, vehículo y operador | IMPLEMENTADO |
-| R25 | Incidentes | Incidentes | incidente PG | Evento genera incidente relacionado | PENDIENTE |
-| R26 | Ciclo alerta | Alertas | MongoDB | Abrir, reconocer, cerrar y deduplicar | PENDIENTE |
-| R27 | Ranking rutas | Analítica | vista PG | Conteos manuales coinciden | PENDIENTE |
-| R28 | Ranking clientes | Analítica | vista PG | Volumen no cancelado coincide | PENDIENTE |
-| R29 | Predicción atrasos | Predicciones | baseline PG | Envío activo con ETA y evaluación | PENDIENTE |
-| R30 | Red relaciones | Grafo | Neo4j | Cypher probado con cliente `cli-001` del backup real | PROBADO |
-| R31 | Histórico desempeño | Analítica | vista PG | Dos períodos y denominadores | PENDIENTE |
-| R32 | Anomalía temperatura | IoT y alertas | Cassandra Mongo PG | Lectura anómala visible | PENDIENTE |
-| R33 | Reportes facturables | Reportes | PG Mongo exportación | Filtros, artefacto y factura | PENDIENTE |
-| R34 | Reportes predictivos | Reportes | predicciones | ETA, score, factores y límites | PENDIENTE |
+| R25 | Incidentes | Incidentes | incidente PG | Evento genera incidente relacionado | IMPLEMENTADO |
+| R26 | Ciclo alerta | Alertas | MongoDB | Abrir, reconocer, cerrar y deduplicar | IMPLEMENTADO |
+| R27 | Ranking rutas | Analítica | vista PG | Conteos manuales coinciden | IMPLEMENTADO |
+| R28 | Ranking clientes | Analítica | vista PG | Volumen no cancelado coincide | IMPLEMENTADO |
+| R29 | Predicción atrasos | Predicciones | baseline PG | Envío activo con ETA y evaluación | IMPLEMENTADO |
+| R30 | Red relaciones | Grafo | Neo4j | Red de un cliente con UUID reales, cargada por el worker del outbox | IMPLEMENTADO |
+| R31 | Histórico desempeño | Analítica | vista PG | Dos períodos y denominadores | IMPLEMENTADO |
+| R32 | Anomalía temperatura | IoT y alertas | Cassandra Mongo PG | Lectura anómala visible | IMPLEMENTADO |
+| R33 | Reportes facturables | Reportes | PG Mongo exportación | Filtros, artefacto y factura | IMPLEMENTADO |
+| R34 | Reportes predictivos | Reportes | predicciones | ETA, score, factores y límites | IMPLEMENTADO |
 | R35 | Reportes envíos | Reportes | v_envios_reporte | Filtros combinables | IMPLEMENTADO |
 | R36 | Máximo mínimo por cliente | Analítica | vista PG | Solo entregados y cálculo manual | IMPLEMENTADO |
 | R37 | Promedio incidentes | Analítica | vista PG | Dimensiones y denominador | IMPLEMENTADO |
 | R38 | Promedio entrega | Analítica | vista PG | Dataset reducido coincide | IMPLEMENTADO |
 | R39 | Costos transporte | Analítica | vista PG | Sumas por medio coinciden | IMPLEMENTADO |
-| R40 | Mensajería | Mensajes | MongoDB | Privado grupal público y aislamiento | PENDIENTE |
+| R40 | Mensajería | Mensajes | MongoDB | Privado grupal público y aislamiento | IMPLEMENTADO |
 

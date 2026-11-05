@@ -12,8 +12,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,12 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiError> conflict(Exception exception, HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, "CONFLICTO_DATOS",
                 "La operación entra en conflicto con un dato existente o una regla de integridad", Map.of(), request);
+    }
+
+    @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
+    ResponseEntity<ApiError> invalidParameter(Exception exception, HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "PARAMETRO_INVALIDO",
+                "Falta un parámetro o tiene un formato inválido", Map.of(), request);
     }
 
     @ExceptionHandler(BadRequestException.class)

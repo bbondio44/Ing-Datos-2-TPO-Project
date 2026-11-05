@@ -23,7 +23,7 @@ public class Neo4jGraphController {
     }
 
     @GetMapping("/clientes/{clientId}/red")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public Map<String, Object> graphForClient(@PathVariable String clientId,
                                               @AuthenticationPrincipal AuthenticatedUser user) {
         return service.graphForClient(clientId, user);

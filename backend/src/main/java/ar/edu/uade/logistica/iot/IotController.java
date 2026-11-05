@@ -45,7 +45,7 @@ public class IotController {
     }
 
     @GetMapping("/sensores/{id}/lecturas")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<LecturaHistoricaResponse> lecturasPorSensor(
             @PathVariable UUID id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant desde,
@@ -55,7 +55,7 @@ public class IotController {
     }
 
     @GetMapping("/contenedores/{id}/lecturas")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<LecturaHistoricaResponse> lecturasPorContenedor(
             @PathVariable UUID id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant desde,
@@ -65,7 +65,7 @@ public class IotController {
     }
 
     @GetMapping("/contenedores/{id}/recorrido")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<PosicionResponse> recorrido(
             @PathVariable UUID id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant desde,
@@ -75,13 +75,13 @@ public class IotController {
     }
 
     @GetMapping("/contenedores/{id}/ultima-posicion")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public PosicionResponse ultimaPosicion(@PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser user) {
         return consultas.ultimaPosicion(id, user);
     }
 
     @GetMapping("/sensores/estado")
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<SensorEstadoResponse> estadoSensores(@AuthenticationPrincipal AuthenticatedUser user) {
         return consultas.estadoSensores(user);
     }

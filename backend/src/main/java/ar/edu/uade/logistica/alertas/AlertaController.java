@@ -30,7 +30,7 @@ public class AlertaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    @PreAuthorize("hasAnyAuthority('LOGISTICA_LEER', 'REPORTES_LEER')")
     public List<AlertaResponse> listar(@RequestParam(required = false) String estado,
                                        @AuthenticationPrincipal AuthenticatedUser user) {
         return service.listar(estado, user);

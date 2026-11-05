@@ -46,7 +46,8 @@
                 <TextField fx:id="searchField" promptText="Buscar por razón social o CUIT" HBox.hgrow="ALWAYS"/>
                 <Button text="Buscar" onAction="#refresh" styleClass="secondary-button"/>
             </HBox>
-            <TableView fx:id="clientsTable" VBox.vgrow="ALWAYS" columnResizePolicy="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN">
+            <TableView fx:id="clientsTable" VBox.vgrow="ALWAYS">
+                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN"/></columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Razón social" prefWidth="300"/>
                     <TableColumn fx:id="cuitColumn" text="CUIT" prefWidth="160"/>
