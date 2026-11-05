@@ -1,7 +1,10 @@
 package ar.edu.uade.logistica.analitica;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,6 +32,8 @@ public class PrediccionService {
     private static final String ULTIMAS_PREDICCIONES = """
             SELECT e.id_envio, c.razon_social AS cliente, e.origen, e.destino, e.estado,
                    e.fecha_entrega_estimada, p.eta_predicha, p.probabilidad_atraso,
+                   (p.variables->>'riesgo_operativo')::numeric AS riesgo_operativo,
+                   (p.variables->>'riesgo_climatico')::numeric AS riesgo_climatico,
                    p.variables::text AS factores, p.fecha_prediccion
               FROM tp_logistica.prediccion_envio p
               JOIN tp_logistica.envio e ON e.id_envio = p.id_envio
@@ -37,6 +42,28 @@ public class PrediccionService {
                AND p.fecha_prediccion = (SELECT max(u.fecha_prediccion) FROM tp_logistica.prediccion_envio u
                                           WHERE u.id_envio = p.id_envio)
             """;
+    private static final String SIN_RIESGOS = """
+            SELECT p.id_prediccion, e.id_envio, e.pais_origen, e.pais_destino
+              FROM tp_logistica.prediccion_envio p
+              JOIN tp_logistica.envio e ON e.id_envio = p.id_envio
+             WHERE e.estado IN ('EN_TRANSITO', 'DEMORADO') AND p.variables->>'riesgo_operativo' IS NULL
+            """;
+    /** Incidentes por envío en la misma ruta de países, sin contar el envío evaluado. */
+    private static final String TASA_RUTA = """
+            SELECT COALESCE(COUNT(i.id_incidente)::numeric / NULLIF(COUNT(DISTINCT e.id_envio), 0), 0)
+              FROM tp_logistica.envio e
+              LEFT JOIN tp_logistica.incidente i ON i.id_envio = e.id_envio
+             WHERE e.pais_origen = ? AND e.pais_destino = ? AND e.id_envio <> ? AND e.estado <> 'CANCELADO'
+            """;
+    /** El tramo que importa es el que está en curso; si no hay, el próximo; si no, el último. */
+    private static final String MEDIO_ACTUAL = """
+            SELECT medio_transporte FROM tp_logistica.tramo WHERE id_envio = ?
+             ORDER BY CASE estado WHEN 'EN_CURSO' THEN 0 WHEN 'PENDIENTE' THEN 1 ELSE 2 END, numero_tramo
+             LIMIT 1
+            """;
+    private static final String CRITERIO_RIESGOS = "Operativo: incidentes abiertos e historial de la ruta. "
+            + "Climatico: estimacion por medio de transporte, sin datos meteorologicos.";
+
     /** Validación: predice cada envío entregado con el promedio de los demás y compara con lo real. */
     private static final String VALIDACION = """
             WITH duracion AS (
@@ -68,7 +95,48 @@ public class PrediccionService {
             jdbcTemplate.queryForObject("SELECT tp_logistica.generar_prediccion_baseline(?)", UUID.class, idEnvio);
             generadas++;
         }
+        completarRiesgos();
         return generadas;
+    }
+
+    /** Suma los riesgos a los factores de la predicción: jsonb admite campos nuevos sin cambiar la tabla. */
+    private void completarRiesgos() {
+        for (Map<String, Object> fila : jdbcTemplate.queryForList(SIN_RIESGOS)) {
+            UUID idEnvio = (UUID) fila.get("id_envio");
+            Long abiertos = jdbcTemplate.queryForObject("""
+                    SELECT count(*) FROM tp_logistica.incidente WHERE id_envio = ? AND estado <> 'CERRADO'
+                    """, Long.class, idEnvio);
+            BigDecimal tasa = jdbcTemplate.queryForObject(TASA_RUTA, BigDecimal.class,
+                    fila.get("pais_origen"), fila.get("pais_destino"), idEnvio);
+            List<String> medios = jdbcTemplate.queryForList(MEDIO_ACTUAL, String.class, idEnvio);
+            String medio = medios.isEmpty() ? null : medios.get(0);
+            String factores = String.format(Locale.ROOT,
+                    "{\"riesgo_operativo\":%.2f,\"riesgo_climatico\":%.2f,\"incidentes_abiertos\":%d,"
+                            + "\"medio_evaluado\":\"%s\",\"criterio_riesgos\":\"%s\"}",
+                    riesgoOperativo(abiertos == null ? 0 : abiertos, tasa == null ? 0 : tasa.doubleValue()),
+                    riesgoClimatico(medio), abiertos == null ? 0 : abiertos, medio == null ? "SIN_TRAMO" : medio,
+                    CRITERIO_RIESGOS);
+            jdbcTemplate.update("""
+                    UPDATE tp_logistica.prediccion_envio SET variables = variables || ?::jsonb WHERE id_prediccion = ?
+                    """, factores, fila.get("id_prediccion"));
+        }
+    }
+
+    /** 60 % incidentes abiertos del envío (tope 3) y 40 % incidentes por envío de la ruta (tope 1). */
+    static double riesgoOperativo(long abiertos, double tasaRuta) {
+        double valor = 0.6 * Math.min(abiertos, 3) / 3.0 + 0.4 * Math.min(tasaRuta, 1.0);
+        return BigDecimal.valueOf(valor).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    /** No hay datos de clima: es una estimación fija por exposición del medio de transporte. */
+    static double riesgoClimatico(String medio) {
+        if (medio == null) return 0.25;
+        return switch (medio) {
+            case "MARITIMO" -> 0.50;
+            case "AEREO" -> 0.35;
+            case "TERRESTRE" -> 0.20;
+            default -> 0.25;
+        };
     }
 
     public List<Map<String, Object>> vigentes(UUID idCliente) {
