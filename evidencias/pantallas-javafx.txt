@@ -1,0 +1,139 @@
+=== Administrador
+OK    entra a la pantalla principal
+     R01/captura-01-alta-cliente.png
+OK    R01 el cliente nuevo aparece en la tabla
+     R01/captura-02-cliente-creado.png
+OK    R01 listado de clientes (14 filas)
+     R01/captura-03-clientes.png
+OK    R02 usuarios (17 filas)
+     R02/captura-01-usuarios.png
+OK    R02 roles (6 filas)
+     R02/captura-02-roles.png
+     R03/captura-01-sesiones.png
+OK    R04 proveedores (10 filas)
+     R04/captura-01-proveedores.png
+OK    R05 operadores (7 filas)
+     R05/captura-01-operadores.png
+OK    R05 vehiculos (2 filas)
+     R05/captura-02-vehiculos.png
+OK    R06 envios (28 filas)
+     R06/captura-01-envios.png
+OK    hay una fila con [Valencia]
+OK    R06 detalle del envio (3 filas)
+     R06/captura-02-detalle-envio.png
+     R07/captura-01-detalle-envio.png
+     R08/captura-01-detalle-envio.png
+OK    R07 contenedores (29 filas)
+     R07/captura-02-contenedores.png
+OK    hay una fila con []
+OK    R07 historial del contenedor (1 filas)
+     R07/captura-03-historial-contenedor.png
+OK    R08 sensores (44 filas)
+     R08/captura-02-sensores.png
+OK    R24 tramos del envio (1 filas)
+     R24/captura-01-tramos.png
+     R04/captura-02-tramos.png
+     R05/captura-03-tramos.png
+OK    hay una fila con []
+     R24/captura-02-edicion-tramo.png
+     R04/captura-03-edicion-tramo.png
+OK    R14 cuentas corrientes (39 filas)
+     R14/captura-01-cuentas.png
+OK    hay una fila con [Transportes del Sur]
+     R10/captura-01-facturas-cliente.png
+     R12/captura-01-facturas-cliente.png
+OK    hay una fila con [Aduana y Servicios]
+OK    R16 la cuenta del proveedor tiene facturas
+     R16/captura-01-cuenta-proveedor.png
+     R04/captura-04-cuenta-proveedor.png
+OK    hay una fila con [Rutas Globales]
+OK    R16 la cuenta del operador tiene facturas
+     R16/captura-02-cuenta-operador.png
+     R05/captura-04-cuenta-operador.png
+OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    hay una fila con [state=BORRADOR]
+OK    hay una fila con [state=EMITIDA]
+OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    R10 el cobro parcial cambia el estado
+     R10/captura-02-cobro-parcial.png
+     R13/captura-01-cobro-parcial.png
+OK    hay una fila con [state=PARCIAL]
+OK    hay una fila con [Alta desde pantalla 4bdea9]
+OK    R10 el cobro total deja la factura pagada
+     R10/captura-03-cobro-total.png
+     R13/captura-02-cobro-total.png
+     R14/captura-02-cobro-total.png
+OK    R15 el cierre informa el saldo
+     R15/captura-01-cierre-mensual.png
+OK    R35 reporte de envios (28 filas)
+OK    R35 el filtro por cliente reduce la tabla
+     R35/captura-01-filtro-cliente.png
+OK    R36 reporte (10 filas)
+     R36/captura-01-reporte.png
+OK    R37 reporte (23 filas)
+     R37/captura-01-reporte.png
+     R38/captura-01-reporte.png
+OK    R39 reporte (3 filas)
+     R39/captura-01-reporte.png
+OK    R22 estado de sensores (44 filas)
+     R22/captura-01-estado-sensores.png
+OK    R19 historico de dos dias (48 filas)
+     R19/captura-01-historico-dos-dias.png
+OK    R18 lecturas registradas (14 filas)
+     R18/captura-01-lecturas-registradas.png
+     R20/captura-01-mapa-recorrido.png
+     R21/captura-01-mapa-recorrido.png
+OK    R26 alertas (18 filas)
+     R26/captura-01-alertas.png
+OK    hay una fila con [tipoRegla=TEMPERATURA]
+     R09/captura-01-alerta-temperatura.png
+     R25/captura-01-alerta-temperatura.png
+OK    hay una fila con [tipoRegla=ANOMALIA_TEMPERATURA]
+     R32/captura-01-alerta-anomalia.png
+OK    hay una fila con [tipoRegla=INACTIVIDAD]
+     R23/captura-01-alerta-inactividad.png
+OK    hay una fila con [estado=ABIERTA]
+OK    hay una fila con [id=e69803c5-26a4-3bc1-b46b-bd37e43d3b9d,]
+OK    R26 la alerta pasa a RECONOCIDA
+     R26/captura-02-alerta-reconocida.png
+OK    hay una fila con [id=e69803c5-26a4-3bc1-b46b-bd37e43d3b9d,]
+OK    R26 la alerta pasa a CERRADA
+     R26/captura-03-alerta-cerrada.png
+OK    R09 reglas (11 filas)
+OK    R09 la regla nueva aparece en la tabla
+OK    hay una fila con [Regla desde la pantalla]
+     R09/captura-02-regla-creada.png
+OK    R17 monitoreo del envio (14 filas)
+     R17/captura-01-monitoreo-envio.png
+OK    R40 conversaciones internas (2 filas)
+OK    hay una fila con [GRUPAL]
+OK    R40 la conversacion grupal muestra mensajes
+     R40/captura-01-mensajeria-grupal.png
+OK    R27 analitica (6 filas)
+     R27/captura-01-resultado.png
+OK    R28 analitica (14 filas)
+     R28/captura-01-resultado.png
+OK    R31 analitica (4 filas)
+     R31/captura-01-resultado.png
+OK    R29 predicciones (7 filas)
+     R29/captura-01-predicciones.png
+OK    R11 solicitudes de reporte (7 filas)
+OK    hay una fila con [PREDICTIVO]
+     R34/captura-01-reporte-predictivo.png
+     R11/captura-01-reporte-predictivo.png
+OK    hay una fila con [FACTURADO]
+     R33/captura-01-reporte-facturado.png
+OK    R30 red del cliente (3 filas)
+     R30/captura-01-red-cliente.png
+=== Usuario CLIENTE
+OK    entra a la pantalla principal
+OK    R02 el CLIENTE ve solo su organizacion
+     R02/captura-03-vista-cliente.png
+OK    R35 reporte de envios (3 filas)
+OK    R35 el CLIENTE no ve el combo de clientes
+     R35/captura-02-vista-cliente.png
+OK    R40 conversaciones del cliente (2 filas)
+OK    hay una fila con [PRIVADA]
+OK    R40 el mensaje nuevo aparece en la conversacion
+     R40/captura-02-mensajeria-cliente.png
+RESUMEN pantallas: 71 OK, 0 FALLA

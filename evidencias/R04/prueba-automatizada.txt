@@ -9,8 +9,8 @@ OK    CLIENTE no da de alta proveedores: esperado=403 obtenido=403
 OK    alta del tramo 2: esperado=201 obtenido=201
 OK    alta del tramo 1: esperado=201 obtenido=201
 OK    tramos en secuencia: esperado=1,2 obtenido=1,2
-OK    R05 operador visible en el tramo: esperado=Operador 2e9679 obtenido=Operador 2e9679
-OK    R04 proveedor visible en el tramo: esperado=Proveedor 2e9679 obtenido=Proveedor 2e9679
+OK    R05 operador visible en el tramo: esperado=Operador 2e96fd obtenido=Operador 2e96fd
+OK    R04 proveedor visible en el tramo: esperado=Proveedor 2e96fd obtenido=Proveedor 2e96fd
 OK    vehiculo de otro operador: esperado=409 obtenido=409
 OK    fechas invertidas: esperado=409 obtenido=409
 OK    finalizado sin llegada real: esperado=409 obtenido=409

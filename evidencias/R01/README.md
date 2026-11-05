@@ -1,6 +1,6 @@
 # R01 — ABM de clientes
 
-Estado: `IMPLEMENTADO`. La API, PostgreSQL y la carga de la vista JavaFX fueron verificadas. Falta la captura y el recorrido visual manual para promoverlo a `PROBADO` porque el servicio nativo de automatización de ventanas no estuvo disponible en esta ejecución.
+Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una instalación limpia. Falta que Persona 3 lo marque como terminado.
 
 ## Flujo ejecutado
 
@@ -27,3 +27,9 @@ Se verificaron además:
 - Outbox: eventos `CLIENTE_INSERT` y `CLIENTE_UPDATE` en estado `PENDIENTE`.
 
 La pantalla `Clientes` contiene alta, búsqueda, edición, confirmación de baja lógica y mensajes asíncronos. La prueba visual debe repetirse manualmente antes de cambiar el estado a `PROBADO`.
+
+## Capturas
+
+- `captura-01-alta-cliente.png`
+- `captura-02-cliente-creado.png`
+- `captura-03-clientes.png`

@@ -2,3 +2,10 @@
      1ro: AgroExport Litoral S.A. 201.800 m3
 OK    volumen del primero: esperado=201.8 obtenido=201.8
 OK    orden descendente: esperado=201,8,201,8,201,8,201,8,99,6,66,4,66,4,66,4,55,2,52,3,13,3,0 obtenido=201,8,201,8,201,8,201,8,99,6,66,4,66,4,66,4,55,2,52,3,13,3,0
+=== R27 R28 R31 analitica contra calculo manual
+OK    R27 orden descendente: esperado=2,2,1,1,1,1 obtenido=2,2,1,1,1,1
+OK    R27 primera ruta contra incidentes: esperado=2 obtenido=2
+OK    R28 volumen del cliente de la demo: esperado=22.5 obtenido=22.5
+OK    R31 hay dos periodos distintos para comparar: esperado=True obtenido=True
+OK    R31 envios creados del mes: esperado=3 obtenido=3
+usuario temporal desactivado

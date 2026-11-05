@@ -1,6 +1,6 @@
 # R05 — Operadores logísticos
 
-Estado: `IMPLEMENTADO`. Probado contra PostgreSQL el 05/11/2026 con `scripts/pruebas/persona1.ps1` (salida en `prueba-automatizada.txt`, sin fallas). Falta la captura desde JavaFX para pasar a `PROBADO`.
+Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una instalación limpia. Falta que Persona 3 lo marque como terminado.
 
 ## Cobertura verificada
 
@@ -32,3 +32,10 @@ Resultado del ciclo ejecutado:
 - El operador se ve en sus tramos; un vehículo de otro operador se rechaza con HTTP `409`.
 - La factura y el pago de un operador se reflejan en su cuenta a pagar (ver R16).
 - Neo4j tiene los mismos operadores que PostgreSQL y una relación `OPERADO_POR` por cada tramo con operador.
+
+## Capturas
+
+- `captura-01-operadores.png`
+- `captura-02-vehiculos.png`
+- `captura-03-tramos.png`
+- `captura-04-cuenta-operador.png`

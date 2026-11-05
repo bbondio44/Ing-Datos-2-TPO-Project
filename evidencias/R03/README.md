@@ -1,6 +1,6 @@
 # R03 — Sesiones activas
 
-Estado: `IMPLEMENTADO`. Se verificó el flujo real de backend y PostgreSQL. Falta la evidencia visual manual de la ventana de sesiones para promoverlo a `PROBADO`.
+Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una instalación limpia. Falta que Persona 3 lo marque como terminado.
 
 ## Flujo ejecutado
 
@@ -23,3 +23,7 @@ Resultado observado:
 ```
 
 La aplicación JavaFX expone `Sesiones activas`, permite seleccionar una sesión `ACTIVA` y revocarla. Los tokens se almacenan únicamente como SHA-256 en `tp_logistica.sesion`.
+
+## Capturas
+
+- `captura-01-sesiones.png`

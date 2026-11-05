@@ -4,24 +4,24 @@ contenedor  = 4a15062a-049f-545e-b35b-911aefcc1d60
 OK    POST lectura -3 min: esperado=201 obtenido=201
 OK    POST lectura -2 min: esperado=201 obtenido=201
 OK    POST lectura -1 min: esperado=201 obtenido=201
-OK    lecturas_por_sensor_dia +3: esperado=90 obtenido=90
-OK    lecturas_por_contenedor_dia +3: esperado=111 obtenido=111
-OK    posiciones_por_contenedor_dia +3: esperado=69 obtenido=69
+OK    lecturas_por_sensor_dia +3: esperado=3 obtenido=3
+OK    lecturas_por_contenedor_dia +3: esperado=3 obtenido=3
+OK    posiciones_por_contenedor_dia +3: esperado=3 obtenido=3
 === 2. Reenvio de la misma lectura
 OK    POST reenvio: esperado=201 obtenido=201
-OK    no duplica: esperado=90 obtenido=90
+OK    no duplica: esperado=3 obtenido=3
 === 3. Lectura tardia, 2 horas atras
-OK    ultima = la mas nueva antes de la tardia: esperado=27c394c6-3aba-43f2-bde6-fda59a3fc986 obtenido=27c394c6-3aba-43f2-bde6-fda59a3fc986
+OK    ultima = la mas nueva antes de la tardia: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
 OK    POST tardia: esperado=201 obtenido=201
-OK    historial +1: esperado=91 obtenido=91
-OK    tardia no pisa ultima_lectura: esperado=27c394c6-3aba-43f2-bde6-fda59a3fc986 obtenido=27c394c6-3aba-43f2-bde6-fda59a3fc986
-     fila:  27c394c6-3aba-43f2-bde6-fda59a3fc986 |           6
-OK    tardia no pisa ultima_posicion: esperado=27c394c6-3aba-43f2-bde6-fda59a3fc986 obtenido=27c394c6-3aba-43f2-bde6-fda59a3fc986
+OK    historial +1: esperado=4 obtenido=4
+OK    tardia no pisa ultima_lectura: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
+     fila:  0f9def4a-6913-45c1-ba27-23af070db8a5 |           6
+OK    tardia no pisa ultima_posicion: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
 === 4. Lectura sin GPS
 OK    POST sin GPS: esperado=201 obtenido=201
-OK    posiciones sin cambios: esperado=70 obtenido=70
-OK    ultima_posicion sin cambios: esperado=27c394c6-3aba-43f2-bde6-fda59a3fc986 obtenido=27c394c6-3aba-43f2-bde6-fda59a3fc986
-OK    ultima_lectura se actualiza: esperado=280b93ba-a11b-44db-af75-c2a1d99dd26c obtenido=280b93ba-a11b-44db-af75-c2a1d99dd26c
+OK    posiciones sin cambios: esperado=4 obtenido=4
+OK    ultima_posicion sin cambios: esperado=0f9def4a-6913-45c1-ba27-23af070db8a5 obtenido=0f9def4a-6913-45c1-ba27-23af070db8a5
+OK    ultima_lectura se actualiza: esperado=53f8aadb-dab0-4b35-b608-8d09f574d1bd obtenido=53f8aadb-dab0-4b35-b608-8d09f574d1bd
 === 5. Errores
 OK    sin token: esperado=401 obtenido=401
 OK    sensor inexistente: esperado=404 obtenido=404
@@ -35,5 +35,24 @@ OK    POST con Cassandra caida: esperado=503 obtenido=503
 OK    reintento con el mismo id: esperado=201 obtenido=201
 === 7. Simulador
 simulador envio 7 lecturas; estados: 201
-OK    lecturas del simulador guardadas: esperado=100 obtenido=100
+OK    lecturas del simulador guardadas: esperado=13 obtenido=13
 usuario de prueba borrado: 1
+=== R18 R20 R21 R22 lecturas con GPS
+OK    lectura 0: esperado=201 obtenido=201
+OK    lectura 1: esperado=201 obtenido=201
+OK    lectura 2: esperado=201 obtenido=201
+OK    lectura 3: esperado=201 obtenido=201
+OK    lectura 4: esperado=201 obtenido=201
+OK    R19 historico del sensor: esperado=5 obtenido=5
+OK    R19 historico del contenedor: esperado=5 obtenido=5
+OK    R20 cantidad de posiciones: esperado=5 obtenido=5
+OK    R20 orden cronologico y mismos puntos: esperado=-34,6,-34,2,-33,9,-33,2,-32,5 obtenido=-34,6,-34,2,-33,9,-33,2,-32,5
+OK    R21 ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 lectura sin GPS: esperado=201 obtenido=201
+OK    R21 sin GPS no mueve la ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 lectura tardia: esperado=201 obtenido=201
+OK    R21 la tardia no pisa la ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 la tardia queda primera en el recorrido: esperado=-34.7 obtenido=-34.7
+OK    R22 sensor en linea: esperado=ONLINE obtenido=ONLINE
+OK    R22 bateria de la ultima lectura: esperado=75 obtenido=75
+OK    R22 contenedor del sensor: esperado=25cea743-bd6e-4608-9a13-620fb38a1f97 obtenido=25cea743-bd6e-4608-9a13-620fb38a1f97

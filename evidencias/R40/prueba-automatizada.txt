@@ -1,13 +1,13 @@
 ﻿=== Bandejas segun quien es el usuario
-C02 ve 4 conversaciones
-C01 ve 11 conversaciones
+C02 ve 2 conversaciones
+C01 ve 1 conversaciones
 OK    C02 tiene una conversacion que C01 no ve: esperado=True obtenido=True
 === Autorizacion: un ajeno no ve nada
 OK    C01 no lee mensajes ajenos: esperado=404 obtenido=404
 OK    C01 no escribe en conversacion ajena: esperado=404 obtenido=404
 OK    C02 si lee su conversacion: esperado=200 obtenido=200
 === Conversacion privada cliente - operador
-conversacion ff7536a4-454d-4cce-a83a-25707eede475; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
+conversacion 7320ab73-b31c-4616-a797-13411386b7c7; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
 OK    cliente envia: esperado=201 obtenido=201
 OK    reintento mismo id: esperado=201 obtenido=201
 OK    no duplica el mensaje: esperado=1 obtenido=1

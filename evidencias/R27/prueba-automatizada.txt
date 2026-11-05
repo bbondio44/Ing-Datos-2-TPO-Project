@@ -1,3 +1,10 @@
 ﻿=== R27 ranking de rutas
-     2 rutas con incidentes; 1ra: Santos -> Valencia (MARITIMO) = 2
-OK    total contra incidentes con tramo: esperado=3 obtenido=3
+     6 rutas con incidentes; 1ra: Puerto de Buenos Aires -> Puerto de Santos (MARITIMO) = 2
+OK    total contra incidentes con tramo: esperado=8 obtenido=8
+=== R27 R28 R31 analitica contra calculo manual
+OK    R27 orden descendente: esperado=2,2,1,1,1,1 obtenido=2,2,1,1,1,1
+OK    R27 primera ruta contra incidentes: esperado=2 obtenido=2
+OK    R28 volumen del cliente de la demo: esperado=22.5 obtenido=22.5
+OK    R31 hay dos periodos distintos para comparar: esperado=True obtenido=True
+OK    R31 envios creados del mes: esperado=3 obtenido=3
+usuario temporal desactivado

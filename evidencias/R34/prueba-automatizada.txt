@@ -4,7 +4,7 @@ OK    reporte generado: esperado=GENERADO obtenido=GENERADO
      resultado en Mongo: 1 filas; riesgo=0.0
 OK    filas del cliente: esperado=1 obtenido=1
 OK    estado facturado: esperado=FACTURADO obtenido=FACTURADO
-OK    facturar dos veces da la misma factura: esperado=0b25a0dd-6d82-433d-8b3a-ef0596c3f8ec obtenido=0b25a0dd-6d82-433d-8b3a-ef0596c3f8ec
+OK    facturar dos veces da la misma factura: esperado=be76e63f-46b7-465d-80fd-2714cd536879 obtenido=be76e63f-46b7-465d-80fd-2714cd536879
 OK    una sola factura: esperado=1 obtenido=1
 OK    otro tipo: desempeno: esperado=GENERADO obtenido=GENERADO
 OK    tipo invalido: esperado=400 obtenido=400

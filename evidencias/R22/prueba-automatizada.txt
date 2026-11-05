@@ -1,6 +1,25 @@
 ﻿=== R22 estado de sensores
 OK    sensores en la lista: esperado=43 obtenido=43
-     OFFLINE=41 SIN_DATOS=1 ONLINE=1
+     SIN_DATOS=3 OFFLINE=39 ONLINE=1
 OK    SEN-040 nunca reporto: esperado=SIN_DATOS obtenido=SIN_DATOS
 OK    sensor demo con lecturas recientes: esperado=ONLINE obtenido=ONLINE
 usuario temporal borrado: 1
+=== R18 R20 R21 R22 lecturas con GPS
+OK    lectura 0: esperado=201 obtenido=201
+OK    lectura 1: esperado=201 obtenido=201
+OK    lectura 2: esperado=201 obtenido=201
+OK    lectura 3: esperado=201 obtenido=201
+OK    lectura 4: esperado=201 obtenido=201
+OK    R19 historico del sensor: esperado=5 obtenido=5
+OK    R19 historico del contenedor: esperado=5 obtenido=5
+OK    R20 cantidad de posiciones: esperado=5 obtenido=5
+OK    R20 orden cronologico y mismos puntos: esperado=-34,6,-34,2,-33,9,-33,2,-32,5 obtenido=-34,6,-34,2,-33,9,-33,2,-32,5
+OK    R21 ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 lectura sin GPS: esperado=201 obtenido=201
+OK    R21 sin GPS no mueve la ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 lectura tardia: esperado=201 obtenido=201
+OK    R21 la tardia no pisa la ultima posicion: esperado=-32.5 obtenido=-32.5
+OK    R20 la tardia queda primera en el recorrido: esperado=-34.7 obtenido=-34.7
+OK    R22 sensor en linea: esperado=ONLINE obtenido=ONLINE
+OK    R22 bateria de la ultima lectura: esperado=75 obtenido=75
+OK    R22 contenedor del sensor: esperado=25cea743-bd6e-4608-9a13-620fb38a1f97 obtenido=25cea743-bd6e-4608-9a13-620fb38a1f97

@@ -5,3 +5,7 @@ OK    desasociar: esperado=204 obtenido=204
 OK    queda en el historico con fin: esperado=True obtenido=True
 OK    asociar despues del cierre: esperado=201 obtenido=201
 OK    una historica y una vigente: esperado=1/1 obtenido=1/1
+=== R07 historial de movimientos de un contenedor
+OK    dos pasos por el mismo envio: esperado=2 obtenido=2
+OK    el duenio ve su historial: esperado=2 obtenido=2
+OK    otro cliente no ve nada: esperado=0 obtenido=0

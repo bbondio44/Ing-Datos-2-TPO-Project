@@ -1,10 +1,17 @@
 ﻿=== R09/R26/R25 lectura que supera la regla
 OK    POST lectura 60 C: esperado=201 obtenido=201
 OK    una alerta para la regla: esperado=1 obtenido=1
-OK    guarda la lectura que la causo: esperado=114469b2-58da-44d1-bfdd-1db82ccf8b29 obtenido=114469b2-58da-44d1-bfdd-1db82ccf8b29
+OK    guarda la lectura que la causo: esperado=02d883e6-de67-4c7d-b423-02406fd28c9e obtenido=02d883e6-de67-4c7d-b423-02406fd28c9e
 OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
 OK    alerta ALTA con incidente: esperado=True obtenido=True
 OK    incidente existe en Postgres: esperado=1 obtenido=1
 OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
 === Control R25: alertas ALTA o CRITICA nuevas sin incidente
 OK    ALTA/CRITICA sin incidente: esperado=0 obtenido=0
+=== R09 R25 R26 temperatura fuera de rango
+OK    lectura fuera de rango: esperado=201 obtenido=201
+OK    alerta generada: esperado=ABIERTA obtenido=ABIERTA
+OK    con la lectura que la causo: esperado=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08 obtenido=8eaeabc6-9b35-4ef5-9eb8-11f4293dcb08
+OK    incidente en PostgreSQL: esperado=1 obtenido=1
+=== R25 integridad entre MongoDB y PostgreSQL
+OK    incidentes referenciados desde Mongo que existen en PostgreSQL: esperado=12 obtenido=12

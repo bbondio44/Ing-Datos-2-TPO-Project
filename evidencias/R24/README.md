@@ -1,6 +1,6 @@
 # R24 — Trayectos y maestros logísticos
 
-Estado: `IMPLEMENTADO`. Probado contra PostgreSQL el 05/11/2026 con `scripts/pruebas/persona1.ps1` (salida en `prueba-automatizada.txt`, sin fallas). Falta la captura desde JavaFX para pasar a `PROBADO`.
+Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una instalación limpia. Falta que Persona 3 lo marque como terminado.
 
 ## Cobertura disponible
 
@@ -32,3 +32,8 @@ Resultado ejecutado:
 ## Verificación Neo4j
 
 Se restauró el backup real en la base `82cf1a53` con Neo4j Enterprise 2026.10.1. La consulta de solo lectura devolvió el tramo `trm-01` del envío `env-101`, orden `1`, medio `Terrestre`, vehículo `veh-801` y operador `op-501`. El resultado confirma la proyección Neo4j de los campos R24.
+
+## Capturas
+
+- `captura-01-tramos.png`
+- `captura-02-edicion-tramo.png`

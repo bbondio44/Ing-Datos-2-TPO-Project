@@ -1,6 +1,6 @@
 # R04 — Proveedores
 
-Estado: `IMPLEMENTADO`. Probado contra PostgreSQL el 05/11/2026 con `scripts/pruebas/persona1.ps1` (salida en `prueba-automatizada.txt`, sin fallas). Falta la captura desde JavaFX para pasar a `PROBADO`.
+Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una instalación limpia. Falta que Persona 3 lo marque como terminado.
 
 ## Cobertura verificada
 
@@ -28,3 +28,10 @@ Resultado del ciclo ejecutado:
 - La factura y el pago de un proveedor se reflejan en su cuenta a pagar (ver R16).
 
 Limitación: la pantalla de Trayectos carga un proveedor por tramo y conserva los demás. Varios proveedores nuevos en un tramo se cargan por API.
+
+## Capturas
+
+- `captura-01-proveedores.png`
+- `captura-02-tramos.png`
+- `captura-03-edicion-tramo.png`
+- `captura-04-cuenta-proveedor.png`
