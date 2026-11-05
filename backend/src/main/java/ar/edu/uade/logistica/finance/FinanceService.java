@@ -4,6 +4,7 @@ import ar.edu.uade.logistica.common.ConflictException;
 import ar.edu.uade.logistica.common.NotFoundException;
 import ar.edu.uade.logistica.contracts.finance.AccountCloseResponse;
 import ar.edu.uade.logistica.contracts.finance.AccountResponse;
+import ar.edu.uade.logistica.contracts.finance.AutomaticCloseResponse;
 import ar.edu.uade.logistica.contracts.finance.AutomaticInvoiceResponse;
 import ar.edu.uade.logistica.contracts.finance.InvoiceLineRequest;
 import ar.edu.uade.logistica.contracts.finance.InvoiceLineResponse;
@@ -182,6 +183,24 @@ public class FinanceService {
         UUID id = jdbcTemplate.queryForObject("SELECT tp_logistica.cerrar_cuenta(?,?)", UUID.class,
                 accountId, date(period));
         return close(id);
+    }
+
+    /** Cierra el período en todas las cuentas; una cuenta ya cerrada en ese período o después se saltea. */
+    @Transactional
+    public AutomaticCloseResponse closeAllAccounts(LocalDate period) {
+        auditContext.applyToCurrentTransaction();
+        ensureAccountsForExistingOwners();
+        List<UUID> open = jdbcTemplate.queryForList("""
+                SELECT c.id_cuenta FROM tp_logistica.cuenta_corriente c
+                 WHERE NOT EXISTS (SELECT 1 FROM tp_logistica.cierre_cuenta cc
+                                    WHERE cc.id_cuenta=c.id_cuenta AND cc.periodo>=?)
+                """, UUID.class, date(period));
+        Integer total = jdbcTemplate.queryForObject(
+                "SELECT count(*) FROM tp_logistica.cuenta_corriente", Integer.class);
+        for (UUID account : open) {
+            jdbcTemplate.queryForObject("SELECT tp_logistica.cerrar_cuenta(?,?)", UUID.class, account, date(period));
+        }
+        return new AutomaticCloseResponse(period, open.size(), (total == null ? 0 : total) - open.size());
     }
 
     @Transactional(readOnly = true)

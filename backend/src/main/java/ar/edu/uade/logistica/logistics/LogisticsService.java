@@ -5,6 +5,7 @@ import ar.edu.uade.logistica.common.NotFoundException;
 import ar.edu.uade.logistica.contracts.PageResponse;
 import ar.edu.uade.logistica.contracts.logistics.ContainerAssignmentRequest;
 import ar.edu.uade.logistica.contracts.logistics.ContainerAssignmentResponse;
+import ar.edu.uade.logistica.contracts.logistics.ContainerHistoryResponse;
 import ar.edu.uade.logistica.contracts.logistics.ContainerRequest;
 import ar.edu.uade.logistica.contracts.logistics.ContainerResponse;
 import ar.edu.uade.logistica.contracts.logistics.SensorAssignmentRequest;
@@ -288,6 +289,28 @@ public class LogisticsService {
             jdbcTemplate.update("UPDATE tp_logistica.contenedor SET estado='DISPONIBLE' WHERE id_contenedor=?",
                     containerId);
         }
+    }
+
+    /** Consulta avanzada del enunciado: por qué envíos pasó un contenedor. Un cliente ve solo los suyos. */
+    @Transactional(readOnly = true)
+    public List<ContainerHistoryResponse> containerHistory(UUID containerId, AuthenticatedUser user) {
+        boolean all = user.permissions().contains("ENVIOS_LEER_TODOS");
+        if (!all && user.clientId() == null) throw new AccessDeniedException("No tiene envíos asociados");
+        String sql = """
+                SELECT ec.id_envio,c.razon_social,e.origen,e.destino,e.estado,
+                       ec.fecha_asociacion,ec.fecha_desasociacion
+                  FROM tp_logistica.envio_contenedor ec
+                  JOIN tp_logistica.envio e ON e.id_envio=ec.id_envio
+                  JOIN tp_logistica.cliente c ON c.id_cliente=e.id_cliente
+                 WHERE ec.id_contenedor=?
+                """ + (all ? "" : " AND e.id_cliente=?") + " ORDER BY ec.fecha_asociacion DESC";
+        Object[] params = all ? new Object[]{containerId} : new Object[]{containerId, user.clientId()};
+        return jdbcTemplate.query(sql, (rs, row) -> {
+            Instant end = instant(rs, "fecha_desasociacion");
+            return new ContainerHistoryResponse(rs.getObject("id_envio", UUID.class), rs.getString("razon_social"),
+                    rs.getString("origen"), rs.getString("destino"), rs.getString("estado"),
+                    instant(rs, "fecha_asociacion"), end, end == null);
+        }, params);
     }
 
     @Transactional(readOnly = true)

@@ -408,6 +408,16 @@ public class ApiClient {
                 AccountCloseResponse.class, true);
     }
 
+    public CompletableFuture<AutomaticCloseResponse> closeAllAccounts(CloseAccountRequest request) {
+        return send("POST", "/api/v1/finanzas/cierre-mensual", request, AutomaticCloseResponse.class, true);
+    }
+
+    public CompletableFuture<List<ar.edu.uade.logistica.contracts.logistics.ContainerHistoryResponse>> containerHistory(
+            UUID containerId) {
+        return send("GET", "/api/v1/contenedores/" + containerId + "/historial", null,
+                new TypeReference<>() {}, true);
+    }
+
     public CompletableFuture<List<TariffResponse>> tariffs() {
         return send("GET", "/api/v1/finanzas/tarifas", null, new TypeReference<>() {}, true);
     }

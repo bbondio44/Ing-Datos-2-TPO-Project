@@ -425,8 +425,31 @@ final class PersonaOneDialogs {
                 api.updateContainer(selected.id(), req).join(); reload.run();
             }));
         });
+        Button history = new Button("Historial de movimientos");
+        history.setOnAction(e -> {
+            var selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) showContainerHistory(selected);
+        });
         reload.run();
-        return new Tab("Contenedores", pane(new HBox(8, create, edit), table, new Label()));
+        return new Tab("Contenedores", pane(new HBox(8, create, edit, history), table, new Label()));
+    }
+
+    private void showContainerHistory(ContainerResponse container) {
+        run(() -> {
+            Dialog<Void> dialog = baseDialog("Historial de " + container.internationalCode(), 860, 460);
+            TableView<ContainerHistoryResponse> table = new TableView<>();
+            table.getColumns().add(column("Cliente", ContainerHistoryResponse::client));
+            table.getColumns().add(column("Origen", ContainerHistoryResponse::origin));
+            table.getColumns().add(column("Destino", ContainerHistoryResponse::destination));
+            table.getColumns().add(column("Estado del envío", ContainerHistoryResponse::shipmentState));
+            table.getColumns().add(column("Desde", h -> h.startAt().toString()));
+            table.getColumns().add(column("Hasta", h -> h.endAt() == null ? "Vigente" : h.endAt().toString()));
+            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+            table.setItems(FXCollections.observableArrayList(api.containerHistory(container.id()).join()));
+            dialog.getDialogPane().setContent(pane(new HBox(), table, new Label(
+                    "Envíos por los que pasó el contenedor. El recorrido GPS está en Monitoreo IoT.")));
+            dialog.showAndWait();
+        });
     }
 
     private Optional<ContainerRequest> containerDialog(ContainerResponse initial) {
@@ -557,8 +580,22 @@ final class PersonaOneDialogs {
             ComboBox<OrganizationResponse> supplier = comboWithEmpty(suppliers, OrganizationResponse::businessName);
             TextField service = new TextField(); TextField supplierCost = new TextField();
             // El formulario edita un proveedor; el resto se reenvía porque el backend reemplaza la lista entera.
-            List<RouteSupplierRequest> otherSuppliers = initial == null ? List.of() : initial.suppliers().stream()
-                    .skip(1).map(s -> new RouteSupplierRequest(s.supplierId(), s.service(), s.cost())).toList();
+            List<RouteSupplierRequest> otherSuppliers = new ArrayList<>();
+            if (initial != null) initial.suppliers().stream().skip(1)
+                    .map(s -> new RouteSupplierRequest(s.supplierId(), s.service(), s.cost())).forEach(otherSuppliers::add);
+            Label otherLabel = new Label();
+            Runnable showOthers = () -> otherLabel.setText(String.join(", ", otherSuppliers.stream()
+                    .map(o -> suppliers.stream().filter(s -> s.id().equals(o.supplierId())).findFirst()
+                            .map(OrganizationResponse::businessName).orElse("Proveedor") + " (" + o.service() + ")").toList()));
+            showOthers.run();
+            Button addSupplier = new Button("Agregar otro proveedor");
+            addSupplier.setOnAction(e -> run(() -> {
+                if (supplier.getValue() == null) return;
+                List<RouteSupplierRequest> merged = mergeSuppliers(new RouteSupplierRequest(supplier.getValue().id(),
+                        service.getText(), decimal(supplierCost.getText())), otherSuppliers);
+                otherSuppliers.clear(); otherSuppliers.addAll(merged);
+                supplier.setValue(null); service.clear(); supplierCost.clear(); showOthers.run();
+            }));
             if (initial != null) {
                 locations.stream().filter(l -> l.id().equals(initial.originLocationId())).findFirst().ifPresent(originLocation::setValue);
                 locations.stream().filter(l -> l.id().equals(initial.destinationLocationId())).findFirst().ifPresent(destinationLocation::setValue);
@@ -580,9 +617,7 @@ final class PersonaOneDialogs {
             grid.addRow(12, new Label("Costo real"), actualCost); grid.addRow(13, new Label("Estado"), state);
             grid.addRow(14, new Label("Proveedor opcional"), supplier); grid.addRow(15, new Label("Servicio proveedor"), service);
             grid.addRow(16, new Label("Costo proveedor"), supplierCost);
-            if (!otherSuppliers.isEmpty()) grid.addRow(17, new Label("Otros proveedores"), new Label(String.join(", ",
-                    initial.suppliers().stream().skip(1).map(s -> s.supplierName() + " (" + s.service() + ")").toList())
-                    + " — se conservan"));
+            grid.addRow(17, addSupplier, otherLabel);
             ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true); scroll.setPrefViewportHeight(520);
             dialog.getDialogPane().setContent(scroll);
             dialog.setResultConverter(b -> {
@@ -653,8 +688,19 @@ final class PersonaOneDialogs {
                 TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).minusMonths(1).toString());
                 input.setHeaderText("Período a cerrar (primer día del mes)");
                 input.showAndWait().ifPresent(value -> run(() -> {
-                    api.closeAccount(selected.id(), new CloseAccountRequest(LocalDate.parse(value))).join();
-                    info("Cierre mensual", "El período quedó cerrado y no admite movimientos retroactivos.");
+                    AccountCloseResponse result = api.closeAccount(selected.id(), new CloseAccountRequest(LocalDate.parse(value))).join();
+                    info("Cierre mensual", "Período " + result.period() + " cerrado. Saldo inicial: " + result.initialBalance()
+                            + ". Débitos: " + result.debits() + ". Créditos: " + result.credits()
+                            + ". Saldo final: " + result.finalBalance() + ". No admite movimientos retroactivos.");
+                }));
+            });
+            Button closeAll = new Button("Cerrar todas las cuentas");
+            closeAll.setOnAction(e -> {
+                TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).minusMonths(1).toString());
+                input.setHeaderText("Período a cerrar en todas las cuentas (primer día del mes)");
+                input.showAndWait().ifPresent(value -> run(() -> {
+                    AutomaticCloseResponse result = api.closeAllAccounts(new CloseAccountRequest(LocalDate.parse(value))).join();
+                    info("Cierre mensual", "Cuentas cerradas: " + result.closed() + ". Ya cerradas: " + result.skipped());
                 }));
             });
             Button automatic = new Button("Facturación automática");
@@ -673,7 +719,7 @@ final class PersonaOneDialogs {
             SplitPane split = new SplitPane(new VBox(new Label("Cuentas corrientes"), accounts),
                     new VBox(new Label("Facturas de la cuenta"), invoices));
             split.setDividerPositions(.42); VBox.setVgrow(accounts, Priority.ALWAYS); VBox.setVgrow(invoices, Priority.ALWAYS);
-            VBox content = new VBox(10, new HBox(8, newInvoice, issue, pay, close, automatic), split);
+            VBox content = new VBox(10, new HBox(8, newInvoice, issue, pay, close, closeAll, automatic), split);
             content.setPadding(new Insets(8)); VBox.setVgrow(split, Priority.ALWAYS);
             dialog.getDialogPane().setContent(content);
             reloadInvoices.run();

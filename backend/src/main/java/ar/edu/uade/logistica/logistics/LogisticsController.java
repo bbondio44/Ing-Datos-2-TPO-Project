@@ -157,6 +157,12 @@ public class LogisticsController {
         service.closeSensorAssignment(id, fin);
     }
 
+    @GetMapping("/contenedores/{id}/historial")
+    public List<ar.edu.uade.logistica.contracts.logistics.ContainerHistoryResponse> containerHistory(
+            @PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser user) {
+        return service.containerHistory(id, user);
+    }
+
     @GetMapping("/contenedores/{id}/sensores")
     @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
     public List<SensorAssignmentResponse> sensorsAt(@PathVariable UUID id,

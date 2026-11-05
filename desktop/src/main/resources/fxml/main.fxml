@@ -9,7 +9,6 @@
             <Label text="LOGÍSTICA IoT" styleClass="sidebar-brand"/>
             <Label text="Grupo 4" styleClass="sidebar-caption"/>
             <Separator/>
-            <Button text="Panel general" maxWidth="Infinity" styleClass="nav-button" disable="true"/>
             <Button text="Clientes" maxWidth="Infinity" styleClass="nav-button-active"/>
             <Button text="Usuarios y roles" onAction="#showAdministration" maxWidth="Infinity" styleClass="nav-button"/>
             <Button text="Proveedores" onAction="#showSuppliers" maxWidth="Infinity" styleClass="nav-button"/>

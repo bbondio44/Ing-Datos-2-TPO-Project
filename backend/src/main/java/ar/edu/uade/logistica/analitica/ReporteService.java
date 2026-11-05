@@ -113,6 +113,13 @@ public class ReporteService {
         exigirAcceso(buscar(idSolicitud), user);
         List<UUID> tarifas = jdbcTemplate.query(TARIFA_VIGENTE, (rs, fila) -> rs.getObject("id_tarifa", UUID.class));
         if (tarifas.isEmpty()) throw new ConflictException("No hay una tarifa de reporte vigente");
+        // Un cliente nuevo todavía no tiene cuenta corriente y facturar_reporte la exige.
+        jdbcTemplate.update("""
+                INSERT INTO tp_logistica.cuenta_corriente(id_cliente,naturaleza)
+                SELECT s.id_cliente,'COBRAR' FROM tp_logistica.solicitud_reporte s
+                 WHERE s.id_solicitud=?
+                   AND NOT EXISTS (SELECT 1 FROM tp_logistica.cuenta_corriente c WHERE c.id_cliente=s.id_cliente)
+                """, idSolicitud);
         jdbcTemplate.queryForObject("SELECT tp_logistica.facturar_reporte(?, ?, ?)", UUID.class,
                 idSolicitud, tarifas.get(0), "reporte:" + idSolicitud);
         return buscar(idSolicitud);

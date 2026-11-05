@@ -17,7 +17,9 @@ public class DatabaseAuditContext {
     }
 
     public void applyToCurrentTransaction() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) return; // tarea programada: no hay usuario ni request
+        Object principal = authentication.getPrincipal();
         if (!(principal instanceof AuthenticatedUser user)) return;
         String correlationId = String.valueOf(request.getAttribute(CorrelationIdFilter.ATTRIBUTE));
         jdbcTemplate.queryForObject("select set_config('app.usuario_id', ?, true)",

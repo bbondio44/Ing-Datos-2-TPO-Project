@@ -48,6 +48,9 @@ app:
     auto-enabled: ${APP_BILLING_AUTO_ENABLED:false}
     cron: ${APP_BILLING_CRON:0 0 2 * * *}
     zone: ${APP_BILLING_ZONE:America/Buenos_Aires}
+  cierre:
+    auto-enabled: ${APP_CIERRE_AUTO_ENABLED:false}
+    cron: ${APP_CIERRE_CRON:0 0 3 1 * *}
 
 management:
   endpoints:

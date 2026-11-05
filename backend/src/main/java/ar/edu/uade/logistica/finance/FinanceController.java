@@ -2,6 +2,7 @@ package ar.edu.uade.logistica.finance;
 
 import ar.edu.uade.logistica.contracts.finance.AccountCloseResponse;
 import ar.edu.uade.logistica.contracts.finance.AccountResponse;
+import ar.edu.uade.logistica.contracts.finance.AutomaticCloseResponse;
 import ar.edu.uade.logistica.contracts.finance.AutomaticInvoiceRequest;
 import ar.edu.uade.logistica.contracts.finance.AutomaticInvoiceResponse;
 import ar.edu.uade.logistica.contracts.finance.CloseAccountRequest;
@@ -112,6 +113,12 @@ public class FinanceController {
     public List<PaymentResponse> payments(@PathVariable UUID id,
                                           @AuthenticationPrincipal AuthenticatedUser user) {
         return service.payments(id, user);
+    }
+
+    @PostMapping("/cierre-mensual")
+    @PreAuthorize("hasAuthority('FINANZAS_ESCRIBIR')")
+    public AutomaticCloseResponse closeAll(@Valid @RequestBody CloseAccountRequest request) {
+        return service.closeAllAccounts(request.period());
     }
 
     @GetMapping("/tarifas")
