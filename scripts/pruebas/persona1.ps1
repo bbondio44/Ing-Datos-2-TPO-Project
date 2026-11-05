@@ -289,6 +289,19 @@ try {
     Ver 'misma cantidad de facturas' $antes (Sql 'select count(*) from tp_logistica.factura;')
     Ver 'una factura por envio' 1 (Sql "select count(*) from tp_logistica.factura where id_envio='$($e3.id)';")
 
+    '=== R15 cierre periodico de todas las cuentas'
+    $total = Sql 'select count(*) from tp_logistica.cuenta_corriente;'
+    $r = Api POST '/api/v1/finanzas/cierre-mensual' @{ period = $anterior }; Ver 'cierre de todas' 200 $r.s
+    Ver 'cerradas mas salteadas igual a cuentas' $total ($r.d.closed + $r.d.skipped)
+    Ver 'la cuenta ya cerrada despues se saltea' True ($r.d.skipped -ge 1)
+    Ver 'repetir no cierra nada' 0 (Api POST '/api/v1/finanzas/cierre-mensual' @{ period = $anterior }).d.closed
+    Ver 'CLIENTE no cierra cuentas' 403 (Api POST '/api/v1/finanzas/cierre-mensual' @{ period = $anterior } $tA).s
+
+    '=== R07 historial de movimientos de un contenedor'
+    Ver 'dos pasos por el mismo envio' 2 @((Api GET "/api/v1/contenedores/$($k1.id)/historial").d).Count
+    Ver 'el duenio ve su historial' 2 @((Api GET "/api/v1/contenedores/$($k1.id)/historial" $null $tA).d).Count
+    Ver 'otro cliente no ve nada' 0 @((Api GET "/api/v1/contenedores/$($k1.id)/historial" $null $tB).d | Where-Object { $_ }).Count
+
     '=== R35 reporte de envios'
     $dato = Sql "select id_cliente from tp_logistica.envio where estado='ENTREGADO' group by 1 order by count(*) desc limit 1;"
     Ver 'filtro por cliente' (Sql "select count(*) from tp_logistica.envio where id_cliente='$dato';") @((Api GET "/api/v1/reportes/envios?clienteId=$dato").d).Count

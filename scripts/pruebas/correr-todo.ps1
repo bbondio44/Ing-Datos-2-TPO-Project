@@ -13,7 +13,7 @@ New-Item -ItemType Directory -Force $temporal | Out-Null
 cmd /c "mvn -B -q -pl simulator dependency:build-classpath -Dmdep.outputFile=$temporal\sim.cp 2>&1" | Out-Null
 
 # prueba = requisito al que van las secciones que no nombran uno
-$pruebas = [ordered]@{ 'r18' = 'R18'; 'fase1' = 'R19'; 'fase2' = 'R09'; 'r40' = 'R40'; 'fase3' = 'R30'; 'roles' = 'R40'; 'persona1' = 'R01' }
+$pruebas = [ordered]@{ 'r18' = 'R18'; 'fase1' = 'R19'; 'fase2' = 'R09'; 'r40' = 'R40'; 'fase3' = 'R30'; 'roles' = 'R40'; 'persona1' = 'R01'; 'demo-integrada' = 'R17' }
 $resumen = @()
 foreach ($nombre in $pruebas.Keys) {
     "##### $nombre"
