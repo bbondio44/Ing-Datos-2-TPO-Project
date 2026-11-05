@@ -1,6 +1,7 @@
 package ar.edu.uade.logistica.alertas;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,15 +19,27 @@ public class IncidenteRepository {
     }
 
     /** id_evento_externo es UNIQUE: reprocesar la misma alerta no crea otro incidente (D04). */
-    public void crear(AlertaNueva alerta) {
+    public void crear(AlertaNueva alerta, UUID idTramo) {
         jdbcTemplate.update("""
                 INSERT INTO tp_logistica.incidente
-                  (id_incidente, id_envio, id_evento_externo, tipo, severidad, descripcion, fecha)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                  (id_incidente, id_envio, id_tramo, id_evento_externo, tipo, severidad, descripcion, fecha)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (id_evento_externo) DO NOTHING
-                """, UUID.fromString(alerta.idIncidente()), alerta.idEnvio(), UUID.fromString(alerta.idEvento()),
+                """, UUID.fromString(alerta.idIncidente()), alerta.idEnvio(), idTramo, UUID.fromString(alerta.idEvento()),
                 "ALERTA_" + alerta.regla().tipoRegla(), alerta.regla().severidad(), alerta.mensaje(),
                 Timestamp.from(alerta.ahora()));
+    }
+
+    /** El tramo que se estaba recorriendo en ese instante. Puede no haber, y el incidente queda sin tramo. */
+    public UUID tramoEnCurso(UUID idEnvio, Instant instante) {
+        Timestamp momento = Timestamp.from(instante);
+        List<UUID> tramos = jdbcTemplate.queryForList("""
+                SELECT id_tramo FROM tp_logistica.tramo
+                 WHERE id_envio = ? AND fecha_salida <= ?
+                   AND COALESCE(fecha_llegada_real, fecha_llegada_estimada) >= ?
+                 ORDER BY numero_tramo LIMIT 1
+                """, UUID.class, idEnvio, momento, momento);
+        return tramos.isEmpty() ? null : tramos.get(0);
     }
 
     public List<IncidenteResponse> porEnvio(UUID idEnvio) {

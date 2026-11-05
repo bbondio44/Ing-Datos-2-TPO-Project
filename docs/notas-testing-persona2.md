@@ -1,16 +1,18 @@
 # Notas para testing · Persona 2
 
-Estado al 04/11/2026. Ya están probados contra las bases reales en Docker y con tests automatizados del
-backend. Falta la evidencia en `evidencias/RXX/` y, en cada uno, repetir el chequeo desde JavaFX.
+Estado al 04/11/2026. Los 20 requisitos de Persona 2 están probados contra las bases reales y la salida de
+esas pruebas está en `evidencias/RXX/prueba-automatizada.txt`. Falta repetir cada uno desde JavaFX y
+guardar la captura.
 
 ## Cómo levantarlo
 
-1. `docker compose up -d` y esperar a que Cassandra esté `healthy`.
-2. Cargar datos: Postgres con `database/init` + `03_datos_demo.sql` + `04` + `06_datos_catalogo.sql`;
-   Mongo y Cassandra con `tp-grupo4-mongo-cassandra/cargar_todo.ps1`.
-3. Correr el backend con el perfil `dev,polyglot`.
-4. En `.env`, definir `APP_BOOTSTRAP_ADMIN_EMAIL` y `APP_BOOTSTRAP_ADMIN_PASSWORD` (12 caracteres o más)
-   para tener un usuario con clave válida.
+Seguir "Arranque con las cuatro bases" en el `README.md`. Para repetir todas las pruebas automáticas, con el
+backend apagado:
+
+```powershell
+mvn -B -DskipTests install
+powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\correr-todo.ps1
+```
 
 Sensores con asignación vigente hoy: los 3 sensores demo (`v_envio_contenedor_sensor_activo`). Las
 asignaciones del catálogo terminan el 23/10/2026: sus lecturas nuevas de hoy responden 409. Las lecturas
@@ -54,6 +56,7 @@ históricas del catálogo son del 20 al 22/10/2026.
 
 ## Pendiente de definir
 
-- Los incidentes que crean las alertas no tienen tramo, así que no aparecen en el ranking de rutas (R27).
+- Un incidente solo tiene tramo si el envío estaba recorriendo uno en ese instante. Sin tramo, no suma en R27.
+- Las reglas de cadena de frío aplican a todos los sensores: `regla_alerta` no tiene un filtro por tipo de contenedor.
 - Los clientes del catálogo no tienen cuenta corriente: sus reportes no se pueden facturar hasta tenerla.
 - Si Mongo estuvo caído, no se reevalúan después las lecturas de ese período.

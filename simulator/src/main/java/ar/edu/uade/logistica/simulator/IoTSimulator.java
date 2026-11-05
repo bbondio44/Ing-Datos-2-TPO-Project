@@ -22,6 +22,8 @@ public final class IoTSimulator {
         long intervalMillis = Long.parseLong(System.getenv().getOrDefault("SIM_INTERVAL_MS", "3000"));
         ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
         HttpClient client = HttpClient.newHttpClient();
+        // Por defecto la temperatura es normal. SIM_TEMPERATURA fuerza un valor, para disparar una alerta en la demo.
+        String temperaturaFija = System.getenv("SIM_TEMPERATURA");
         double latitud = Double.parseDouble(System.getenv().getOrDefault("SIM_LATITUD", "-34.6037"));
         double longitud = Double.parseDouble(System.getenv().getOrDefault("SIM_LONGITUD", "-58.3816"));
 
@@ -33,7 +35,8 @@ public final class IoTSimulator {
                     "idLectura", UUID.randomUUID(),
                     "idSensor", UUID.fromString(sensorId),
                     "timestamp", Instant.now(),
-                    "temperatura", ThreadLocalRandom.current().nextDouble(2, 9),
+                    "temperatura", temperaturaFija != null ? Double.parseDouble(temperaturaFija)
+                            : ThreadLocalRandom.current().nextDouble(3, 7),
                     "humedad", ThreadLocalRandom.current().nextDouble(35, 70),
                     "vibracion", ThreadLocalRandom.current().nextDouble(0, 1.5),
                     "bateria", ThreadLocalRandom.current().nextDouble(35, 100),

@@ -102,7 +102,7 @@ nueva ETA; desvío: rutas y km). Índices: `{id_envio, fecha}`, `{id_contenedor,
 - **Deduplicación (D04):** índice **único parcial** `{clave_dedup: 1}` con
   `partialFilterExpression: {activa: true}` ⇒ a lo sumo una alerta activa por regla y sensor. Las lecturas
   que repiten la violación hacen `$inc: {ocurrencias: 1}`. Al cerrarla (`activa: false`), una violación
-  nueva abre otra alerta (reapertura). Probado en R09.
+  nueva abre otra alerta (reapertura). Probado en R09. `ultima_id_lectura` guarda la última lectura contada: si se reenvía la misma, no suma otra ocurrencia.
 - **Transiciones válidas:** ABIERTA → RECONOCIDA → CERRADA (o ABIERTA → CERRADA). Se aplican con
   filtro por estado actual (`updateOne({_id, estado: 'ABIERTA'}, ...)`) para que una transición inválida
   no modifique nada; cada cambio queda en `historial_estados`.

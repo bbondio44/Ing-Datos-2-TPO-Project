@@ -15,9 +15,9 @@ Los 40 requisitos, su prueba de aceptación, el estado de cada uno y la definici
 - **Simulador IoT** (Java): manda lecturas a `POST /api/v1/iot/lecturas`.
 - Sincronización: PostgreSQL escribe en la tabla `outbox_evento`; un worker la lee, actualiza
   MongoDB/Neo4j, marca procesado y reintenta si falla.
-- Estado al 04/11/2026: solo PostgreSQL está conectado. Spring Boot excluye la autoconfiguración de
-  MongoDB, Cassandra y Neo4j, y el endpoint de estado las devuelve como `NO_CONFIGURADA`.
-  El endpoint de ingesta IoT todavía no existe.
+- Conexión: las cuatro bases están conectadas. PostgreSQL usa JPA y JDBC; MongoDB, Cassandra y Neo4j
+  usan sus drivers directos y se activan con el perfil `polyglot`. Spring Boot excluye su
+  autoconfiguración porque la conexión la arma cada clase de configuración en `integration/`.
 
 ## Stack
 
@@ -35,9 +35,13 @@ Los 40 requisitos, su prueba de aceptación, el estado de cada uno y la definici
 <!-- Completar en la primera sesión con los comandos reales del repo. -->
 - Levantar bases: `docker compose up -d`
 - Estado de las bases: `docker compose ps`
-- Build: (completar)
-- Tests: (completar)
-- Correr la app: (completar)
+- Cargar PostgreSQL desde cero: `powershell -ExecutionPolicy Bypass -File .\scripts\cargar-postgres.ps1`
+- Cargar MongoDB y Cassandra: `powershell -ExecutionPolicy Bypass -File .	p-grupo4-mongo-cassandra\cargar_todo.ps1`
+- Build: `mvn -B -DskipTests install`
+- Tests: `mvn -B test`
+- Backend: `$env:SPRING_PROFILES_ACTIVE='dev,polyglot'; mvn -pl backend spring-boot:run`
+- App de escritorio: `mvn -pl desktop javafx:run`
+- Pruebas de aceptación de Persona 2: `powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\correr-todo.ps1`
 
 ## Qué guarda cada base (fuente de verdad única por dato)
 
@@ -72,8 +76,7 @@ Modelo físico detallado de MongoDB y Cassandra: @docs/modelo-fisico-mongodb-cas
 
 - En las bases, usar primero lo visto en clase y seguir su regla de uso: @docs/visto-en-clase.md
 - Antes de un cambio que toque varios archivos o el modelo de datos, proponer un plan y esperar OK.
-- Un módulo de Spring Data por base (JPA, Spring Data MongoDB, Spring Data Cassandra,
-  Spring Data Neo4j), con paquetes separados por base.
+- Un paquete por base. MongoDB, Cassandra y Neo4j usan driver directo, con las consultas a la vista.
 - Cassandra: una tabla por patrón de consulta. Nunca `ALLOW FILTERING` sobre toda la tabla.
 - Reutilizar las tablas, funciones SQL y contratos que ya existen; no romper endpoints existentes.
 - Cada requisito incluye: backend, pantalla JavaFX, datos demo, prueba automatizada y evidencia en

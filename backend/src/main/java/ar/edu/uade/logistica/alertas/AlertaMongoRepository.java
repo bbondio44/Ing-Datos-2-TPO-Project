@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import ar.edu.uade.logistica.common.ConflictException;
@@ -103,7 +104,7 @@ public class AlertaMongoRepository {
         return insertarSiNoExiste(alertas, documento);
     }
 
-    public void insertarEvento(AlertaNueva alerta, boolean conIncidente) {
+    public void insertarEvento(AlertaNueva alerta, boolean conIncidente, UUID idTramo) {
         Date ahora = Date.from(alerta.ahora());
         Document payload = new Document("tipo_regla", alerta.regla().tipoRegla())
                 .append("severidad", alerta.regla().severidad())
@@ -111,6 +112,7 @@ public class AlertaMongoRepository {
         Document evento = new Document("_id", alerta.idEvento())
                 .append("id_envio", alerta.idEnvio().toString())
                 .append("id_contenedor", texto(alerta.idContenedor()))
+                .append("id_tramo", texto(idTramo))
                 .append("tipo", "ALERTA_GENERADA")
                 .append("fecha", ahora)
                 .append("descripcion", alerta.mensaje())

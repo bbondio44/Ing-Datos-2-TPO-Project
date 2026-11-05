@@ -114,9 +114,10 @@ public class AlertaService {
         if (alertas.sumarOcurrencia(alerta)) return;
         // El incidente va primero: así nunca queda una alerta ALTA/CRITICA sin incidente (control de R25).
         boolean conIncidente = alerta.generaIncidente();
-        if (conIncidente) incidentes.crear(alerta);
+        UUID idTramo = alerta.idEnvio() == null ? null : incidentes.tramoEnCurso(alerta.idEnvio(), alerta.fechaLectura());
+        if (conIncidente) incidentes.crear(alerta, idTramo);
         if (alertas.insertar(alerta, conIncidente) && alerta.idEnvio() != null) {
-            alertas.insertarEvento(alerta, conIncidente);
+            alertas.insertarEvento(alerta, conIncidente, idTramo);
         }
         log.info("Alerta {} de regla {} para el sensor {}", alerta.idAlerta(), alerta.regla().nombre(), alerta.idSensor());
     }

@@ -39,14 +39,22 @@ public class OutboxNeo4jWorker {
             "Incidente", "id_incidente");
 
     // FOR UPDATE SKIP LOCKED: bloqueo exclusivo por fila; un segundo worker salta las filas ya tomadas.
+    // El NOT EXISTS mantiene el orden por entidad: si un evento anterior de la misma entidad sigue sin
+    // procesar, este espera. Si no, un reintento viejo pisaría en el grafo un cambio más nuevo.
     private static final String RECLAMAR_LOTE = """
             UPDATE tp_logistica.outbox_evento SET estado = 'PROCESANDO'
              WHERE id_evento IN (
-                   SELECT id_evento FROM tp_logistica.outbox_evento
-                    WHERE estado IN ('PENDIENTE', 'ERROR')
-                      AND (proximo_intento IS NULL OR proximo_intento <= now())
-                    ORDER BY fecha_creacion LIMIT ?
-                    FOR UPDATE SKIP LOCKED)
+                   SELECT o.id_evento FROM tp_logistica.outbox_evento o
+                    WHERE o.estado IN ('PENDIENTE', 'ERROR')
+                      AND (o.proximo_intento IS NULL OR o.proximo_intento <= now())
+                      AND NOT EXISTS (
+                          SELECT 1 FROM tp_logistica.outbox_evento previo
+                           WHERE previo.agregado_tipo = o.agregado_tipo
+                             AND previo.agregado_id = o.agregado_id
+                             AND previo.estado <> 'PROCESADO'
+                             AND previo.fecha_creacion < o.fecha_creacion)
+                    ORDER BY o.fecha_creacion LIMIT ?
+                    FOR UPDATE OF o SKIP LOCKED)
             RETURNING id_evento, agregado_tipo, tipo_evento, payload::text AS payload, intentos, fecha_creacion
             """;
 
