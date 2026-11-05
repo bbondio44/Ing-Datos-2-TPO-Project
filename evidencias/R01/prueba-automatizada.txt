@@ -1,0 +1,10 @@
+﻿NOTICE:  database "logistica_p1" does not exist, skipping
+=== R01 ABM clientes
+OK    alta: esperado=201 obtenido=201
+OK    CUIT duplicado: esperado=409 obtenido=409
+OK    CUIT con digito verificador invalido: esperado=409 obtenido=409
+OK    CUIT mal formado: esperado=400 obtenido=400
+OK    edicion: esperado=200 obtenido=200
+OK    listado por busqueda: esperado=1 obtenido=1
+OK    baja logica: esperado=204 obtenido=204
+OK    estado despues de la baja: esperado=INACTIVO obtenido=INACTIVO

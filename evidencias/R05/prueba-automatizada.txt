@@ -1,0 +1,22 @@
+﻿=== R05 operadores y vehiculos
+OK    alta: esperado=201 obtenido=201
+OK    baja logica: esperado=204 obtenido=204
+OK    alta de vehiculo: esperado=201 obtenido=201
+OK    vehiculo de operador inactivo: esperado=409 obtenido=409
+OK    operadores de la demo presentes en Neo4j: esperado=7 obtenido=7
+OK    tramos con operador en Neo4j: esperado=47 obtenido=47
+=== R24 R04 R05 trayectos con operador y proveedor
+OK    alta del tramo 2: esperado=201 obtenido=201
+OK    alta del tramo 1: esperado=201 obtenido=201
+OK    tramos en secuencia: esperado=1,2 obtenido=1,2
+OK    R05 operador visible en el tramo: esperado=Operador 2e9679 obtenido=Operador 2e9679
+OK    R04 proveedor visible en el tramo: esperado=Proveedor 2e9679 obtenido=Proveedor 2e9679
+OK    vehiculo de otro operador: esperado=409 obtenido=409
+OK    fechas invertidas: esperado=409 obtenido=409
+OK    finalizado sin llegada real: esperado=409 obtenido=409
+OK    numero de tramo repetido: esperado=409 obtenido=409
+OK    proveedor inactivo: esperado=409 obtenido=409
+OK    edicion con dos proveedores: esperado=200 obtenido=200
+OK    el tramo conserva los dos proveedores: esperado=2 obtenido=2
+OK    baja de tramo: esperado=204 obtenido=204
+OK    CLIENTE no crea tramos: esperado=403 obtenido=403

@@ -1,0 +1,5 @@
+﻿=== R36 maximo y minimo por cliente
+OK    entregados: esperado=3 obtenido=3
+OK    minimo: esperado=34 obtenido=34
+OK    maximo: esperado=60 obtenido=60
+OK    cliente sin entregas no aparece: esperado=0 obtenido=0

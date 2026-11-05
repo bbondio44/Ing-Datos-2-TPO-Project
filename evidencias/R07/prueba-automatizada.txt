@@ -1,0 +1,7 @@
+﻿=== R07 contenedores de un envio
+OK    asociar: esperado=201 obtenido=201
+OK    mismo contenedor en otro envio, superpuesto: esperado=409 obtenido=409
+OK    desasociar: esperado=204 obtenido=204
+OK    queda en el historico con fin: esperado=True obtenido=True
+OK    asociar despues del cierre: esperado=201 obtenido=201
+OK    una historica y una vigente: esperado=1/1 obtenido=1/1

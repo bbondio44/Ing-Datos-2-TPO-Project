@@ -1,6 +1,6 @@
 # R04 — Proveedores
 
-Estado: `PENDIENTE` con avance parcial ejecutado.
+Estado: `IMPLEMENTADO`. Probado contra PostgreSQL el 05/11/2026 con `scripts/pruebas/persona1.ps1` (salida en `prueba-automatizada.txt`, sin fallas). Falta la captura desde JavaFX para pasar a `PROBADO`.
 
 ## Cobertura verificada
 
@@ -21,6 +21,10 @@ Resultado del ciclo ejecutado:
 }
 ```
 
-## Pendiente para completar R04
+## Relaciones verificadas
 
-El proveedor debe seleccionarse y visualizarse desde tramos y desde la operación financiera de terceros. Hasta verificar esas relaciones y la interfaz completa, R04 no puede pasar a `IMPLEMENTADO` ni `PROBADO`.
+- El proveedor se elige al crear o editar un tramo y se ve en la columna Proveedores de Trayectos.
+- Un tramo conserva dos proveedores al editarlo; un proveedor inactivo se rechaza con HTTP `409`.
+- La factura y el pago de un proveedor se reflejan en su cuenta a pagar (ver R16).
+
+Limitación: la pantalla de Trayectos carga un proveedor por tramo y conserva los demás. Varios proveedores nuevos en un tramo se cargan por API.

@@ -1,0 +1,5 @@
+﻿=== R39 costos por transporte
+OK    total AEREO: esperado=21000 obtenido=21000
+OK    total MARITIMO: esperado=203000 obtenido=203000
+OK    total TERRESTRE: esperado=32000 obtenido=32000
+copia de la base borrada: logistica_p1

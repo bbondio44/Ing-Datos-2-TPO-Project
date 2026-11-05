@@ -1,0 +1,8 @@
+﻿=== R03 sesiones
+OK    lista sesiones activas: esperado=True obtenido=True
+OK    revocar: esperado=204 obtenido=204
+OK    sesion revocada no accede: esperado=401 obtenido=401
+OK    sesion activa accede: esperado=200 obtenido=200
+OK    logout: esperado=204 obtenido=204
+OK    despues del logout no accede: esperado=401 obtenido=401
+OK    sesion expirada no accede: esperado=401 obtenido=401

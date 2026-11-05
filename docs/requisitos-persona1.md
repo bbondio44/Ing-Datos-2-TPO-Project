@@ -23,7 +23,7 @@ Este archivo concreta el alcance entregable de Persona 1. Un requisito queda `IM
 ## Finanzas
 
 - R10: factura borrador con detalles, emisión mediante función SQL, consulta de saldo y cobros parciales/totales.
-- R12: proceso invocable y programable que usa una clave estable por envío/tarifa; dos ejecuciones retornan la misma factura.
+- R12: proceso invocable y programable que usa una clave estable por envío/tarifa; dos ejecuciones retornan la misma factura. Un envío de una cuenta con el mes cerrado se saltea y se informa, para no revertir el lote de los demás clientes.
 - R13: pagos idempotentes; duplicados incompatibles y sobrepagos se rechazan.
 - R14: cuenta corriente con movimientos inmutables, saldo almacenado/calculado y conciliación visible.
 - R15: cierre mensual por primer día del mes; no permite doble cierre ni cierres retroactivos.

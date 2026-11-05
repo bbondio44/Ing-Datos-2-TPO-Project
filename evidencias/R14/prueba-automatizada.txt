@@ -1,0 +1,6 @@
+﻿=== R14 cuenta corriente
+OK    saldo igual al calculado: esperado=0 obtenido=0
+OK    conciliada: esperado=True obtenido=True
+OK    saldo igual a la suma de movimientos: esperado=0 obtenido=0
+OK    movimientos: esperado=3 obtenido=3
+OK    desconciliadas en toda la base: esperado=0 obtenido=0

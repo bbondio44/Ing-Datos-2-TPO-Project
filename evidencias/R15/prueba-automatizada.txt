@@ -1,0 +1,7 @@
+﻿=== R15 cierre mensual
+OK    cierre: esperado=200 obtenido=200
+OK    el cierre reproduce el saldo: esperado=250 obtenido=250
+OK    repetir el periodo: esperado=409 obtenido=409
+OK    cierre retroactivo: esperado=409 obtenido=409
+OK    dia que no es primero de mes: esperado=409 obtenido=409
+OK    cierres registrados: esperado=1 obtenido=1

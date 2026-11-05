@@ -1,4 +1,4 @@
 ﻿=== R32 anomalia de temperatura
 OK    anomalia detectada: esperado=1 obtenido=1
-OK    con la lectura que la causo: esperado=311d6ce5-fb9b-48cc-a65c-dc99c5d44d15 obtenido=311d6ce5-fb9b-48cc-a65c-dc99c5d44d15
-     z=47.765049984271975 umbral=3.0 severidad=MEDIA
+OK    con la lectura que la causo: esperado=c7bb26dc-ef34-4f42-815e-34cc79989d0d obtenido=c7bb26dc-ef34-4f42-815e-34cc79989d0d
+     z=4.359281250860409 umbral=3.0 severidad=MEDIA

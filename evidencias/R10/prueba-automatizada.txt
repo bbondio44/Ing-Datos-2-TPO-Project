@@ -1,0 +1,17 @@
+﻿=== R10 factura y cobros
+OK    factura borrador: esperado=201 obtenido=201
+OK    estado inicial: esperado=BORRADOR obtenido=BORRADOR
+OK    emitir: esperado=200 obtenido=200
+OK    saldo despues de emitir: esperado=1000 obtenido=1000
+OK    cobro parcial: esperado=201 obtenido=201
+OK    saldo despues del cobro parcial: esperado=600 obtenido=600
+OK    estado parcial: esperado=PARCIAL obtenido=PARCIAL
+=== R13 R10 pagos
+OK    misma clave y datos no duplica: esperado=True obtenido=True
+OK    pagos registrados: esperado=1 obtenido=1
+OK    misma clave con otro monto: esperado=409 obtenido=409
+OK    sobrepago: esperado=409 obtenido=409
+OK    cliente ajeno no ve la factura: esperado=True obtenido=True
+OK    pago total: esperado=201 obtenido=201
+OK    R10 factura pagada: esperado=PAGADA obtenido=PAGADA
+OK    R10 pendiente en cero: esperado=0 obtenido=0

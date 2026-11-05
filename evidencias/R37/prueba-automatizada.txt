@@ -1,0 +1,4 @@
+﻿=== R37 promedio de incidentes
+OK    envios del denominador: esperado=29 obtenido=29
+OK    incidentes del numerador: esperado=28 obtenido=28
+OK    promedio del grupo mayor: esperado=22 obtenido=22

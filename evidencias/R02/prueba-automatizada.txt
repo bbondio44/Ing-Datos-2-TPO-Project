@@ -1,0 +1,13 @@
+﻿=== R02 usuarios y roles
+OK    alta de usuario con rol: esperado=201 obtenido=201
+OK    email repetido: esperado=409 obtenido=409
+OK    admin lista usuarios: esperado=200 obtenido=200
+OK    CLIENTE no lista usuarios: esperado=403 obtenido=403
+OK    CLIENTE no crea clientes: esperado=403 obtenido=403
+OK    alta de rol: esperado=201 obtenido=201
+OK    edicion de rol: esperado=200 obtenido=200
+OK    baja de rol: esperado=204 obtenido=204
+OK    usuario activo accede: esperado=200 obtenido=200
+OK    bloquear usuario: esperado=200 obtenido=200
+OK    bloquear revoca la sesion: esperado=401 obtenido=401
+OK    bloqueado no puede entrar: esperado=401 obtenido=401

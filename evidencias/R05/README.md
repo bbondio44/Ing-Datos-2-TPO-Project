@@ -1,6 +1,6 @@
 # R05 — Operadores logísticos
 
-Estado: `PENDIENTE` con avance parcial ejecutado.
+Estado: `IMPLEMENTADO`. Probado contra PostgreSQL el 05/11/2026 con `scripts/pruebas/persona1.ps1` (salida en `prueba-automatizada.txt`, sin fallas). Falta la captura desde JavaFX para pasar a `PROBADO`.
 
 ## Cobertura verificada
 
@@ -27,6 +27,8 @@ Resultado del ciclo ejecutado:
 }
 ```
 
-## Pendiente para completar R05
+## Relaciones verificadas
 
-Falta implementar y verificar la relación del operador con vehículos, tramos, facturación de terceros y la proyección Neo4j. R05 permanece pendiente hasta cubrir esas dependencias.
+- El operador se ve en sus tramos; un vehículo de otro operador se rechaza con HTTP `409`.
+- La factura y el pago de un operador se reflejan en su cuenta a pagar (ver R16).
+- Neo4j tiene los mismos operadores que PostgreSQL y una relación `OPERADO_POR` por cada tramo con operador.

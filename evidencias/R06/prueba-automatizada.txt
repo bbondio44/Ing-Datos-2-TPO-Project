@@ -1,0 +1,14 @@
+﻿=== R06 envios, contenedores y sensores
+OK    alta de envio: esperado=201 obtenido=201
+OK    alta de contenedor: esperado=201 obtenido=201
+OK    alta de sensor: esperado=201 obtenido=201
+OK    CLIENTE no ve envio ajeno: esperado=404 obtenido=404
+=== R08 R06 sensores de un contenedor
+OK    asociar: esperado=201 obtenido=201
+OK    superposicion por fecha: esperado=409 obtenido=409
+OK    desasociar: esperado=204 obtenido=204
+OK    sensor visible dentro de la vigencia: esperado=1 obtenido=1
+OK    sensor no visible fuera de la vigencia: esperado=0 obtenido=0
+OK    asociar de nuevo: esperado=201 obtenido=201
+OK    R06 el envio muestra contenedores: esperado=2 obtenido=2
+OK    R06 el envio muestra sensores: esperado=True obtenido=True
