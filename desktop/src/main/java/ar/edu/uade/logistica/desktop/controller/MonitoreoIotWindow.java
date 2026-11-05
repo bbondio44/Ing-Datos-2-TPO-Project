@@ -207,13 +207,15 @@ public final class MonitoreoIotWindow {
                 <body><div id="mapa"></div><script>
                 var puntos=[PUNTOS];
                 var mapa=L.map('mapa');
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-                  {attribution:'OpenStreetMap, CARTO',maxZoom:18}).addTo(mapa);
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+                  {attribution:'Esri',maxZoom:18}).addTo(mapa);
                 var linea=L.polyline(puntos,{color:'#1769d2',weight:4}).addTo(mapa);
                 puntos.forEach(function(p){L.circleMarker(p,{radius:3,color:'#1769d2'}).addTo(mapa);});
                 L.circleMarker(puntos[0],{radius:7,color:'#2e9e5b',fillOpacity:1}).addTo(mapa).bindTooltip('Inicio');
                 L.circleMarker(puntos[puntos.length-1],{radius:8,color:'#d2352b',fillOpacity:1}).addTo(mapa).bindTooltip('Última posición');
-                if(puntos.length>1){mapa.fitBounds(linea.getBounds(),{padding:[30,30]});}else{mapa.setView(puntos[0],10);}
+                function encuadrar(){mapa.invalidateSize();
+                  if(puntos.length>1){mapa.fitBounds(linea.getBounds(),{padding:[30,30]});}else{mapa.setView(puntos[0],10);}}
+                encuadrar();setTimeout(encuadrar,500);
                 </script></body></html>
                 """.replace("PUNTOS", puntos);
     }
