@@ -494,6 +494,8 @@ final class PersonaOneDialogs {
             table.getColumns().add(column("Medio", RouteLegResponse::transportType));
             table.getColumns().add(column("Operador", r -> value(r.operator())));
             table.getColumns().add(column("Vehículo", r -> value(r.vehicle())));
+            table.getColumns().add(column("Proveedores", r -> String.join(", ",
+                    r.suppliers().stream().map(s -> s.supplierName()).toList())));
             table.getColumns().add(column("Estado", RouteLegResponse::state));
             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
             Runnable reload = () -> {
@@ -554,6 +556,9 @@ final class PersonaOneDialogs {
             TextField actualCost = text(initial == null || initial.actualCost() == null ? null : initial.actualCost().toPlainString());
             ComboBox<OrganizationResponse> supplier = comboWithEmpty(suppliers, OrganizationResponse::businessName);
             TextField service = new TextField(); TextField supplierCost = new TextField();
+            // El formulario edita un proveedor; el resto se reenvía porque el backend reemplaza la lista entera.
+            List<RouteSupplierRequest> otherSuppliers = initial == null ? List.of() : initial.suppliers().stream()
+                    .skip(1).map(s -> new RouteSupplierRequest(s.supplierId(), s.service(), s.cost())).toList();
             if (initial != null) {
                 locations.stream().filter(l -> l.id().equals(initial.originLocationId())).findFirst().ifPresent(originLocation::setValue);
                 locations.stream().filter(l -> l.id().equals(initial.destinationLocationId())).findFirst().ifPresent(destinationLocation::setValue);
@@ -575,12 +580,16 @@ final class PersonaOneDialogs {
             grid.addRow(12, new Label("Costo real"), actualCost); grid.addRow(13, new Label("Estado"), state);
             grid.addRow(14, new Label("Proveedor opcional"), supplier); grid.addRow(15, new Label("Servicio proveedor"), service);
             grid.addRow(16, new Label("Costo proveedor"), supplierCost);
+            if (!otherSuppliers.isEmpty()) grid.addRow(17, new Label("Otros proveedores"), new Label(String.join(", ",
+                    initial.suppliers().stream().skip(1).map(s -> s.supplierName() + " (" + s.service() + ")").toList())
+                    + " — se conservan"));
             ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true); scroll.setPrefViewportHeight(520);
             dialog.getDialogPane().setContent(scroll);
             dialog.setResultConverter(b -> {
                 if (b.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
-                List<RouteSupplierRequest> supplierRows = supplier.getValue() == null ? List.of()
-                        : List.of(new RouteSupplierRequest(supplier.getValue().id(), service.getText(), decimal(supplierCost.getText())));
+                RouteSupplierRequest edited = supplier.getValue() == null ? null
+                        : new RouteSupplierRequest(supplier.getValue().id(), service.getText(), decimal(supplierCost.getText()));
+                List<RouteSupplierRequest> supplierRows = mergeSuppliers(edited, otherSuppliers);
                 return new RouteLegRequest(shipmentId, order.getValue(), origin.getText(), destination.getText(),
                         id(originLocation.getValue()), id(destinationLocation.getValue()), transport.getValue(),
                         id(vehicle.getValue()), id(operator.getValue()), parseInstant(departure.getText()),
@@ -656,7 +665,8 @@ final class PersonaOneDialogs {
                         t -> t.concept() + " — " + t.price() + " " + t.currency());
                 choice.showAndWait().ifPresent(t -> {
                     AutomaticInvoiceResponse result = api.runAutomaticBilling(t.id()).join();
-                    info("Facturación automática", "Procesados: " + result.processed() + ". Nuevos: " + result.created());
+                    info("Facturación automática", "Procesados: " + result.processed() + ". Nuevos: " + result.created()
+                            + ". Salteados por mes cerrado: " + result.skippedClosed());
                 });
                 reloadInvoices.run();
             }));
@@ -726,12 +736,22 @@ final class PersonaOneDialogs {
         TextField country = new TextField(); country.setPromptText("País destino");
         TextField state = new TextField(); state.setPromptText("Estado");
         CheckBox delayed = new CheckBox("Solo demorados"); CheckBox incidents = new CheckBox("Con incidentes abiertos");
+        // Un usuario CLIENTE no ve este filtro: el backend ya limita el reporte a su propio cliente.
+        boolean canChooseClient = session.permissions().contains("REPORTES_LEER_TODOS")
+                && session.permissions().contains("CLIENTES_LEER_TODOS");
+        List<Optional<ClientResponse>> clientOptions = new ArrayList<>();
+        clientOptions.add(Optional.empty());
+        if (canChooseClient) run(() -> api.clients("").join().content().forEach(c -> clientOptions.add(Optional.of(c))));
+        ComboBox<Optional<ClientResponse>> client = combo(clientOptions,
+                c -> c.map(ClientResponse::businessName).orElse("Todos los clientes"));
         Runnable load = () -> run(() -> table.setItems(FXCollections.observableArrayList(api.shipmentReport(
-                country.getText(), state.getText(), delayed.isSelected() ? true : null,
-                incidents.isSelected() ? true : null).join())));
+                country.getText(), state.getText(), client.getValue().map(ClientResponse::id).orElse(null),
+                delayed.isSelected() ? true : null, incidents.isSelected() ? true : null).join())));
         Button filter = new Button("Aplicar filtros"); filter.setOnAction(e -> load.run());
         load.run();
-        return new Tab("R35 Envíos", pane(new HBox(8, country, state, delayed, incidents, filter), table,
+        HBox filters = new HBox(8, country, state, delayed, incidents, filter);
+        if (canChooseClient) filters.getChildren().add(2, client);
+        return new Tab("R35 Envíos", pane(filters, table,
                 new Label("País se interpreta como país de destino; los filtros se combinan.")));
     }
 
@@ -860,6 +880,15 @@ final class PersonaOneDialogs {
         throw new IllegalArgumentException("Tipo sin UUID");
     }
     private static String value(Object value) { return value == null ? "" : value.toString(); }
+
+    /** Une el proveedor editado con los demás sin repetir la PK (tramo, proveedor, servicio). */
+    static List<RouteSupplierRequest> mergeSuppliers(RouteSupplierRequest edited, List<RouteSupplierRequest> others) {
+        List<RouteSupplierRequest> rows = new ArrayList<>();
+        if (edited != null) rows.add(edited);
+        others.stream().filter(o -> edited == null || !(o.supplierId().equals(edited.supplierId())
+                && o.service().equals(edited.service()))).forEach(rows::add);
+        return rows;
+    }
 
     private static void run(Runnable operation) {
         try { operation.run(); }

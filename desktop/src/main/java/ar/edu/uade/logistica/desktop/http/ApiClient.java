@@ -418,11 +418,18 @@ public class ApiClient {
     }
 
     public CompletableFuture<List<ShipmentReportResponse>> shipmentReport(
-            String country, String state, Boolean delayed, Boolean openIncidents) {
+            String country, String state, UUID clientId, Boolean delayed, Boolean openIncidents) {
+        return send("GET", shipmentReportPath(country, state, clientId, delayed, openIncidents), null,
+                new TypeReference<>() {}, true);
+    }
+
+    static String shipmentReportPath(String country, String state, UUID clientId,
+                                     Boolean delayed, Boolean openIncidents) {
         String path = "/api/v1/reportes/envios?pais=" + encode(country) + "&estado=" + encode(state);
+        if (clientId != null) path += "&clienteId=" + clientId;
         if (delayed != null) path += "&demorado=" + delayed;
         if (openIncidents != null) path += "&incidentesAbiertos=" + openIncidents;
-        return send("GET", path, null, new TypeReference<>() {}, true);
+        return path;
     }
 
     public CompletableFuture<List<ClientDeliveryTimeResponse>> clientDeliveryTimes() {

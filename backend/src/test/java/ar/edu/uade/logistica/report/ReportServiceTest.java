@@ -3,13 +3,18 @@ package ar.edu.uade.logistica.report;
 import ar.edu.uade.logistica.security.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 class ReportServiceTest {
@@ -24,5 +29,18 @@ class ReportServiceTest {
         assertThrows(AccessDeniedException.class, () -> service.shipments(
                 null, null, UUID.randomUUID(), null, null, user));
         verifyNoInteractions(jdbc);
+    }
+
+    @Test
+    void r35AdminFiltersShipmentsByRequestedClient() {
+        JdbcTemplate jdbc = mock(JdbcTemplate.class);
+        ReportService service = new ReportService(jdbc);
+        UUID requested = UUID.randomUUID();
+        AuthenticatedUser admin = new AuthenticatedUser(UUID.randomUUID(), null, null, null,
+                "admin@example.test", "Admin", Set.of("ADMIN"), Set.of("REPORTES_LEER", "REPORTES_LEER_TODOS"));
+
+        service.shipments(null, null, requested, null, null, admin);
+
+        verify(jdbc).query(contains("AND id_cliente=?"), any(RowMapper.class), eq(requested));
     }
 }

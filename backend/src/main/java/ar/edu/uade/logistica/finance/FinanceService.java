@@ -217,7 +217,7 @@ public class FinanceService {
                                  AND (vigencia_hasta IS NULL OR vigencia_hasta>=current_date))
                 """, Boolean.class, tariffId);
         if (!Boolean.TRUE.equals(validTariff)) throw new ConflictException("La tarifa no está vigente");
-        List<UUID> shipments = jdbcTemplate.queryForList("""
+        List<UUID> pending = jdbcTemplate.queryForList("""
                 SELECT id_envio FROM tp_logistica.envio
                  WHERE estado IN ('EN_TRANSITO','DEMORADO','ENTREGADO')
                    AND NOT EXISTS (
@@ -226,6 +226,15 @@ public class FinanceService {
                    )
                  ORDER BY fecha_creacion
                 """, UUID.class);
+        // Una cuenta con el mes cerrado rechaza movimientos: si entrara al lote, la transacción
+        // se revertiría y ningún otro cliente quedaría facturado. Se saltea y se informa.
+        List<UUID> closed = jdbcTemplate.queryForList("""
+                SELECT e.id_envio FROM tp_logistica.envio e
+                  JOIN tp_logistica.cuenta_corriente c ON c.id_cliente=e.id_cliente
+                  JOIN tp_logistica.cierre_cuenta cc ON cc.id_cuenta=c.id_cuenta
+                 WHERE cc.periodo>=date_trunc('month',now() AT TIME ZONE 'UTC')::date
+                """, UUID.class);
+        List<UUID> shipments = pending.stream().filter(id -> !closed.contains(id)).toList();
         List<UUID> invoiceIds = new ArrayList<>();
         int created = 0;
         for (UUID shipmentId : shipments) {
@@ -238,7 +247,8 @@ public class FinanceService {
             invoiceIds.add(invoiceId);
             if (!Boolean.TRUE.equals(existed)) created++;
         }
-        return new AutomaticInvoiceResponse(shipments.size(), created, List.copyOf(invoiceIds));
+        return new AutomaticInvoiceResponse(shipments.size(), created, pending.size() - shipments.size(),
+                List.copyOf(invoiceIds));
     }
 
     private AccountResponse mapAccount(ResultSet rs, int row) throws SQLException {
