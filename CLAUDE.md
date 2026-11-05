@@ -41,7 +41,7 @@ Los 40 requisitos, su prueba de aceptación, el estado de cada uno y la definici
 - Tests: `mvn -B test`
 - Backend: `$env:SPRING_PROFILES_ACTIVE='dev,polyglot'; mvn -pl backend spring-boot:run`
 - App de escritorio: `mvn -pl desktop javafx:run`
-- Pruebas de aceptación de Persona 2: `powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\correr-todo.ps1`
+- Pruebas de aceptación de los 40 requisitos: `powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\correr-todo.ps1`
 
 ## Qué guarda cada base (fuente de verdad única por dato)
 
