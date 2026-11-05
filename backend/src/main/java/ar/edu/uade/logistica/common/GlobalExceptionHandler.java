@@ -66,6 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class,
             UncategorizedSQLException.class})
     ResponseEntity<ApiError> conflict(Exception exception, HttpServletRequest request) {
+        LOGGER.warn("Conflicto en {} {}: {}", request.getMethod(), request.getRequestURI(), exception.getMessage());
         return response(HttpStatus.CONFLICT, "CONFLICTO_DATOS",
                 "La operación entra en conflicto con un dato existente o una regla de integridad", Map.of(), request);
     }
