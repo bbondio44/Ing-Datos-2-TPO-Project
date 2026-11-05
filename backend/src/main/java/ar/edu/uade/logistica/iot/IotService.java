@@ -4,10 +4,14 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
+import ar.edu.uade.logistica.alertas.AlertaService;
 import ar.edu.uade.logistica.common.ConflictException;
 import ar.edu.uade.logistica.common.NotFoundException;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotRequest;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(prefix = "app.cassandra", name = "enabled", havingValue = "true")
 public class IotService {
+    private static final Logger log = LoggerFactory.getLogger(IotService.class);
     private static final String SENSOR_EXISTE = """
             SELECT count(*) FROM tp_logistica.sensor_iot WHERE id_sensor = ?
             """;
@@ -27,16 +32,31 @@ public class IotService {
 
     private final JdbcTemplate jdbcTemplate;
     private final LecturaCassandraRepository lecturas;
+    private final ObjectProvider<AlertaService> alertas;
 
-    public IotService(JdbcTemplate jdbcTemplate, LecturaCassandraRepository lecturas) {
+    public IotService(JdbcTemplate jdbcTemplate, LecturaCassandraRepository lecturas,
+                      ObjectProvider<AlertaService> alertas) {
         this.jdbcTemplate = jdbcTemplate;
         this.lecturas = lecturas;
+        this.alertas = alertas;
     }
 
     public LecturaIotResponse registrar(LecturaIotRequest lectura) {
         UUID idContenedor = contenedorEnInstante(lectura);
         lecturas.guardar(lectura, idContenedor);
+        evaluarAlertas(lectura, idContenedor);
         return new LecturaIotResponse(lectura.idLectura(), idContenedor);
+    }
+
+    /** La lectura ya quedó guardada: si falla la evaluación, no se la rechaza al sensor. */
+    private void evaluarAlertas(LecturaIotRequest lectura, UUID idContenedor) {
+        AlertaService servicio = alertas.getIfAvailable();
+        if (servicio == null) return;
+        try {
+            servicio.evaluar(lectura, idContenedor);
+        } catch (RuntimeException exception) {
+            log.warn("No se pudo evaluar la lectura {}", lectura.idLectura(), exception);
+        }
     }
 
     private UUID contenedorEnInstante(LecturaIotRequest lectura) {

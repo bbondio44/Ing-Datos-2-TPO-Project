@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import ar.edu.uade.logistica.alertas.AlertaService;
 import ar.edu.uade.logistica.common.ConflictException;
 import ar.edu.uade.logistica.common.NotFoundException;
 import ar.edu.uade.logistica.contracts.iot.LecturaIotRequest;
@@ -14,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,13 +34,14 @@ class IotServiceTest {
 
     @Mock JdbcTemplate jdbcTemplate;
     @Mock LecturaCassandraRepository lecturas;
+    @Mock ObjectProvider<AlertaService> alertas;
 
     IotService service;
     LecturaIotRequest lectura;
 
     @BeforeEach
     void setUp() {
-        service = new IotService(jdbcTemplate, lecturas);
+        service = new IotService(jdbcTemplate, lecturas, alertas);
         lectura = new LecturaIotRequest(UUID.randomUUID(), UUID.randomUUID(), Instant.parse("2026-10-21T12:00:00Z"),
                 6.2, null, null, null, null, null);
     }
