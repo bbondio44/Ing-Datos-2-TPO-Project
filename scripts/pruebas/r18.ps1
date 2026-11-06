@@ -43,7 +43,7 @@ function Ver($titulo, $esperado, $obtenido) {
 
 $proc = $null
 try {
-    $fila = Sql "select id_sensor, id_contenedor from tp_logistica.v_envio_contenedor_sensor_activo order by id_sensor desc limit 1;"
+    $fila = Sql "select id_sensor, id_contenedor from tp_logistica.v_envio_contenedor_sensor_activo where id_sensor is not null order by id_sensor desc limit 1;"
     $script:sensor, $cont = ("$fila").Trim() -split '\|'
     "sensor demo = $script:sensor"; "contenedor  = $cont"
     $ahora = (Get-Date).ToUniversalTime()

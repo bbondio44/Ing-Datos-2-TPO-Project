@@ -11,6 +11,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -18,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -51,12 +53,15 @@ public class CapturasPantallas extends Application {
     private static final UUID CONTENEDOR = UUID.fromString("42d867d9-d7a4-5248-9681-33e2c0cdb123");
     private static final String ENVIO_E002 = "ec22d634-96cd-5267-b7bd-accdce959d92";
     private static final String CLIENTE_C02 = "270823a9-7978-5eda-80f0-9ae673331b0b";
+    private static final String CLIENTE_C01 = "aef2750c-1592-5ed4-b7a7-ab5771efc165";
+    private static final String CLAVE_GUIA = "Guia-Prueba-2026";
 
     private static PrintWriter log;
     private static int oks;
     private static int fallas;
     private Stage principal;
     private String clienteNuevo;
+    private final String marca = UUID.randomUUID().toString().substring(0, 6);
 
     public static final class Lanzador {
         public static void main(String[] args) throws IOException {
@@ -71,8 +76,14 @@ public class CapturasPantallas extends Application {
         new DesktopApplication().start(stage);
         Thread hilo = new Thread(() -> {
             try {
-                recorrerComoAdmin();
-                recorrerComoCliente();
+                if (System.getenv("CAPTURA_SOLO_ENVIO") != null) {
+                    entrar(System.getenv("CAPTURA_ADMIN_EMAIL"), System.getenv("CAPTURA_ADMIN_PASSWORD"));
+                    paso("R06 R07 R08 R24", this::guiaEnvioCompleto);
+                } else {
+                    recorrerComoAdmin();
+                    recorrerComoCliente();
+                    recorrerUsuariosCreados();
+                }
             } catch (Throwable error) {
                 falla("recorrido interrumpido: " + error);
             }
@@ -125,6 +136,7 @@ public class CapturasPantallas extends Application {
         recorrerMonitoreo();
         recorrerAlertas();
         recorrerAnalitica();
+        recorrerGuia();
         click(boton(principal, "Cerrar sesión"));
         esperarLogin();
     }
@@ -245,6 +257,19 @@ public class CapturasPantallas extends Application {
         verificar("R10 el cobro parcial cambia el estado", fx(() -> tabla0(finanzas, 1).toString().contains("state=PARCIAL")));
         captura(finanzas, "cobro-parcial", "R10", "R13");
         seleccionar(tabla(finanzas, 1), "state=PARCIAL");
+        Window sobrepago = abrirCon(() -> click(boton(finanzas, "Registrar pago")));
+        fx(() -> {
+            visibleEnFx(sobrepago, TextField.class).getFirst().setText("9999");
+            return null;
+        });
+        Window rechazo = abrirConError(() -> click(boton(sobrepago, "Guardar")));
+        verificar("R13 el sobrepago explica el motivo", fx(() -> ((DialogPane) rechazo.getScene().getRoot()).getContentText()).contains("excede"));
+        guardar(rechazo, "sobrepago-rechazado", "R13");
+        Platform.runLater(rechazo::hide);
+        esperarCierre(rechazo);
+        seleccionar(tabla(finanzas, 0), clienteNuevo);
+        espera(1000);
+        seleccionar(tabla(finanzas, 1), "state=PARCIAL");
         pagar(finanzas, "600");
         seleccionar(tabla(finanzas, 0), clienteNuevo);
         espera(1000);
@@ -331,16 +356,6 @@ public class CapturasPantallas extends Application {
         espera(1800);
         conDatos(iot, "R19 historico de dos dias");
         captura(iot, "historico-dos-dias", "R19");
-        fx(() -> {
-            id.setValue(SENSOR_DEMO);
-            fechas.get(0).setValue(LocalDate.now().minusDays(1));
-            fechas.get(1).setValue(LocalDate.now().plusDays(1));
-            return null;
-        });
-        click(boton(iot, "Consultar"));
-        espera(1800);
-        conDatos(iot, "R18 lecturas registradas");
-        captura(iot, "lecturas-registradas", "R18");
         pestania(iot, "Recorrido y mapa");
         ComboBox<Object> contenedor = combo(iot, 0);
         List<DatePicker> fechasMapa = nodos(iot, DatePicker.class);
@@ -444,12 +459,7 @@ public class CapturasPantallas extends Application {
         pestania(analitica, "Reportes");
         espera(1200);
         conDatos(analitica, "R11 solicitudes de reporte");
-        seleccionar(tabla(analitica, 0), "PREDICTIVO");
-        espera(1500);
-        captura(analitica, "reporte-predictivo", "R34", "R11");
-        seleccionar(tabla(analitica, 0), "FACTURADO");
-        espera(1500);
-        captura(analitica, "reporte-facturado", "R33");
+        captura(analitica, "reportes", "R11");
         pestania(analitica, "Red del cliente");
         TextField cliente = visible(analitica, TextField.class).getFirst();
         fx(() -> {
@@ -457,7 +467,7 @@ public class CapturasPantallas extends Application {
             return null;
         });
         click(boton(analitica, "Consultar"));
-        espera(2000);
+        esperarConsulta(analitica);
         conDatos(analitica, "R30 red del cliente");
         captura(analitica, "red-cliente", "R30");
         cerrar(analitica);
@@ -487,6 +497,592 @@ public class CapturasPantallas extends Application {
         verificar("R40 el mensaje nuevo aparece en la conversacion", filas(alertas, 1) == mensajes + 1);
         captura(alertas, "mensajeria-cliente", "R40");
         cerrar(alertas);
+    }
+
+    // ---- Recorrido de las guías: usa cada formulario como lo haría una persona -------------------
+
+    private void recorrerGuia() {
+        titulo("Guia paso a paso");
+        paso("R18", this::guiaLecturas);
+        paso("R09 R32 R26 R23", this::guiaAlertas);
+        paso("R01", this::guiaClientes);
+        paso("R04", () -> guiaOrganizacion("Proveedores", "Proveedor guia"));
+        paso("R05", () -> guiaOrganizacion("Operadores", "Operador guia"));
+        paso("R05 vehiculos", this::guiaVehiculo);
+        paso("R06 R07 R08 R24", this::guiaEnvioCompleto);
+        paso("R16", this::guiaTerceros);
+        paso("R35", this::guiaFiltrosEnvios);
+        paso("R29 R34 R11 R33 R30", this::guiaAnalitica);
+        paso("R02", this::guiaUsuarios);
+        paso("R12 R15", this::guiaProcesos);
+    }
+
+    private void paso(String nombre, Accion accion) {
+        try {
+            accion.correr();
+        } catch (Throwable error) {
+            falla(nombre + " interrumpido: " + error);
+        }
+        try {
+            for (Window w : ventanas()) {
+                if (w != principal) {
+                    Platform.runLater(w::hide);
+                    espera(250);
+                }
+            }
+            espera(400);
+        } catch (Exception error) {
+            falla(nombre + " al cerrar ventanas: " + error);
+        }
+    }
+
+    private void lecturas(String... argumentos) throws Exception {
+        List<String> comando = new ArrayList<>(List.of("powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                "scripts\\mandar-lecturas.ps1", "-Email", System.getenv("CAPTURA_ADMIN_EMAIL"),
+                "-Clave", System.getenv("CAPTURA_ADMIN_PASSWORD")));
+        comando.addAll(List.of(argumentos));
+        Process proceso = new ProcessBuilder(comando).redirectErrorStream(true).start();
+        String salida = new String(proceso.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        verificar("el script manda la lectura " + String.join(" ", argumentos),
+                proceso.waitFor() == 0 && salida.contains("Lectura enviada"));
+    }
+
+    private void guiaLecturas() throws Exception {
+        lecturas("-Cantidad", "12");
+        Window iot = abrir("Monitoreo IoT");
+        espera(2000);
+        verificar("R22 el sensor demo queda ONLINE con bateria", fx(() -> visibleEnFx(iot, TableView.class).getFirst().getItems()
+                .stream().anyMatch(s -> s.toString().contains(SENSOR_DEMO.toString()) && s.toString().contains("conexion=ONLINE"))));
+        pestania(iot, "Histórico de lecturas");
+        ComboBox<Object> id = combo(iot, 1);
+        fx(() -> {
+            id.setValue(SENSOR_DEMO);
+            return null;
+        });
+        click(boton(iot, "Consultar"));
+        espera(1800);
+        verificar("R18 las 12 lecturas aparecen con las fechas por defecto (" + filas(iot, 0) + ")", filas(iot, 0) >= 12);
+        captura(iot, "lecturas-enviadas", "R18");
+        cerrar(iot);
+    }
+
+    private void guiaAlertas() throws Exception {
+        Window alertas = abrir("Alertas");
+        espera(1800);
+        pestania(alertas, "Reglas");
+        espera(1000);
+        List<TextField> campos = visible(alertas, TextField.class);
+        fx(() -> {
+            campos.get(0).setText("Regla guia " + marca);
+            campos.get(1).setText("40");
+            return null;
+        });
+        click(boton(alertas, "Crear regla"));
+        espera(1500);
+        seleccionar(tabla(alertas, 0), "Regla guia " + marca);
+        lecturas("-Temperatura", "45");
+        pestania(alertas, "Alertas");
+        click(boton(alertas, "Filtrar"));
+        espera(1800);
+        verificar("R09 la lectura de 45 genera alerta de la regla nueva", fx(() -> visibleEnFx(alertas, TableView.class).getFirst().getItems()
+                .stream().anyMatch(a -> a.toString().contains(SENSOR_DEMO.toString()) && a.toString().contains("Regla guia " + marca))));
+        verificar("R32 la misma lectura genera anomalia", fx(() -> visibleEnFx(alertas, TableView.class).getFirst().getItems()
+                .stream().anyMatch(a -> a.toString().contains(SENSOR_DEMO.toString()) && a.toString().contains("tipoRegla=ANOMALIA_TEMPERATURA"))));
+        captura(alertas, "alertas-de-la-lectura", "R09", "R32");
+        seleccionar(tabla(alertas, 0), "Regla guia " + marca);
+        click(boton(alertas, "Reconocer"));
+        espera(1500);
+        seleccionar(tabla(alertas, 0), "Regla guia " + marca);
+        click(boton(alertas, "Cerrar"));
+        espera(1500);
+        seleccionar(tabla(alertas, 0), "Regla guia " + marca);
+        click(boton(alertas, "Reconocer"));
+        espera(1500);
+        verificar("R26 repetir la accion avisa el error: " + textos(alertas), !textos(alertas).isBlank());
+        lecturas("-Bateria", "10");
+        click(boton(alertas, "Filtrar"));
+        espera(1800);
+        verificar("R23 la bateria baja genera alerta", fx(() -> visibleEnFx(alertas, TableView.class).getFirst().getItems()
+                .stream().anyMatch(a -> a.toString().contains(SENSOR_DEMO.toString()) && a.toString().contains("tipoRegla=BATERIA"))));
+        cerrar(alertas);
+    }
+
+    private void guiaClientes() throws Exception {
+        String nombre = "Cliente guia " + marca;
+        Window nuevo = abrirCon(() -> click(boton(principal, "Nuevo cliente")));
+        escribir(nuevo, "Razón social", nombre);
+        click(boton(nuevo, "Guardar"));
+        esperarCierre(nuevo);
+        espera(1500);
+        seleccionar(tabla(principal, 0), nombre);
+        Window edicion = abrirCon(() -> click(boton(principal, "Editar")));
+        escribir(edicion, "Teléfono", "1144445555");
+        click(boton(edicion, "Guardar"));
+        esperarCierre(edicion);
+        espera(1500);
+        seleccionar(tabla(principal, 0), nombre);
+        Window confirma = abrirCon(() -> click(boton(principal, "Desactivar")));
+        aceptar(confirma);
+        esperarCierre(confirma);
+        espera(1500);
+        verificar("R01 la baja deja el cliente INACTIVO", fx(() -> visibleEnFx(principal, TableView.class).getFirst().getItems()
+                .stream().anyMatch(c -> c.toString().contains(nombre) && c.toString().contains("state=INACTIVO"))));
+        Window duplicado = abrirCon(() -> click(boton(principal, "Nuevo cliente")));
+        escribir(duplicado, "Razón social", "Duplicado " + marca);
+        escribir(duplicado, "CUIT", "30755666773");
+        click(boton(duplicado, "Guardar"));
+        esperarCierre(duplicado);
+        espera(1500);
+        verificar("R01 el CUIT repetido se rechaza: " + textos(principal), textos(principal).contains("conflicto"));
+    }
+
+    private void guiaOrganizacion(String menu, String prefijo) throws Exception {
+        String nombre = prefijo + " " + marca;
+        Window lista = abrir(menu);
+        espera(1200);
+        Window nuevo = abrirCon(() -> click(boton(lista, "Nuevo")));
+        escribir(nuevo, "Razón social", nombre);
+        click(boton(nuevo, "Guardar"));
+        esperarCierre(nuevo);
+        espera(1500);
+        seleccionar(tabla(lista, 0), nombre);
+        Window edicion = abrirCon(() -> click(boton(lista, "Editar")));
+        escribir(edicion, "Teléfono", "1144445555");
+        click(boton(edicion, "Guardar"));
+        esperarCierre(edicion);
+        espera(1500);
+        seleccionar(tabla(lista, 0), nombre);
+        Window confirma = abrirCon(() -> click(boton(lista, "Desactivar")));
+        aceptar(confirma);
+        esperarCierre(confirma);
+        espera(1500);
+        verificar(menu + " la baja queda INACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
+                .stream().anyMatch(o -> o.toString().contains(nombre) && o.toString().contains("state=INACTIVO"))));
+        String cuit = fx(() -> {
+            for (Object fila : visibleEnFx(lista, TableView.class).getFirst().getItems()) {
+                String texto = fila.toString();
+                if (texto.matches(".*cuit=\\d{11}.*")) return texto.replaceAll(".*cuit=(\\d{11}).*", "$1");
+            }
+            throw new IllegalStateException("Ninguna fila tiene CUIT");
+        });
+        Window duplicado = abrirCon(() -> click(boton(lista, "Nuevo")));
+        escribir(duplicado, "Razón social", "Duplicado " + marca);
+        escribir(duplicado, "CUIT", cuit);
+        click(boton(duplicado, "Guardar"));
+        esperarCierre(duplicado);
+        espera(1500);
+        verificar(menu + " el CUIT repetido se rechaza: " + textos(lista), textos(lista).contains("conflicto"));
+        cerrar(lista);
+    }
+
+    private void guiaVehiculo() throws Exception {
+        Window lista = abrir("Vehículos");
+        espera(1200);
+        int antes = filas(lista, 0);
+        Window nuevo = abrirCon(() -> click(boton(lista, "Nuevo")));
+        elegir(nuevo, "Operador", "Logistica Oceano");
+        escribir(nuevo, "Identificación", "VH" + marca);
+        click(boton(nuevo, "Guardar"));
+        esperarCierre(nuevo);
+        espera(1500);
+        verificar("R05 el vehiculo se crea con su operador", filas(lista, 0) == antes + 1);
+        cerrar(lista);
+    }
+
+    private void guiaEnvioCompleto() throws Exception {
+        String origen = "Origen " + marca;
+        Window envios = abrir("Envíos");
+        espera(1000);
+        Window catalogos = abrirCon(() -> click(boton(envios, "Catálogos contenedores/sensores")));
+        Window contenedor = abrirCon(() -> click(boton(catalogos, "Nuevo contenedor")));
+        escribir(contenedor, "Código", "GUIA" + marca);
+        escribir(contenedor, "Tipo", "DRY");
+        escribir(contenedor, "Capacidad", "30");
+        click(boton(contenedor, "Guardar"));
+        esperarCierre(contenedor);
+        espera(1200);
+        cerrar(catalogos);
+
+        Window nuevo = abrirCon(() -> click(boton(envios, "Nuevo envío")));
+        escribir(nuevo, "Origen", origen);
+        escribir(nuevo, "Destino", "Destino guia");
+        escribir(nuevo, "País destino", "Brasil");
+        click(boton(nuevo, "Guardar"));
+        esperarCierre(nuevo);
+        espera(1500);
+        seleccionar(tabla(envios, 0), origen);
+        Window estado = abrirCon(() -> click(boton(envios, "Cambiar estado")));
+        fx(() -> {
+            combo0(estado).setValue("EN_PREPARACION");
+            return null;
+        });
+        aceptar(estado);
+        esperarCierre(estado);
+        espera(1500);
+        verificar("R06 el envio cambia de estado", fx(() -> visibleEnFx(envios, TableView.class).getFirst().getItems()
+                .stream().anyMatch(e -> e.toString().contains(origen) && e.toString().contains("state=EN_PREPARACION"))));
+
+        seleccionar(tabla(envios, 0), origen);
+        Window detalle = abrirCon(() -> click(boton(envios, "Detalle y trazabilidad")));
+        Window eleccion = abrirCon(() -> click(boton(detalle, "Asociar contenedor")));
+        fx(() -> {
+            ComboBox<Object> c = combo0(eleccion);
+            c.getItems().stream().filter(i -> i.toString().contains("GUIA" + marca)).findFirst().ifPresent(c::setValue);
+            return null;
+        });
+        Window conContenedor = abrirCon(() -> click(boton(eleccion, "Seleccionar")));
+        verificar("R07 el contenedor queda vigente", fx(() -> visibleEnFx(conContenedor, TableView.class).getFirst().getItems()
+                .stream().anyMatch(a -> a.toString().contains("active=true"))));
+        captura(conContenedor, "contenedor-asociado", "R07");
+
+        seleccionar(tabla(conContenedor, 0), "active=true");
+        Window eleccionSensor = abrirCon(() -> click(boton(conContenedor, "Asociar sensor")));
+        Window conSensor = abrirCon(() -> click(boton(eleccionSensor, "Seleccionar")));
+        revisarErrores();
+        verificar("R08 el sensor aparece", filas(conSensor, 1) > 0);
+        captura(conSensor, "sensor-asociado", "R08");
+        seleccionar(tabla(conSensor, 1), "active=true");
+        Window sinSensor = abrirCon(() -> click(boton(conSensor, "Desasociar sensor")));
+        verificar("R08 el sensor queda con fecha de fin", fx(() -> visibleEnFx(sinSensor, TableView.class).get(1).getItems()
+                .stream().anyMatch(a -> a.toString().contains("active=false"))));
+        seleccionar(tabla(sinSensor, 0), "active=true");
+        Window sinContenedor = abrirCon(() -> click(boton(sinSensor, "Desasociar")));
+        verificar("R07 el contenedor queda con fecha de fin", fx(() -> visibleEnFx(sinContenedor, TableView.class).getFirst().getItems()
+                .stream().anyMatch(a -> a.toString().contains("active=false"))));
+        cerrar(sinContenedor);
+        cerrar(envios);
+
+        Window trayectos = abrir("Trayectos");
+        ComboBox<Object> envio = combo(trayectos, 0);
+        fx(() -> {
+            envio.getItems().stream().filter(i -> i.toString().contains(origen)).findFirst().ifPresent(envio::setValue);
+            return null;
+        });
+        espera(1200);
+        Window tramo = abrirCon(() -> click(boton(trayectos, "Nuevo tramo")));
+        escribir(tramo, "Origen", "Punto A");
+        escribir(tramo, "Destino", "Punto B");
+        click(boton(tramo, "Guardar"));
+        esperarCierre(tramo);
+        espera(1500);
+        verificar("R24 el tramo aparece", filas(trayectos, 0) == 1);
+        seleccionar(tabla(trayectos, 0), "Punto A");
+        Window edicion = abrirCon(() -> click(boton(trayectos, "Editar")));
+        elegir(edicion, "Estado", "EN_CURSO");
+        elegirIndice(edicion, "Proveedor opcional", 0);
+        escribir(edicion, "Servicio proveedor", "ADUANA");
+        escribir(edicion, "Costo proveedor", "100");
+        click(boton(edicion, "Agregar otro proveedor"));
+        espera(500);
+        elegirIndice(edicion, "Proveedor opcional", 1);
+        escribir(edicion, "Servicio proveedor", "DEPOSITO");
+        escribir(edicion, "Costo proveedor", "200");
+        click(boton(edicion, "Guardar"));
+        esperarCierre(edicion);
+        espera(1500);
+        verificar("R24 el tramo queda EN_CURSO con dos proveedores", fx(() -> {
+            String fila = visibleEnFx(trayectos, TableView.class).getFirst().getItems().getFirst().toString();
+            return fila.contains("state=EN_CURSO") && fila.split("supplierName=", -1).length == 3;
+        }));
+        captura(trayectos, "dos-proveedores", "R24", "R04");
+        seleccionar(tabla(trayectos, 0), "Punto A");
+        Window cancelar = abrirCon(() -> click(boton(trayectos, "Editar")));
+        elegir(cancelar, "Estado", "CANCELADO");
+        click(boton(cancelar, "Guardar"));
+        esperarCierre(cancelar);
+        espera(1500);
+        seleccionar(tabla(trayectos, 0), "Punto A");
+        click(boton(trayectos, "Eliminar"));
+        espera(1500);
+        verificar("R24 el tramo se elimina", filas(trayectos, 0) == 0);
+        cerrar(trayectos);
+    }
+
+    private void guiaTerceros() throws Exception {
+        Window finanzas = abrir("Facturación");
+        for (String cuenta : List.of("Aduana y Servicios", "Rutas Globales")) {
+            seleccionar(tabla(finanzas, 0), cuenta);
+            espera(800);
+            Window factura = abrirCon(() -> click(boton(finanzas, "Nueva factura")));
+            escribir(factura, "Concepto", "Servicio de tercero");
+            escribir(factura, "Precio unitario", "500");
+            click(boton(factura, "Guardar"));
+            esperarCierre(factura);
+            espera(1500);
+            seleccionar(tabla(finanzas, 1), "state=BORRADOR");
+            click(boton(finanzas, "Emitir"));
+            espera(1500);
+            seleccionar(tabla(finanzas, 1), "state=EMITIDA");
+            pagar(finanzas, "200");
+            seleccionar(tabla(finanzas, 0), cuenta);
+            espera(800);
+            verificar("R16 " + cuenta + " es cuenta a pagar y refleja el pago", fx(() -> {
+                String fila = visibleEnFx(finanzas, TableView.class).getFirst().getSelectionModel().getSelectedItem().toString();
+                return fila.contains("nature=PAGAR") && !fila.contains("balance=0.00");
+            }));
+        }
+        cerrar(finanzas);
+    }
+
+    private void guiaFiltrosEnvios() throws Exception {
+        Window reportes = abrir("Reportes");
+        int todos = filas(reportes, 0);
+        TextField pais = visible(reportes, TextField.class).getFirst();
+        fx(() -> {
+            pais.setText("Brasil");
+            return null;
+        });
+        click(boton(reportes, "Aplicar filtros"));
+        espera(1200);
+        int brasil = filas(reportes, 0);
+        verificar("R35 el filtro por pais achica la tabla (" + brasil + " de " + todos + ")", brasil > 0 && brasil < todos);
+        fx(() -> {
+            nodosDe(reportes, javafx.scene.control.CheckBox.class).getFirst().setSelected(true);
+            return null;
+        });
+        click(boton(reportes, "Aplicar filtros"));
+        espera(1200);
+        verificar("R35 los filtros se combinan (" + filas(reportes, 0) + ")", filas(reportes, 0) <= brasil);
+        cerrar(reportes);
+    }
+
+    private void guiaAnalitica() throws Exception {
+        Window analitica = abrir("Analítica");
+        espera(1500);
+        pestania(analitica, "Predicción de atrasos");
+        espera(1200);
+        click(boton(analitica, "Generar predicción del día"));
+        espera(2000);
+        click(boton(analitica, "Generar predicción del día"));
+        espera(2000);
+        verificar("R29 se ven los riesgos", columnas(analitica, 0).contains("riesgo_operativo") && columnas(analitica, 0).contains("riesgo_climatico"));
+        click(boton(analitica, "Ver validación"));
+        espera(1200);
+        revisarErrores();
+        captura(analitica, "riesgos", "R29");
+
+        pestania(analitica, "Reportes");
+        espera(1200);
+        ComboBox<Object> tipo = combo(analitica, 0);
+        TextField cliente = visible(analitica, TextField.class).getFirst();
+        fx(() -> {
+            tipo.setValue("PREDICTIVO");
+            cliente.setText("0bca0b45-e7f6-59b2-a455-02191ee367f6");
+            return null;
+        });
+        click(boton(analitica, "Solicitar"));
+        espera(2500);
+        fx(() -> {
+            visibleEnFx(analitica, TableView.class).getFirst().getSelectionModel().clearAndSelect(0);
+            return null;
+        });
+        espera(1500);
+        verificar("R34 el reporte predictivo trae riesgos", columnas(analitica, 1).contains("riesgo_operativo") && filas(analitica, 1) > 0);
+        captura(analitica, "predictivo-con-riesgos", "R34");
+
+        fx(() -> {
+            tipo.setValue("DESEMPENO");
+            cliente.setText(CLIENTE_C02);
+            return null;
+        });
+        click(boton(analitica, "Solicitar"));
+        espera(2500);
+        fx(() -> {
+            visibleEnFx(analitica, TableView.class).getFirst().getSelectionModel().clearAndSelect(0);
+            return null;
+        });
+        espera(1500);
+        verificar("R11 el reporte queda GENERADO con resultado", fx(() -> visibleEnFx(analitica, TableView.class).getFirst()
+                .getSelectionModel().getSelectedItem().toString().contains("estado=GENERADO")) && filas(analitica, 1) > 0);
+        click(boton(analitica, "Facturar"));
+        espera(2000);
+        String primera = fx(() -> visibleEnFx(analitica, TableView.class).getFirst().getItems().getFirst().toString());
+        fx(() -> {
+            visibleEnFx(analitica, TableView.class).getFirst().getSelectionModel().clearAndSelect(0);
+            return null;
+        });
+        espera(800);
+        click(boton(analitica, "Facturar"));
+        espera(2000);
+        String segunda = fx(() -> visibleEnFx(analitica, TableView.class).getFirst().getItems().getFirst().toString());
+        verificar("R33 queda FACTURADO con una sola factura", primera.contains("estado=FACTURADO") && primera.equals(segunda));
+        captura(analitica, "reporte-facturado", "R33");
+
+        pestania(analitica, "Red del cliente");
+        TextField red = visible(analitica, TextField.class).getFirst();
+        fx(() -> {
+            red.setText(CLIENTE_C02);
+            return null;
+        });
+        click(boton(analitica, "Consultar"));
+        esperarConsulta(analitica);
+        ComboBox<Object> vista = combo(analitica, 0);
+        for (String v : List.of("tramos", "operadores")) {
+            fx(() -> {
+                vista.setValue(v);
+                return null;
+            });
+            espera(800);
+            verificar("R30 la vista " + v + " tiene datos", filas(analitica, 0) > 0);
+        }
+        cerrar(analitica);
+    }
+
+    private void guiaUsuarios() throws Exception {
+        for (String[] usuario : List.of(new String[]{correoGuia(1), CLIENTE_C02}, new String[]{correoGuia(2), CLIENTE_C01})) {
+            Window admin = abrir("Usuarios y roles");
+            Window nuevo = abrirCon(() -> click(boton(admin, "Nuevo usuario")));
+            escribir(nuevo, "Nombre", "Guia");
+            escribir(nuevo, "Apellido", "Prueba");
+            escribir(nuevo, "Email", usuario[0]);
+            escribir(nuevo, "Contraseña", CLAVE_GUIA);
+            elegir(nuevo, "Tipo titular", "CLIENTE");
+            escribir(nuevo, "UUID titular", usuario[1]);
+            fx(() -> {
+                javafx.scene.control.ListView<?> roles = nodosDe(nuevo, javafx.scene.control.ListView.class).getFirst();
+                for (int i = 0; i < roles.getItems().size(); i++) {
+                    if (roles.getItems().get(i).toString().contains("description=CLIENTE")) roles.getSelectionModel().select(i);
+                }
+                return null;
+            });
+            click(boton(nuevo, "Guardar"));
+            esperarCierre(nuevo);
+            espera(1500);
+            revisarErrores();
+            verificar("R02 el usuario aparece en la tabla", fx(() -> visibleEnFx(admin, TableView.class).getFirst().getItems()
+                    .stream().anyMatch(u -> u.toString().contains(usuario[0]))));
+            cerrar(admin);
+        }
+    }
+
+    private void guiaProcesos() throws Exception {
+        Window finanzas = abrir("Facturación");
+        for (int vuelta = 1; vuelta <= 2; vuelta++) {
+            Window tarifa = abrirCon(() -> click(boton(finanzas, "Facturación automática")));
+            Window resultado = abrirCon(() -> click(boton(tarifa, "Seleccionar")));
+            String texto = fx(() -> ((DialogPane) resultado.getScene().getRoot()).getContentText());
+            linea("     " + texto);
+            if (vuelta == 2) verificar("R12 la segunda corrida no crea nada", texto.contains("Nuevos: 0"));
+            cerrar(resultado);
+            espera(800);
+        }
+        for (int vuelta = 1; vuelta <= 2; vuelta++) {
+            Window periodo = abrirCon(() -> click(boton(finanzas, "Cerrar todas las cuentas")));
+            Window resultado = abrirCon(() -> aceptar(periodo));
+            String texto = fx(() -> ((DialogPane) resultado.getScene().getRoot()).getContentText());
+            linea("     " + texto);
+            if (vuelta == 2) verificar("R15 repetir no cierra nada", texto.contains("Cuentas cerradas: 0"));
+            cerrar(resultado);
+            espera(800);
+        }
+        captura(finanzas, "procesos-de-cierre", "R12", "R15");
+        cerrar(finanzas);
+    }
+
+    private void recorrerUsuariosCreados() throws Exception {
+        titulo("Usuarios creados desde la pantalla");
+        click(boton(principal, "Cerrar sesión"));
+        esperarLogin();
+        entrar(correoGuia(1), CLAVE_GUIA);
+        verificar("R02 el usuario creado solo ve su cliente", filas(principal, 0) == 1);
+        Window primero = abrir("Alertas");
+        espera(1500);
+        pestania(primero, "Mensajería");
+        espera(1500);
+        verificar("R40 el primer cliente ve la demora del E002", fx(() -> visibleEnFx(primero, TableView.class).getFirst().getItems()
+                .stream().anyMatch(c -> c.toString().contains("Demora del env"))));
+        cerrar(primero);
+        click(boton(principal, "Cerrar sesión"));
+        esperarLogin();
+        entrar(correoGuia(2), CLAVE_GUIA);
+        Window segundo = abrir("Alertas");
+        espera(1500);
+        pestania(segundo, "Mensajería");
+        espera(1500);
+        verificar("R40 otro cliente no ve esa conversacion", fx(() -> visibleEnFx(segundo, TableView.class).getFirst().getItems()
+                .stream().noneMatch(c -> c.toString().contains("Demora del env"))));
+        cerrar(segundo);
+    }
+
+    /** La primera consulta a Neo4j tarda: se espera a que la pantalla deje de decir "Consultando". */
+    private void esperarConsulta(Window ventana) throws Exception {
+        for (int i = 0; i < 80; i++) {
+            espera(250);
+            if (!textos(ventana).contains("Consultando")) return;
+        }
+    }
+
+    private String correoGuia(int numero) {
+        return "guia" + numero + "-" + marca + "@ejemplo.test";
+    }
+
+    private void aceptar(Window dialogo) {
+        Platform.runLater(() -> ((Button) ((DialogPane) dialogo.getScene().getRoot()).lookupButton(ButtonType.OK)).fire());
+    }
+
+    private void escribir(Window ventana, String etiqueta, String texto) throws Exception {
+        fx(() -> {
+            ((TextField) campo(ventana, etiqueta)).setText(texto);
+            return null;
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void elegir(Window ventana, String etiqueta, String contiene) throws Exception {
+        boolean elegido = fx(() -> {
+            ComboBox<Object> combo = (ComboBox<Object>) campo(ventana, etiqueta);
+            for (Object item : combo.getItems()) {
+                if (item.toString().contains(contiene)) {
+                    combo.setValue(item);
+                    return true;
+                }
+            }
+            return false;
+        });
+        if (!elegido) throw new IllegalStateException("No está la opción " + contiene + " en " + etiqueta);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void elegirIndice(Window ventana, String etiqueta, int indice) throws Exception {
+        fx(() -> {
+            ComboBox<Object> combo = (ComboBox<Object>) campo(ventana, etiqueta);
+            combo.setValue(combo.getItems().get(indice));
+            return null;
+        });
+    }
+
+    /** El campo de un formulario: el nodo de la misma fila de la grilla que su etiqueta. */
+    private static Node campo(Window ventana, String etiqueta) {
+        for (GridPane grilla : nodosDe(ventana, GridPane.class)) {
+            for (Node hijo : grilla.getChildren()) {
+                if (hijo instanceof Label l && etiqueta.equals(l.getText())) {
+                    Integer fila = GridPane.getRowIndex(hijo);
+                    for (Node otro : grilla.getChildren()) {
+                        if (otro != hijo && java.util.Objects.equals(GridPane.getRowIndex(otro), fila)) return otro;
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("No existe el campo " + etiqueta);
+    }
+
+    private String textos(Window ventana) throws Exception {
+        return fx(() -> String.join(" | ", nodosDe(ventana, Label.class).stream().map(Label::getText)
+                .filter(t -> t != null && !t.isBlank()).toList()));
+    }
+
+    private String columnas(Window ventana, int indice) throws Exception {
+        return fx(() -> String.join(",", visibleEnFx(ventana, TableView.class).get(indice).getColumns().stream()
+                .map(c -> ((javafx.scene.control.TableColumn<?, ?>) c).getText()).toList()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ComboBox<Object> combo0(Window ventana) {
+        return (ComboBox<Object>) nodosDe(ventana, ComboBox.class).getFirst();
+    }
+
+    private static <T extends Node> List<T> nodosDe(Window ventana, Class<T> tipo) {
+        return visibleEnFx(ventana, tipo);
     }
 
     // ---- Acciones de usuario ------------------------------------------------------------------
@@ -536,6 +1132,19 @@ public class CapturasPantallas extends Application {
             }
         }
         throw new IllegalStateException("No se abrió la ventana");
+    }
+
+    /** Como abrirCon, pero la ventana que se abre es un error esperado y no cuenta como falla. */
+    private Window abrirConError(Accion accion) throws Exception {
+        Set<Window> antes = new HashSet<>(ventanas());
+        accion.correr();
+        for (int i = 0; i < 60; i++) {
+            espera(250);
+            for (Window w : ventanas()) {
+                if (!antes.contains(w)) return w;
+            }
+        }
+        throw new IllegalStateException("No apareció el error esperado");
     }
 
     private void cerrar(Window ventana) throws Exception {
@@ -613,6 +1222,10 @@ public class CapturasPantallas extends Application {
 
     private void captura(Window ventana, String nombre, String... requisitos) throws Exception {
         revisarErrores();
+        guardar(ventana, nombre, requisitos);
+    }
+
+    private void guardar(Window ventana, String nombre, String... requisitos) throws Exception {
         WritableImage imagen = fx(() -> ventana.getScene().snapshot(null));
         int ancho = (int) imagen.getWidth();
         int alto = (int) imagen.getHeight();
@@ -719,7 +1332,17 @@ public class CapturasPantallas extends Application {
                 resultado.completeExceptionally(error);
             }
         });
-        return resultado.get(20, TimeUnit.SECONDS);
+        try {
+            return resultado.get(20, TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException error) {
+            Thread.getAllStackTraces().forEach((hilo, pila) -> {
+                if (hilo.getName().contains("JavaFX Application")) {
+                    linea("HILO TRABADO " + hilo.getName() + " " + hilo.getState());
+                    for (StackTraceElement paso : pila) linea("     " + paso);
+                }
+            });
+            throw error;
+        }
     }
 
     private static void espera(long milisegundos) throws InterruptedException {

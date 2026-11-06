@@ -29,7 +29,7 @@ function AlertasDe($sensor, $idRegla) { ,@(Get1 '/api/v1/alertas' | Where-Object
 
 $proc = $null; $regla = $null; $inact = $null
 try {
-    $filas = @(Sql "select id_sensor, id_contenedor, id_envio from tp_logistica.v_envio_contenedor_sensor_activo order by id_sensor;")
+    $filas = @(Sql "select id_sensor, id_contenedor, id_envio from tp_logistica.v_envio_contenedor_sensor_activo where id_sensor is not null order by id_sensor;")
     $s = @(); foreach ($f in $filas) { $s += ,("$f".Trim() -split '\|') }
     $s1 = $s[0][0]; $s2 = $s[1][0]; $s3 = $s[2][0]; $envio1 = $s[0][2]
     "sensores: $s1 / $s2 / $s3"
@@ -107,8 +107,16 @@ try {
     '=== R23 tarea periodica'
     $inact = (Invoke-RestMethod "$base/api/v1/reglas" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ idSensor = $s3; nombre = 'Prueba inactividad'; tipoRegla = 'INACTIVIDAD'; operador = '>'; minutosInactividad = 1; severidad = 'ALTA'; activa = $true } | ConvertTo-Json)).idRegla
     Req POST '/api/v1/iot/lecturas' (Lectura $s3 (Get-Date).ToUniversalTime().AddMinutes(-3) @{ temperatura = 5.0; bateria = 10.0 } $null) | Out-Null
-    Start-Sleep -Seconds 75
-    $e = AlertasDe $s3 $null
+    # Un contenedor vigente sin sensor no puede frenar la tarea periodica de los demas sensores.
+    $cli = Sql "select id_cliente from tp_logistica.cliente where estado='ACTIVO' limit 1;"
+    $sinSensor = Invoke-RestMethod "$base/api/v1/envios" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ clientId = "$cli".Trim(); origin = 'Sin sensor'; destination = 'Destino'; originCountry = 'Argentina'; destinationCountry = 'Brasil'; priority = 'NORMAL'; volumeM3 = 1 } | ConvertTo-Json)
+    $vacio = Invoke-RestMethod "$base/api/v1/contenedores" -Method Post -Headers (Autorizacion) -ContentType 'application/json' -Body (@{ internationalCode = "VACIO$([guid]::NewGuid().ToString('N').Substring(0,8))"; type = 'DRY'; capacity = 10; state = 'DISPONIBLE' } | ConvertTo-Json)
+    Ver 'contenedor vigente sin sensor' 201 (Req POST "/api/v1/envios/$($sinSensor.id)/contenedores" @{ containerId = $vacio.id })
+    $e = @(); for ($i = 0; $i -lt 40; $i++) {
+        Start-Sleep -Seconds 5
+        $e = AlertasDe $s3 $null
+        if ($e | Where-Object tipoRegla -eq 'INACTIVIDAD') { break }
+    }
     "     alertas del sensor: $(($e | ForEach-Object { "$($_.tipoRegla)x$($_.ocurrencias)" }) -join ' ')"
     Ver 'alerta de inactividad' True ([bool]($e | Where-Object tipoRegla -eq 'INACTIVIDAD'))
     Ver 'alerta de bateria' True ([bool]($e | Where-Object tipoRegla -eq 'BATERIA'))
