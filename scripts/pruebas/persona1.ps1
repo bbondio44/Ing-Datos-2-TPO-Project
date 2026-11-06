@@ -39,8 +39,8 @@ function Api($m, $p, $b = $null, $t = $script:token) {
         $d = $null; if ($r.Content) { $d = $r.Content | ConvertFrom-Json }
         [pscustomobject]@{ s = [int]$r.StatusCode; d = $d }
     } catch {
-        $c = 0; if ($_.Exception.Response) { $c = [int]$_.Exception.Response.StatusCode }
-        [pscustomobject]@{ s = $c; d = $null }
+        $c = 0; $m = ''; if ($_.Exception.Response) { $c = [int]$_.Exception.Response.StatusCode; $m = (New-Object IO.StreamReader($_.Exception.Response.GetResponseStream())).ReadToEnd() }
+        [pscustomobject]@{ s = $c; d = $null; e = $m }
     }
 }
 function Login($correo, $pass) { (Api POST '/api/v1/auth/login' @{ email = $correo; password = $pass } '').d.token }
@@ -231,7 +231,8 @@ try {
     Ver 'misma clave y datos no duplica' True ((Pago $f1.id 400 "PG-$marca-1").s -lt 300)
     Ver 'pagos registrados' 1 @((Api GET "/api/v1/finanzas/facturas/$($f1.id)/pagos").d).Count
     Ver 'misma clave con otro monto' 409 (Pago $f1.id 300 "PG-$marca-1").s
-    Ver 'sobrepago' 409 (Pago $f1.id 9999 "PG-$marca-2").s
+    $sobre = Pago $f1.id 9999 "PG-$marca-2"; Ver 'sobrepago' 409 $sobre.s
+    Ver 'el sobrepago explica el motivo' True ($sobre.e -match 'excede saldo pendiente')
     Ver 'cliente ajeno no ve la factura' True ((Api GET "/api/v1/finanzas/facturas/$($f1.id)" $null $tB).s -in 403, 404)
     Ver 'pago total' 201 (Pago $f1.id 600 "PG-$marca-3").s
     $f = (Api GET "/api/v1/finanzas/facturas/$($f1.id)").d

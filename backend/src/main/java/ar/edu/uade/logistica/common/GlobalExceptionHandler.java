@@ -20,6 +20,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -67,8 +68,18 @@ public class GlobalExceptionHandler {
             UncategorizedSQLException.class})
     ResponseEntity<ApiError> conflict(Exception exception, HttpServletRequest request) {
         LOGGER.warn("Conflicto en {} {}: {}", request.getMethod(), request.getRequestURI(), exception.getMessage());
-        return response(HttpStatus.CONFLICT, "CONFLICTO_DATOS",
-                "La operación entra en conflicto con un dato existente o una regla de integridad", Map.of(), request);
+        return response(HttpStatus.CONFLICT, "CONFLICTO_DATOS", motivoConflicto(exception), Map.of(), request);
+    }
+
+    /** P0001 es un RAISE EXCEPTION de nuestras funciones SQL: su texto es una regla de negocio, no un detalle interno. */
+    private String motivoConflicto(Exception exception) {
+        if (exception instanceof ConflictException) return exception.getMessage();
+        for (Throwable causa = exception; causa != null; causa = causa.getCause()) {
+            if (causa instanceof SQLException sql && "P0001".equals(sql.getSQLState())) {
+                return sql.getMessage().lines().findFirst().orElse("").replaceFirst("^ERROR: ", "");
+            }
+        }
+        return "La operación entra en conflicto con un dato existente o una regla de integridad";
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
