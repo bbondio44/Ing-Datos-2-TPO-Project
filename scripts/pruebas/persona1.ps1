@@ -273,7 +273,7 @@ try {
     }
 
     '=== R12 facturacion automatica'
-    $tarifa = (@((Api GET '/api/v1/finanzas/tarifas').d) | Where-Object serviceType -eq 'TRANSPORTE' | Select-Object -First 1).id
+    $tarifa = (@((Api GET '/api/v1/finanzas/tarifas').d) | Where-Object { $_.serviceType -eq 'TRANSPORTE' -and $_.calculation -eq 'FIJO' } | Select-Object -First 1).id
     Ver 'transicion de estado invalida' 409 (Api PATCH "/api/v1/envios/$($e2.id)/estado" @{ state = 'EN_TRANSITO' }).s
     $e3 = (Envio $cB.id).d
     foreach ($x in @($e2.id, $e3.id)) {

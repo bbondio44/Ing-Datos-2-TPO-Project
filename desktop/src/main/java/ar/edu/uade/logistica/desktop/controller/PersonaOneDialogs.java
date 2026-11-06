@@ -845,7 +845,8 @@ final class PersonaOneDialogs {
             Button automatic = new Button("Facturación automática");
             automatic.setOnAction(e -> run(() -> {
                 List<TariffResponse> tariffs = api.tariffs().join().stream().filter(TariffResponse::active)
-                        .filter(t -> List.of("TRANSPORTE", "SERVICIO").contains(t.serviceType())).toList();
+                        .filter(t -> List.of("TRANSPORTE", "SERVICIO").contains(t.serviceType()))
+                        .filter(t -> "FIJO".equals(t.calculation())).toList();
                 Dialog<TariffResponse> choice = choice("Tarifa vigente", tariffs,
                         t -> t.concept() + " — " + t.price() + " " + t.currency());
                 choice.showAndWait().ifPresent(t -> {
