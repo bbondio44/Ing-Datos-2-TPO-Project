@@ -41,6 +41,8 @@ services:
       CASSANDRA_CLUSTER_NAME: logistica-grupo4
       CASSANDRA_DC: datacenter1
       CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_BROADCAST_RPC_ADDRESS: 127.0.0.1
       MAX_HEAP_SIZE: 1024M
       HEAP_NEWSIZE: 256M
     ports:
