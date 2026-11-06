@@ -155,6 +155,12 @@ final class PersonaOneDialogs {
         grid.addRow(4, new Label("Tipo titular"), ownerType);
         grid.addRow(5, new Label("UUID titular"), ownerId);
         grid.addRow(6, new Label("Roles"), roleList);
+        Formulario.ayuda(grid, 2, "Formato nombre@dominio.com, no repetido");
+        Formulario.ayuda(grid, 3, initial == null ? "Mínimo 12 caracteres" : "Mínimo 12 caracteres. Vacía conserva la actual");
+        Formulario.ayuda(grid, 5, "Solo si el usuario pertenece a un cliente, proveedor u operador");
+        Formulario.ayuda(grid, 6, "Al menos uno. Ctrl + clic para elegir varios");
+        if (initial == null) Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Contraseña", "Roles");
+        else Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Roles");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(button -> {
             if (button.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
@@ -226,6 +232,10 @@ final class PersonaOneDialogs {
         grid.addRow(0, new Label("Nombre"), name);
         grid.addRow(1, new Label("Nivel"), level);
         grid.addRow(2, new Label("Permisos"), list);
+        Formulario.ayuda(grid, 0, "No repetido");
+        Formulario.ayuda(grid, 1, "De 0 a 100");
+        Formulario.ayuda(grid, 2, "Ctrl + clic para elegir varios");
+        Formulario.obligatorios(grid, "Nombre", "Nivel");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(button -> button.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new RoleRequest(name.getText(), level.getValue(), list.getSelectionModel().getSelectedItems()
@@ -319,6 +329,10 @@ final class PersonaOneDialogs {
         grid.addRow(5, new Label("Entrega estimada UTC"), estimated);
         grid.addRow(6, new Label("Prioridad"), priority);
         grid.addRow(7, new Label("Volumen m³"), volume);
+        Formulario.ayuda(grid, 0, "Debe estar activo");
+        Formulario.ayuda(grid, 5, "Opcional. Ejemplo: 2026-12-01T15:00:00Z");
+        Formulario.ayuda(grid, 7, "0 o más. Decimales con punto");
+        Formulario.obligatorios(grid, "Cliente", "Origen", "Destino", "País origen", "País destino", "Prioridad", "Volumen m³");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(button -> {
             if (button.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
@@ -467,6 +481,10 @@ final class PersonaOneDialogs {
         state.setValue(initial == null ? "DISPONIBLE" : initial.state());
         GridPane grid = grid(); grid.addRow(0, new Label("Código"), code); grid.addRow(1, new Label("Tipo"), type);
         grid.addRow(2, new Label("Capacidad"), capacity); grid.addRow(3, new Label("Estado"), state);
+        Formulario.ayuda(grid, 0, "No repetido");
+        Formulario.ayuda(grid, 1, "Ejemplo: REEFER, DRY u OPEN_TOP");
+        Formulario.ayuda(grid, 2, "Mayor a 0. Decimales con punto");
+        Formulario.obligatorios(grid, "Código", "Tipo", "Capacidad", "Estado");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new ContainerRequest(code.getText(), type.getText(), new BigDecimal(capacity.getText()), state.getValue()) : null);
@@ -502,6 +520,8 @@ final class PersonaOneDialogs {
         state.setValue(initial == null ? "ACTIVO" : initial.state());
         GridPane grid = grid(); grid.addRow(0, new Label("Tipo"), type);
         grid.addRow(1, new Label("Fabricante"), manufacturer); grid.addRow(2, new Label("Estado"), state);
+        Formulario.ayuda(grid, 1, "Opcional");
+        Formulario.obligatorios(grid, "Tipo", "Estado");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new SensorRequest(type.getText(), manufacturer.getText(),
@@ -623,6 +643,16 @@ final class PersonaOneDialogs {
             grid.addRow(14, new Label("Proveedor opcional"), supplier); grid.addRow(15, new Label("Servicio proveedor"), service);
             grid.addRow(16, new Label("Costo proveedor"), supplierCost);
             grid.addRow(17, addSupplier, otherLabel);
+            Formulario.ayuda(grid, 0, "1 o más, sin repetir dentro del envío");
+            Formulario.ayuda(grid, 7, "Requiere operador y debe pertenecerle");
+            Formulario.ayuda(grid, 8, "Opcional. Ej.: 2026-12-01T15:00:00Z");
+            Formulario.ayuda(grid, 9, "Opcional. No anterior a la salida");
+            Formulario.ayuda(grid, 10, "Obligatoria si el estado es FINALIZADO");
+            Formulario.ayuda(grid, 11, "Opcional. 0 o más, decimales con punto");
+            Formulario.ayuda(grid, 12, "Opcional. 0 o más, decimales con punto");
+            Formulario.ayuda(grid, 15, "Obligatorio si hay proveedor");
+            Formulario.ayuda(grid, 16, "Obligatorio si hay proveedor. 0 o más");
+            Formulario.obligatorios(grid, "Orden", "Origen", "Destino", "Medio", "Estado");
             ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true); scroll.setPrefViewportHeight(520);
             dialog.getDialogPane().setContent(scroll);
             dialog.setResultConverter(b -> {
@@ -740,6 +770,11 @@ final class PersonaOneDialogs {
         GridPane grid = grid(); grid.addRow(0, new Label("Concepto"), concept);
         grid.addRow(1, new Label("Cantidad"), quantity); grid.addRow(2, new Label("Precio unitario"), price);
         grid.addRow(3, new Label("Vencimiento"), due); grid.addRow(4, new Label("Clave idempotente"), key);
+        Formulario.ayuda(grid, 1, "Mayor a 0. Decimales con punto");
+        Formulario.ayuda(grid, 2, "0 o más. Decimales con punto");
+        Formulario.ayuda(grid, 3, "Formato AAAA-MM-DD");
+        Formulario.ayuda(grid, 4, "Generada sola: evita duplicar la factura");
+        Formulario.obligatorios(grid, "Concepto", "Cantidad", "Precio unitario", "Vencimiento", "Clave idempotente");
         dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new InvoiceRequest(account.ownerType(), account.ownerId(), null, LocalDate.parse(due.getText()),
@@ -756,7 +791,12 @@ final class PersonaOneDialogs {
         TextField reference = new TextField(); TextField key = text("PAGO-" + UUID.randomUUID());
         GridPane grid = grid(); grid.addRow(0, new Label("Monto"), amount);
         grid.addRow(1, new Label("Medio"), method); grid.addRow(2, new Label("Referencia"), reference);
-        grid.addRow(3, new Label("Clave idempotente"), key); dialog.getDialogPane().setContent(grid);
+        grid.addRow(3, new Label("Clave idempotente"), key);
+        Formulario.ayuda(grid, 0, "Mayor a 0 y hasta el saldo pendiente. Decimales con punto");
+        Formulario.ayuda(grid, 2, "Opcional, no repetida");
+        Formulario.ayuda(grid, 3, "Generada sola: evita duplicar el pago");
+        Formulario.obligatorios(grid, "Monto", "Medio", "Clave idempotente");
+        dialog.getDialogPane().setContent(grid);
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new PaymentRequest(decimal(amount.getText()), method.getValue(), key.getText(), reference.getText()) : null);
         return dialog.showAndWait();

@@ -119,9 +119,14 @@ public final class OperacionWindow {
         reglas.getColumns().add(columna("Contenedor", r -> r.tipoContenedor() == null ? "Todos" : r.tipoContenedor()));
         reglas.getColumns().add(columna("Activa", r -> r.activa() ? "Sí" : "No"));
         reglas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        nombreRegla.setPromptText("Nombre");
-        valorRegla.setPromptText("Umbral o minutos");
-        valorRegla.setPrefWidth(130);
+        nombreRegla.setPromptText("Nombre (obligatorio)");
+        valorRegla.setPrefWidth(150);
+        tipoRegla.valueProperty().addListener((obs, antes, ahora) -> valorRegla.setPromptText(switch (ahora) {
+            case "INACTIVIDAD" -> "Minutos, mayor a 0";
+            case "HUMEDAD", "BATERIA" -> "Umbral en %";
+            case "VIBRACION" -> "Umbral (número)";
+            default -> "Umbral en °C";
+        }));
         tipoRegla.setValue("TEMPERATURA");
         operador.setValue(">");
         severidad.setValue("ALTA");

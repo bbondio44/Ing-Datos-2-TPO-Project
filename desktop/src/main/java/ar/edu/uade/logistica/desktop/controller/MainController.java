@@ -148,6 +148,9 @@ public class MainController {
         grid.addRow(3, new Label("Teléfono"), phone);
         grid.addRow(4, new Label("Dirección"), address);
         grid.addRow(5, new Label("País"), country);
+        Formulario.ayuda(grid, 1, "Opcional. 11 dígitos sin guiones, CUIT válido y no repetido");
+        Formulario.ayuda(grid, 2, "Opcional. Formato nombre@dominio.com, no repetido");
+        Formulario.obligatorios(grid, "Razón social", "País");
         dialog.getDialogPane().setContent(grid);
 
         Node saveButton = dialog.getDialogPane().lookupButton(save);
@@ -357,6 +360,9 @@ public class MainController {
         grid.addRow(4, new Label("Dirección"), address);
         grid.addRow(5, new Label("País"), country);
         if (supplier) grid.addRow(6, new Label("Tipo de servicio"), service);
+        Formulario.ayuda(grid, 1, "Opcional. 11 dígitos sin guiones, CUIT válido y no repetido");
+        Formulario.ayuda(grid, 2, "Opcional. Formato nombre@dominio.com");
+        Formulario.obligatorios(grid, "Razón social", "País");
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty()
                 .bind(name.textProperty().isEmpty().or(country.textProperty().isEmpty()));
@@ -477,6 +483,8 @@ public class MainController {
         grid.addRow(1, new Label("Nombre"), name);
         grid.addRow(2, new Label("País"), country);
         grid.addRow(3, new Label("Tipo"), type);
+        Formulario.ayuda(grid, 0, "No repetido");
+        Formulario.obligatorios(grid, "Código", "Nombre", "País", "Tipo");
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty().bind(
                 code.textProperty().isEmpty().or(name.textProperty().isEmpty()).or(country.textProperty().isEmpty()));
@@ -613,6 +621,9 @@ public class MainController {
         grid.addRow(1, new Label("Tipo"), type);
         grid.addRow(2, new Label("Identificación"), identification);
         grid.addRow(3, new Label("Estado"), state);
+        Formulario.ayuda(grid, 0, "Debe estar activo");
+        Formulario.ayuda(grid, 2, "Patente o matrícula, no repetida");
+        Formulario.obligatorios(grid, "Operador", "Tipo", "Identificación", "Estado");
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty().bind(
                 operator.valueProperty().isNull().or(identification.textProperty().isEmpty()));
