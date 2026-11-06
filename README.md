@@ -1,90 +1,123 @@
-# Ing-Datos-2-TPO-Project
+# Plataforma de logística internacional e IoT
 
-Ingeniería de Datos II - Segundo Cuatrimestre 2026 - UADE
+Trabajo práctico de Ingeniería de Datos II · UADE · Segundo cuatrimestre 2026 · Grupo 4
 
-## Plataforma de logística internacional e IoT - Grupo 4
+Aplicación de escritorio JavaFX con backend Spring Boot y persistencia políglota:
 
-Aplicación de escritorio JavaFX con backend Spring Boot y persistencia políglota. PostgreSQL es la fuente transaccional; Cassandra conserva telemetría; MongoDB almacena eventos, alertas, reportes y mensajería; Neo4j mantiene una proyección del grafo logístico.
+| Base | Qué guarda |
+|---|---|
+| PostgreSQL | Clientes, usuarios, envíos, contenedores, incidentes y finanzas |
+| Cassandra | Telemetría IoT: lecturas y posiciones GPS |
+| MongoDB | Eventos, alertas, mensajería y resultados de reportes |
+| Neo4j | Red de clientes, envíos, tramos y operadores |
 
-El repositorio está en construcción por fases. El estado verificable y las brechas se registran en [docs/ESTADO_INICIAL.md](docs/ESTADO_INICIAL.md) y [docs/MATRIZ_PROMOCION.md](docs/MATRIZ_PROMOCION.md). No se declara cobertura 40/40 hasta ejecutar cada flujo y guardar su evidencia.
+## Levantar la app
 
-## Requisitos
+### Qué hace falta
 
-- JDK 21.
-- Docker Desktop para el entorno local de datos.
-- Maven Wrapper incluido en el repositorio después del primer bootstrap.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/), abierto y corriendo.
+- JDK 21. Se comprueba con `java -version`.
+- Git e internet, para bajar el proyecto, las imágenes y las dependencias, y para el mapa.
+- Libres los puertos 5432, 27017, 9042, 7474, 7687 y 8080.
 
-## Arranque local
+Maven no hace falta: el proyecto trae su propio `mvnw`.
 
-1. Crear el archivo local de secretos y reemplazar todos los valores de ejemplo:
+### Pasos
 
-```powershell
-Copy-Item .env.example .env
-```
-
-2. Iniciar los cuatro motores desde el único Compose:
-
-```powershell
-docker compose --env-file .env -f infra/docker-compose.yml up -d
-```
-
-3. Cargar en la consola las variables de PostgreSQL del mismo `.env` y definir un administrador inicial solo para el primer arranque:
+1. Si todavía no tenés el proyecto, bajalo una sola vez:
 
 ```powershell
-$env:PG_PASSWORD='el-mismo-secreto-de-POSTGRES_PASSWORD'
-$env:APP_BOOTSTRAP_ADMIN_EMAIL='admin@grupo4.local'
-$env:APP_BOOTSTRAP_ADMIN_PASSWORD='una-clave-larga-y-unica'
+git clone https://github.com/bbondio44/Ing-Datos-2-TPO-Project
+cd Ing-Datos-2-TPO-Project
+git checkout integracion/app-completa
 ```
 
-4. Instalar los módulos locales una vez con `./mvnw.cmd install -DskipTests`.
-5. Ejecutar `./mvnw.cmd -pl backend spring-boot:run`.
-6. En otra consola ejecutar `./mvnw.cmd -pl desktop javafx:run`.
+Si ya lo tenés, actualizalo desde su carpeta con `git pull`.
 
-El bootstrap no contiene una contraseña predeterminada. Si las variables no están definidas, no crea usuarios. La carga de datos de demostración es opt-in y nunca se ejecuta contra Supabase de forma automática.
+2. Hacé doble clic en `iniciar.bat`.
 
-## Arranque rápido
+La primera vez tarda unos 4 minutos, o más si tiene que bajar las imágenes. Crea el archivo `.env` con claves propias, levanta las cuatro bases, carga los datos, compila, arranca el backend y abre la app. Las veces siguientes tarda menos de un minuto.
 
-Con Docker Desktop abierto y el JDK 21 instalado, hacer doble clic en `iniciar.bat`. La primera vez crea el `.env` con claves propias y muestra el usuario para entrar. Levanta las cuatro bases, carga los datos si están vacías, arranca el backend y abre la aplicación. Al cerrar la aplicación se apaga el backend; las bases se apagan con `docker compose stop`.
+### Entrar
 
-## Arranque con las cuatro bases
+La primera vez, `iniciar.bat` muestra en la ventana negra el email `admin@grupo4.local` y una contraseña, que queda guardada en `.env` como `APP_BOOTSTRAP_ADMIN_PASSWORD`. No hay registro público: el administrador crea los demás usuarios desde **Usuarios y roles**.
 
-1. Copiar `.env.example` a `.env` y completar las claves. `MONGO_URI` va sin comillas y con la misma clave que `MONGO_PASSWORD`.
-2. Levantar las bases con `docker compose --env-file .env -f infra/docker-compose.yml up -d --wait`. También funciona `docker compose up -d --wait` con el compose de la raíz; cada uno usa sus propios volúmenes, así que hay que cargar los datos en el que se use y no tener los dos prendidos a la vez.
-3. Cargar los datos:
+### Cerrar
+
+Al cerrar la app se apaga el backend. Las bases siguen prendidas y se apagan con `docker compose stop`, sin perder datos.
+
+Para volver a los datos iniciales, correr `docker compose down -v` y abrir `iniciar.bat`. **Ese comando borra todos los datos cargados.**
+
+## Si algo falla
+
+| Qué pasa | Qué hacer |
+|---|---|
+| `Docker no responde` | Abrir Docker Desktop y esperar a que diga que está corriendo |
+| `No encontre Java` | Instalar el JDK 21 y abrir de nuevo la ventana |
+| `Hay una version vieja corriendo` | Cerrar la app y su ventana negra, y volver a abrir `iniciar.bat` |
+| `Las bases no arrancaron` | Otro programa usa esos puertos: apagarlo y reintentar |
+| `.env no define APP_BOOTSTRAP_ADMIN_EMAIL` | Completar ese dato y `APP_BOOTSTRAP_ADMIN_PASSWORD` (12 caracteres o más) en `.env` y reintentar |
+| El login rechaza la contraseña | Escribirla a mano: un espacio de más la invalida |
+| Falta el menú Analítica | Estás en otra rama: `git checkout integracion/app-completa` |
+| El backend no arranca | Revisar `logs\backend.log` |
+| La app abre sin datos de Neo4j | Esperar un minuto: el grafo se llena solo |
+
+Si cambiás las claves del `.env` con las bases ya creadas, dejan de coincidir. En ese caso hay que volver a los datos iniciales.
+
+## Probar la app
+
+Los sensores se simulan. Con la app abierta, desde PowerShell en la carpeta del proyecto:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\cargar-postgres.ps1
-powershell -ExecutionPolicy Bypass -File .\tp-grupo4-mongo-cassandra\cargar_todo.ps1
+.\scripts\mandar-lecturas.ps1 -Email TU_EMAIL -Clave TU_CLAVE -Cantidad 12      # serie normal
+.\scripts\mandar-lecturas.ps1 -Email TU_EMAIL -Clave TU_CLAVE -Temperatura 45   # dispara alertas
+.\scripts\mandar-lecturas.ps1 -Email TU_EMAIL -Clave TU_CLAVE -Bateria 10       # batería baja
 ```
 
-4. Compilar con `mvn -B -DskipTests install`.
-5. Definir en `.env` `APP_BOOTSTRAP_ADMIN_EMAIL` y `APP_BOOTSTRAP_ADMIN_PASSWORD` (12 caracteres o más) para tener un usuario con clave válida.
-6. Correr el backend. Neo4j se llena solo con el worker del outbox.
-
-```powershell
-$env:SPRING_PROFILES_ACTIVE='dev,polyglot'
-mvn -pl backend spring-boot:run
-```
-
-7. En otra consola, correr la app con `mvn -pl desktop javafx:run`.
-
-Para el simulador, usar un sensor con asignación vigente (`v_envio_contenedor_sensor_activo`) y el token que devuelve `POST /api/v1/auth/login`. `SIM_TEMPERATURA` fuerza un valor, para disparar una alerta en la demo:
+Para un flujo continuo está el simulador Java. Necesita un sensor con asignación vigente y el token de `POST /api/v1/auth/login`:
 
 ```powershell
 $env:SENSOR_ID='cb6a673c-14a5-5469-a365-30fe9700c80b'
 $env:API_TOKEN='<token>'
-mvn -pl simulator exec:java "-Dexec.mainClass=ar.edu.uade.logistica.simulator.IoTSimulator"
+.\mvnw.cmd -pl simulator exec:java "-Dexec.mainClass=ar.edu.uade.logistica.simulator.IoTSimulator"
 ```
 
-Las pruebas de aceptación contra las bases reales están en `scripts/pruebas`, y los pasos manuales por requisito en `docs/notas-testing-persona2.md`.
+### Pruebas automáticas
 
-Las tareas de Persona 1 y sus casos de aceptación están detallados en [docs/requisitos-persona1.md](docs/requisitos-persona1.md). La facturación automática programada se habilita con `APP_BILLING_AUTO_ENABLED=true`; también puede ejecutarse manualmente desde la pantalla de Facturación. El cierre mensual programado se habilita con `APP_CIERRE_AUTO_ENABLED=true` y corre el primer día de cada mes; también está el botón "Cerrar todas las cuentas".
-
-## Validación
+Con el backend apagado y las bases cargadas:
 
 ```powershell
-./mvnw.cmd test
-./mvnw.cmd package
+.\mvnw.cmd test                                                                # tests de código
+powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\correr-todo.ps1     # los 40 requisitos
+powershell -ExecutionPolicy Bypass -File .\scripts\pruebas\capturas.ps1        # pantallas JavaFX
 ```
 
-Las referencias originales del equipo están en `database/referencia-postgresql` y `docs/referencias`. No deben ejecutarse scripts destructivos ni el seed de demo sobre una base remota existente.
+`correr-todo.ps1` tarda unos 12 minutos y apaga y prende bases para probar caídas. `capturas.ps1` maneja la app sola y crea datos de prueba. Los resultados y capturas quedan en `evidencias/RXX/`.
+
+## Qué hay en cada carpeta
+
+| Carpeta | Contenido |
+|---|---|
+| `backend/` | API Spring Boot |
+| `desktop/` | Aplicación JavaFX |
+| `shared-contracts/` | Clases compartidas entre backend y app |
+| `simulator/` | Simulador de sensores IoT |
+| `database/` | Esquemas y datos de PostgreSQL, Cassandra y Neo4j |
+| `tp-grupo4-mongo-cassandra/` | Dataset y scripts de carga de MongoDB y Cassandra |
+| `scripts/` | Arranque, carga de datos y pruebas |
+| `evidencias/` | Resultado y capturas de cada requisito |
+| `docs/` | Requisitos, modelos físicos y documentación técnica |
+
+## Documentación
+
+- [Los 40 requisitos](docs/requisitos.md)
+- [Cumplimiento del enunciado](docs/cumplimiento-enunciado.md)
+- [Modelo físico de MongoDB y Cassandra](docs/modelo-fisico-mongodb-cassandra.md)
+- [Modelo físico de Neo4j](docs/modelo-fisico-neo4j.md)
+- [Lo usado fuera de clase](docs/fuera-de-clase.md)
+
+## Configuración opcional
+
+`docker-compose.yml` es el que usa `iniciar.bat`. `infra/docker-compose.yml` es una alternativa con versiones fijas de las imágenes: usa los mismos puertos y sus propios volúmenes, así que no se prenden los dos a la vez.
+
+Los procesos periódicos se controlan en `.env`: `APP_BILLING_AUTO_ENABLED` para la facturación automática y `APP_CIERRE_AUTO_ENABLED` para el cierre mensual.
