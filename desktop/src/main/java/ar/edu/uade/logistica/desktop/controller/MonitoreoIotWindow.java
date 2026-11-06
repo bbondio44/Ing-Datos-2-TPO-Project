@@ -68,7 +68,7 @@ public final class MonitoreoIotWindow {
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         Stage stage = new Stage();
         stage.setTitle("Monitoreo IoT");
-        stage.setScene(new Scene(tabs, 1120, 720));
+        stage.setScene(new Scene(tabs, 1120, Formulario.altoVentana(720)));
         stage.show();
         cargarEstados();
     }

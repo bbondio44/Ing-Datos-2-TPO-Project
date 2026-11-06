@@ -439,6 +439,17 @@ public class CapturasPantallas extends Application {
         espera(1500);
         verificar("R40 la conversacion grupal muestra mensajes", filas(alertas, 1) > 0);
         captura(alertas, "mensajeria-grupal", "R40");
+        String mensajeAdmin = "Mensaje del admin " + marca;
+        fx(() -> {
+            TextField campoMensaje = visibleEnFx(alertas, TextField.class).stream()
+                    .filter(t -> t.getPromptText() != null && t.getPromptText().contains("escribí un mensaje")).findFirst().orElseThrow();
+            campoMensaje.setText(mensajeAdmin);
+            campoMensaje.fireEvent(new javafx.event.ActionEvent());
+            return null;
+        });
+        espera(1800);
+        verificar("R40 Enter envia el mensaje como admin", fx(() -> visibleEnFx(alertas, TableView.class).get(1).getItems()
+                .stream().anyMatch(m -> m.toString().contains(mensajeAdmin))));
         Window destinatarios = abrirCon(() -> click(boton(alertas, "Elegir…")));
         click(boton(destinatarios, "Seleccionar"));
         esperarCierre(destinatarios);

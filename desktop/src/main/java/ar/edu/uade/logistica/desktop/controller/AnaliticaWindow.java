@@ -69,7 +69,7 @@ public final class AnaliticaWindow {
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         Stage stage = new Stage();
         stage.setTitle("Analítica y reportes");
-        stage.setScene(new Scene(tabs, 1180, 720));
+        stage.setScene(new Scene(tabs, 1180, Formulario.altoVentana(720)));
         stage.show();
         consultar();
         cargarPredicciones();

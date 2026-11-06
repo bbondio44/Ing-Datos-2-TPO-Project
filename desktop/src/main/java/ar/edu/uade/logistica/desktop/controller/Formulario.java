@@ -16,6 +16,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Screen;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
@@ -72,6 +73,11 @@ final class Formulario {
         if (!limpio.matches("\\d{11}")) return "El CUIT debe tener 11 dígitos, sin guiones ni espacios";
         return digitoVerificador(limpio) == limpio.charAt(10) - '0' ? null
                 : "El CUIT no es válido: no coincide el último dígito. Podés usar el botón Generar";
+    }
+
+    /** El alto pedido, sin pasarse de la pantalla: la barra de título y la de tareas también ocupan lugar. */
+    static double altoVentana(double alto) {
+        return Math.min(alto, Screen.getPrimary().getVisualBounds().getHeight() - 60);
     }
 
     /** Abre una lista para elegir un registro por su nombre; vacío si se cancela. */

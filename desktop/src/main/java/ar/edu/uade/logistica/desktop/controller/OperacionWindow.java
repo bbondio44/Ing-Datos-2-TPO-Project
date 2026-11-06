@@ -88,7 +88,7 @@ public final class OperacionWindow {
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         Stage stage = new Stage();
         stage.setTitle("Alertas y operación");
-        stage.setScene(new Scene(tabs, 1180, 720));
+        stage.setScene(new Scene(tabs, 1180, Formulario.altoVentana(720)));
         stage.show();
         cargarAlertas();
         cargarReglas();
@@ -177,6 +177,7 @@ public final class OperacionWindow {
         mensajes.getColumns().add(columna("Mensaje", MensajeResponse::contenido));
         mensajes.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         nuevoMensaje.setPromptText("Elegí una conversación y escribí un mensaje");
+        nuevoMensaje.setOnAction(event -> enviarMensaje());
         HBox.setHgrow(nuevoMensaje, Priority.ALWAYS);
         HBox tablas = new HBox(12, conversaciones, mensajes);
         HBox.setHgrow(conversaciones, Priority.ALWAYS);
@@ -230,7 +231,7 @@ public final class OperacionWindow {
         al(AppContext.get().api().createConversation(conversacion), estadoMensajes, creada -> {
             asunto.clear();
             destinatario.clear();
-            cargarConversaciones();
+            cargarConversaciones(creada.id());
         });
     }
 
@@ -323,9 +324,16 @@ public final class OperacionWindow {
     }
 
     private void cargarConversaciones() {
+        cargarConversaciones(null);
+    }
+
+    /** Recarga la bandeja y deja elegida la conversación indicada, para poder escribir enseguida. */
+    private void cargarConversaciones(String aElegir) {
         al(AppContext.get().api().conversations(), estadoMensajes, lista -> {
             conversaciones.setItems(FXCollections.observableArrayList(lista));
             estadoMensajes.setText(lista.size() + " conversación(es)");
+            lista.stream().filter(c -> c.id().equals(aElegir)).findFirst()
+                    .ifPresent(c -> conversaciones.getSelectionModel().select(c));
         });
     }
 
