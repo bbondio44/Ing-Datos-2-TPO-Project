@@ -6,5 +6,5 @@ OK    R27 orden descendente: esperado=2,2,1,1,1,1 obtenido=2,2,1,1,1,1
 OK    R27 primera ruta contra incidentes: esperado=2 obtenido=2
 OK    R28 volumen del cliente de la demo: esperado=22.5 obtenido=22.5
 OK    R31 hay dos periodos distintos para comparar: esperado=True obtenido=True
-OK    R31 envios creados del mes: esperado=3 obtenido=3
+OK    R31 envios creados del mes: esperado=5 obtenido=5
 usuario temporal desactivado

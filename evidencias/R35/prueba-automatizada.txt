@@ -1,7 +1,7 @@
 ﻿=== R35 reporte de envios
 OK    filtro por cliente: esperado=3 obtenido=3
 OK    filtro por estado: esperado=18 obtenido=18
-OK    filtro por pais: esperado=10 obtenido=10
+OK    filtro por pais: esperado=12 obtenido=12
 OK    cliente y estado combinados: esperado=3 obtenido=3
 OK    demorados: esperado=6 obtenido=6
 OK    incidentes abiertos: esperado=6 obtenido=6

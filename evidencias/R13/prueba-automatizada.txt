@@ -3,6 +3,7 @@ OK    misma clave y datos no duplica: esperado=True obtenido=True
 OK    pagos registrados: esperado=1 obtenido=1
 OK    misma clave con otro monto: esperado=409 obtenido=409
 OK    sobrepago: esperado=409 obtenido=409
+OK    el sobrepago explica el motivo: esperado=True obtenido=True
 OK    cliente ajeno no ve la factura: esperado=True obtenido=True
 OK    pago total: esperado=201 obtenido=201
 OK    R10 factura pagada: esperado=PAGADA obtenido=PAGADA

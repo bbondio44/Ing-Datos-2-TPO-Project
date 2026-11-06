@@ -7,7 +7,7 @@ OK    C01 no lee mensajes ajenos: esperado=404 obtenido=404
 OK    C01 no escribe en conversacion ajena: esperado=404 obtenido=404
 OK    C02 si lee su conversacion: esperado=200 obtenido=200
 === Conversacion privada cliente - operador
-conversacion e06c60ab-b717-4626-a074-cf78b75b2fd6; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
+conversacion 52f92d73-ec86-4bcb-88d7-8ecbb4ff9a73; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
 OK    cliente envia: esperado=201 obtenido=201
 OK    reintento mismo id: esperado=201 obtenido=201
 OK    no duplica el mensaje: esperado=1 obtenido=1

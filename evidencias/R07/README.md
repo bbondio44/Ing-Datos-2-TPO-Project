@@ -13,5 +13,6 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 - `captura-01-detalle-envio.png`
 - `captura-02-contenedores.png`
 - `captura-03-historial-contenedor.png`
+- `captura-04-contenedor-asociado.png`
 
 Las capturas las genera `scripts/pruebas/capturas.ps1` manejando la aplicación real; su detalle está en `evidencias/pantallas-javafx.txt`.

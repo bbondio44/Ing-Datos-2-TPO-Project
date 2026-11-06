@@ -10,6 +10,6 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 ## Evidencia
 
 - `prueba-automatizada.txt`: requests, respuestas y contraste con la base.
-- `captura-01-reporte-predictivo.png`
+- `captura-01-predictivo-con-riesgos.png`
 
 Las capturas las genera `scripts/pruebas/capturas.ps1` manejando la aplicación real; su detalle está en `evidencias/pantallas-javafx.txt`.

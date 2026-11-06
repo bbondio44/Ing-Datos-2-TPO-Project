@@ -2,13 +2,13 @@
      2026-08-01: creados=1 entregados=1 fuera_plazo=0 horas=384.00
      2026-09-01: creados=2 entregados=2 fuera_plazo=1 horas=252.00
      2026-10-01: creados=21 entregados=15 fuera_plazo=0 horas=64.60
-     2026-11-01: creados=2 entregados=0 fuera_plazo=0 horas=
+     2026-11-01: creados=4 entregados=0 fuera_plazo=0 horas=
 OK    mas de un periodo: esperado=True obtenido=True
-OK    creados igual que Postgres: esperado=26 obtenido=26
+OK    creados igual que Postgres: esperado=28 obtenido=28
 === R27 R28 R31 analitica contra calculo manual
 OK    R27 orden descendente: esperado=2,2,1,1,1,1 obtenido=2,2,1,1,1,1
 OK    R27 primera ruta contra incidentes: esperado=2 obtenido=2
 OK    R28 volumen del cliente de la demo: esperado=22.5 obtenido=22.5
 OK    R31 hay dos periodos distintos para comparar: esperado=True obtenido=True
-OK    R31 envios creados del mes: esperado=3 obtenido=3
+OK    R31 envios creados del mes: esperado=5 obtenido=5
 usuario temporal desactivado

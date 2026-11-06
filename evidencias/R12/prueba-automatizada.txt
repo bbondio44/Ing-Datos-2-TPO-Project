@@ -5,5 +5,5 @@ OK    crea facturas: esperado=True obtenido=True
 OK    saltea la cuenta con el mes cerrado: esperado=1 obtenido=1
 OK    el envio de la cuenta cerrada no se factura: esperado=0 obtenido=0
 OK    segunda corrida no crea nada: esperado=0 obtenido=0
-OK    misma cantidad de facturas: esperado=35 obtenido=35
+OK    misma cantidad de facturas: esperado=39 obtenido=39
 OK    una factura por envio: esperado=1 obtenido=1

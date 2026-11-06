@@ -11,5 +11,6 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 
 - `prueba-automatizada.txt`: requests, respuestas y contraste con la base.
 - `captura-01-alerta-anomalia.png`
+- `captura-02-alertas-de-la-lectura.png`
 
 Las capturas las genera `scripts/pruebas/capturas.ps1` manejando la aplicación real; su detalle está en `evidencias/pantallas-javafx.txt`.

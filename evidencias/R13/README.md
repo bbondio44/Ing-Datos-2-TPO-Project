@@ -11,6 +11,7 @@ Estado: `IMPLEMENTADO`. Pasó la prueba automatizada y la de pantalla sobre una 
 
 - `prueba-automatizada.txt`: requests, respuestas y contraste con la base.
 - `captura-01-cobro-parcial.png`
-- `captura-02-cobro-total.png`
+- `captura-02-sobrepago-rechazado.png`
+- `captura-03-cobro-total.png`
 
 Las capturas las genera `scripts/pruebas/capturas.ps1` manejando la aplicación real; su detalle está en `evidencias/pantallas-javafx.txt`.
