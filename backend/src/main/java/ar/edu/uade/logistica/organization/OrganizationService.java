@@ -114,6 +114,14 @@ public class OrganizationService {
         if (changed == 0) throw new NotFoundException(label(kind) + " activo no existe");
     }
 
+    @Transactional
+    public void activate(OrganizationKind kind, UUID id) {
+        auditContext.applyToCurrentTransaction();
+        int changed = jdbcTemplate.update("UPDATE tp_logistica." + kind.table
+                + " SET estado='ACTIVO' WHERE " + kind.idColumn + "=? AND estado <> 'ACTIVO'", id);
+        if (changed == 0) throw new NotFoundException(label(kind) + " inactivo no existe");
+    }
+
     private OrganizationResponse map(ResultSet rs, int row) throws SQLException {
         return new OrganizationResponse(rs.getObject(1, UUID.class), rs.getString("razon_social"),
                 rs.getString("cuit"), rs.getString("email"), rs.getString("telefono"),

@@ -42,6 +42,7 @@
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button fx:id="editButton" text="Editar" onAction="#editClient" styleClass="secondary-button"/>
                 <Button fx:id="deactivateButton" text="Desactivar" onAction="#deactivateClient" styleClass="secondary-button"/>
+                <Button fx:id="activateButton" text="Activar" onAction="#activateClient" styleClass="secondary-button"/>
                 <Button text="Nuevo cliente" onAction="#createClient" styleClass="primary-button"/>
             </HBox>
             <HBox spacing="10">

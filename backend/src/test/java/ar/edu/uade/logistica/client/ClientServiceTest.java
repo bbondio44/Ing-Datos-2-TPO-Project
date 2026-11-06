@@ -36,4 +36,18 @@ class ClientServiceTest {
         assertThat(captor.getValue().getBusinessName()).isEqualTo("Transportes Sur");
         assertThat(response.state()).isEqualTo("ACTIVO");
     }
+
+    @Test
+    void activatesAnInactiveClientAndAppliesDatabaseAuditContext() {
+        ClientService service = new ClientService(repository, auditContext);
+        ClientEntity entity = new ClientEntity("Transportes Sur", null, null, null, null, "Argentina");
+        entity.deactivate();
+        java.util.UUID id = java.util.UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(java.util.Optional.of(entity));
+
+        service.activate(id);
+
+        verify(auditContext).applyToCurrentTransaction();
+        assertThat(entity.getState()).isEqualTo("ACTIVO");
+    }
 }

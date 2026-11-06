@@ -61,6 +61,7 @@ public class ClientEntity {
     }
 
     public void deactivate() { this.state = "INACTIVO"; }
+    public void activate() { this.state = "ACTIVO"; }
     private static String blankToNull(String value) { return value == null || value.isBlank() ? null : value.strip(); }
     public UUID getId() { return id; }
     public String getBusinessName() { return businessName; }

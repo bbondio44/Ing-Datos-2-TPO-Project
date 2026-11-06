@@ -136,6 +136,22 @@ final class PersonaOneDialogs {
         else if (initial.supplierId() != null) { ownerType.setValue("PROVEEDOR"); ownerId.setText(initial.supplierId().toString()); }
         else if (initial.operatorId() != null) { ownerType.setValue("OPERADOR"); ownerId.setText(initial.operatorId().toString()); }
         else ownerType.setValue("SIN ORGANIZACIÓN");
+        ownerType.valueProperty().addListener((obs, before, now) -> ownerId.clear());
+        Button chooseOwner = new Button("Elegir…");
+        chooseOwner.disableProperty().bind(ownerType.valueProperty().isEqualTo("SIN ORGANIZACIÓN"));
+        chooseOwner.setOnAction(event -> run(() -> {
+            if ("CLIENTE".equals(ownerType.getValue())) {
+                choice("Cliente titular", api.clients("").join().content().stream()
+                        .filter(c -> "ACTIVO".equals(c.state())).toList(),
+                        c -> c.businessName() + " — " + value(c.cuit()))
+                        .showAndWait().ifPresent(c -> ownerId.setText(c.id().toString()));
+            } else {
+                String resource = "PROVEEDOR".equals(ownerType.getValue()) ? "proveedores" : "operadores";
+                choice("Organización titular", api.organizations(resource, "").join().content().stream()
+                        .filter(o -> "ACTIVO".equals(o.state())).toList(), OrganizationResponse::businessName)
+                        .showAndWait().ifPresent(o -> ownerId.setText(o.id().toString()));
+            }
+        }));
         ListView<RoleResponse> roleList = new ListView<>(FXCollections.observableArrayList(roles));
         roleList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         roleList.setCellFactory(ignored -> listCell(r -> r.description() + " — " + r.permissions().size() + " permisos"));
@@ -157,11 +173,27 @@ final class PersonaOneDialogs {
         grid.addRow(6, new Label("Roles"), roleList);
         Formulario.ayuda(grid, 2, "Formato nombre@dominio.com, no repetido");
         Formulario.ayuda(grid, 3, initial == null ? "Mínimo 12 caracteres" : "Mínimo 12 caracteres. Vacía conserva la actual");
-        Formulario.ayuda(grid, 5, "Solo si el usuario pertenece a un cliente, proveedor u operador");
+        Formulario.conBoton(grid, 5, chooseOwner, "Solo si pertenece a un cliente, proveedor u operador");
         Formulario.ayuda(grid, 6, "Al menos uno. Ctrl + clic para elegir varios");
         if (initial == null) Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Contraseña", "Roles");
         else Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Roles");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> {
+            if (firstName.getText().isBlank() || lastName.getText().isBlank()) return "Completá el nombre y el apellido";
+            if (email.getText().isBlank()) return "Completá el email";
+            String emailError = Formulario.errorEmail(email.getText());
+            if (emailError != null) return emailError;
+            if (initial == null && password.getText().isBlank()) return "Completá la contraseña";
+            if (!password.getText().isBlank() && password.getText().length() < 12) {
+                return "La contraseña debe tener al menos 12 caracteres";
+            }
+            if (!"SIN ORGANIZACIÓN".equals(ownerType.getValue())) {
+                if (ownerId.getText().isBlank()) return "Elegí el titular con el botón Elegir…";
+                try { UUID.fromString(ownerId.getText().strip()); }
+                catch (IllegalArgumentException exception) { return "El UUID del titular no es válido"; }
+            }
+            return roleList.getSelectionModel().isEmpty() ? "Elegí al menos un rol" : null;
+        });
         dialog.setResultConverter(button -> {
             if (button.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
             try {
@@ -183,8 +215,13 @@ final class PersonaOneDialogs {
 
     private Node rolesPane() {
         TableView<RoleResponse> table = new TableView<>();
-        table.getColumns().add(column("Rol", RoleResponse::description));
-        table.getColumns().add(column("Nivel", r -> Integer.toString(r.level())));
+        // Sin ancho mínimo, la lista larga de permisos deja a estas dos columnas casi sin lugar.
+        TableColumn<RoleResponse, String> roleName = column("Rol", RoleResponse::description);
+        roleName.setMinWidth(160);
+        TableColumn<RoleResponse, String> roleLevel = column("Nivel", r -> Integer.toString(r.level()));
+        roleLevel.setMinWidth(70);
+        table.getColumns().add(roleName);
+        table.getColumns().add(roleLevel);
         table.getColumns().add(column("Permisos", r -> String.join(", ", r.permissions())));
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         Label status = new Label();
@@ -224,7 +261,8 @@ final class PersonaOneDialogs {
         Spinner<Integer> level = new Spinner<>(0, 100, initial == null ? 50 : initial.level());
         ListView<PermissionResponse> list = new ListView<>(FXCollections.observableArrayList(permissions));
         list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        list.setCellFactory(ignored -> listCell(p -> p.code() + " — " + p.description()));
+        list.setCellFactory(ignored -> listCell(PersonaOneDialogs::permissionLabel));
+        list.setPrefWidth(470);
         if (initial != null) for (int i = 0; i < permissions.size(); i++) {
             if (initial.permissions().contains(permissions.get(i).code())) list.getSelectionModel().select(i);
         }
@@ -241,6 +279,13 @@ final class PersonaOneDialogs {
                 ? new RoleRequest(name.getText(), level.getValue(), list.getSelectionModel().getSelectedItems()
                 .stream().map(PermissionResponse::code).collect(java.util.stream.Collectors.toSet())) : null);
         return dialog.showAndWait();
+    }
+
+    /** El código del permiso, con su descripción solo cuando agrega algo: varias repiten "Permiso CODIGO". */
+    static String permissionLabel(PermissionResponse permission) {
+        String description = permission.description();
+        return description == null || description.equals("Permiso " + permission.code())
+                ? permission.code() : permission.code() + " — " + description;
     }
 
     void showShipments() {

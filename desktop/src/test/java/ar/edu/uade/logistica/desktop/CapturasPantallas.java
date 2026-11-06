@@ -611,9 +611,19 @@ public class CapturasPantallas extends Application {
         String nombre = "Cliente guia " + marca;
         Window nuevo = abrirCon(() -> click(boton(principal, "Nuevo cliente")));
         escribir(nuevo, "Razón social", nombre);
+        escribir(nuevo, "Email", "email-mal-escrito");
+        Window aviso = abrirConError(() -> click(boton(nuevo, "Guardar")));
+        verificar("R01 un email mal escrito avisa", fx(() -> ((DialogPane) aviso.getScene().getRoot()).getContentText().contains("email")));
+        aceptar(aviso);
+        esperarCierre(aviso);
+        verificar("R01 el formulario sigue abierto con lo cargado", fx(nuevo::isShowing));
+        escribir(nuevo, "Email", "");
+        click(boton(nuevo, "Generar"));
         click(boton(nuevo, "Guardar"));
         esperarCierre(nuevo);
         espera(1500);
+        verificar("R01 la base acepta el CUIT generado", fx(() -> visibleEnFx(principal, TableView.class).getFirst().getItems()
+                .stream().anyMatch(c -> c.toString().contains(nombre) && c.toString().matches(".*cuit=30\\d{9}.*"))));
         seleccionar(tabla(principal, 0), nombre);
         Window edicion = abrirCon(() -> click(boton(principal, "Editar")));
         escribir(edicion, "Teléfono", "1144445555");
@@ -627,6 +637,11 @@ public class CapturasPantallas extends Application {
         espera(1500);
         verificar("R01 la baja deja el cliente INACTIVO", fx(() -> visibleEnFx(principal, TableView.class).getFirst().getItems()
                 .stream().anyMatch(c -> c.toString().contains(nombre) && c.toString().contains("state=INACTIVO"))));
+        seleccionar(tabla(principal, 0), nombre);
+        click(boton(principal, "Activar"));
+        espera(1500);
+        verificar("R01 activar deja el cliente ACTIVO", fx(() -> visibleEnFx(principal, TableView.class).getFirst().getItems()
+                .stream().anyMatch(c -> c.toString().contains(nombre) && c.toString().contains("state=ACTIVO"))));
         Window duplicado = abrirCon(() -> click(boton(principal, "Nuevo cliente")));
         escribir(duplicado, "Razón social", "Duplicado " + marca);
         escribir(duplicado, "CUIT", "30755666773");
@@ -658,6 +673,11 @@ public class CapturasPantallas extends Application {
         espera(1500);
         verificar(menu + " la baja queda INACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
                 .stream().anyMatch(o -> o.toString().contains(nombre) && o.toString().contains("state=INACTIVO"))));
+        seleccionar(tabla(lista, 0), nombre);
+        click(boton(lista, "Activar"));
+        espera(1500);
+        verificar(menu + " activar deja ACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
+                .stream().anyMatch(o -> o.toString().contains(nombre) && o.toString().contains("state=ACTIVO"))));
         String cuit = fx(() -> {
             for (Object fila : visibleEnFx(lista, TableView.class).getFirst().getItems()) {
                 String texto = fila.toString();
@@ -686,6 +706,19 @@ public class CapturasPantallas extends Application {
         esperarCierre(nuevo);
         espera(1500);
         verificar("R05 el vehiculo se crea con su operador", filas(lista, 0) == antes + 1);
+        String patente = ("VH" + marca).toUpperCase();
+        seleccionar(tabla(lista, 0), patente);
+        Window confirma = abrirCon(() -> click(boton(lista, "Desactivar")));
+        aceptar(confirma);
+        esperarCierre(confirma);
+        espera(1500);
+        verificar("R05 la baja deja el vehiculo INACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
+                .stream().anyMatch(v -> v.toString().contains(patente) && v.toString().contains("state=INACTIVO"))));
+        seleccionar(tabla(lista, 0), patente);
+        click(boton(lista, "Activar"));
+        espera(1500);
+        verificar("R05 activar deja el vehiculo ACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
+                .stream().anyMatch(v -> v.toString().contains(patente) && v.toString().contains("state=ACTIVO"))));
         cerrar(lista);
     }
 
@@ -937,6 +970,11 @@ public class CapturasPantallas extends Application {
             escribir(nuevo, "Email", usuario[0]);
             escribir(nuevo, "Contraseña", CLAVE_GUIA);
             elegir(nuevo, "Tipo titular", "CLIENTE");
+            Window titulares = abrirCon(() -> click(boton(nuevo, "Elegir…")));
+            click(boton(titulares, "Seleccionar"));
+            esperarCierre(titulares);
+            verificar("R02 Elegir completa el UUID del titular", fx(() ->
+                    ((TextField) campo(nuevo, "UUID titular")).getText().matches("[0-9a-f-]{36}")));
             escribir(nuevo, "UUID titular", usuario[1]);
             fx(() -> {
                 javafx.scene.control.ListView<?> roles = nodosDe(nuevo, javafx.scene.control.ListView.class).getFirst();
