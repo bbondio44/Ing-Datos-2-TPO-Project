@@ -509,6 +509,7 @@ public class CapturasPantallas extends Application {
         paso("R04", () -> guiaOrganizacion("Proveedores", "Proveedor guia"));
         paso("R05", () -> guiaOrganizacion("Operadores", "Operador guia"));
         paso("R05 vehiculos", this::guiaVehiculo);
+        paso("R24 ubicaciones", this::guiaUbicacion);
         paso("R06 R07 R08 R24", this::guiaEnvioCompleto);
         paso("R16", this::guiaTerceros);
         paso("R35", this::guiaFiltrosEnvios);
@@ -722,6 +723,18 @@ public class CapturasPantallas extends Application {
         cerrar(lista);
     }
 
+    private void guiaUbicacion() throws Exception {
+        Window lista = abrir("Ubicaciones");
+        espera(1200);
+        Window nueva = abrirCon(() -> click(boton(lista, "Nueva")));
+        escribir(nueva, "Nombre", "Rosario");
+        click(boton(nueva, "Generar"));
+        verificar("R24 Generar arma un codigo que no existe", fx(() -> ((TextField) campo(nueva, "Código")).getText().startsWith("ARROS")
+                && !"ARROS".equals(((TextField) campo(nueva, "Código")).getText())));
+        cerrar(nueva);
+        cerrar(lista);
+    }
+
     private void guiaEnvioCompleto() throws Exception {
         String origen = "Origen " + marca;
         Window envios = abrir("Envíos");
@@ -730,6 +743,12 @@ public class CapturasPantallas extends Application {
         Window contenedor = abrirCon(() -> click(boton(catalogos, "Nuevo contenedor")));
         escribir(contenedor, "Código", "GUIA" + marca);
         escribir(contenedor, "Tipo", "DRY");
+        escribir(contenedor, "Capacidad", "treinta");
+        Window avisoNumero = abrirConError(() -> click(boton(contenedor, "Guardar")));
+        verificar("R07 una capacidad que no es numero avisa", fx(() -> ((DialogPane) avisoNumero.getScene().getRoot()).getContentText().contains("número")));
+        aceptar(avisoNumero);
+        esperarCierre(avisoNumero);
+        verificar("R07 el formulario sigue abierto con lo cargado", fx(contenedor::isShowing));
         escribir(contenedor, "Capacidad", "30");
         click(boton(contenedor, "Guardar"));
         esperarCierre(contenedor);

@@ -379,6 +379,14 @@ final class PersonaOneDialogs {
         Formulario.ayuda(grid, 7, "0 o más. Decimales con punto");
         Formulario.obligatorios(grid, "Cliente", "Origen", "Destino", "País origen", "País destino", "Prioridad", "Volumen m³");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.primerError(
+                client.getValue() == null ? "Elegí el cliente" : null,
+                Formulario.errorObligatorio(origin.getText(), "el origen"),
+                Formulario.errorObligatorio(destination.getText(), "el destino"),
+                Formulario.errorObligatorio(originCountry.getText(), "el país de origen"),
+                Formulario.errorObligatorio(destinationCountry.getText(), "el país de destino"),
+                Formulario.errorInstante(estimated.getText(), "La entrega estimada"),
+                Formulario.errorNumero(volume.getText(), "El volumen", "0", true, true)));
         dialog.setResultConverter(button -> {
             if (button.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
             try {
@@ -531,6 +539,10 @@ final class PersonaOneDialogs {
         Formulario.ayuda(grid, 2, "Mayor a 0. Decimales con punto");
         Formulario.obligatorios(grid, "Código", "Tipo", "Capacidad", "Estado");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.primerError(
+                Formulario.errorObligatorio(code.getText(), "el código"),
+                Formulario.errorObligatorio(type.getText(), "el tipo"),
+                Formulario.errorNumero(capacity.getText(), "La capacidad", "0", false, true)));
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new ContainerRequest(code.getText(), type.getText(), new BigDecimal(capacity.getText()), state.getValue()) : null);
         return dialog.showAndWait();
@@ -568,6 +580,7 @@ final class PersonaOneDialogs {
         Formulario.ayuda(grid, 1, "Opcional");
         Formulario.obligatorios(grid, "Tipo", "Estado");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.errorObligatorio(type.getText(), "el tipo"));
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new SensorRequest(type.getText(), manufacturer.getText(),
                 initial == null ? Instant.now() : initial.installationDate(), state.getValue()) : null);
@@ -659,8 +672,13 @@ final class PersonaOneDialogs {
                             .map(OrganizationResponse::businessName).orElse("Proveedor") + " (" + o.service() + ")").toList()));
             showOthers.run();
             Button addSupplier = new Button("Agregar otro proveedor");
+            java.util.function.Supplier<String> supplierError = () -> supplier.getValue() == null ? null
+                    : Formulario.primerError(Formulario.errorObligatorio(service.getText(), "el servicio del proveedor"),
+                    Formulario.errorNumero(supplierCost.getText(), "El costo del proveedor", "0", true, true));
             addSupplier.setOnAction(e -> run(() -> {
                 if (supplier.getValue() == null) return;
+                String error = supplierError.get();
+                if (error != null) { showError(error); return; }
                 List<RouteSupplierRequest> merged = mergeSuppliers(new RouteSupplierRequest(supplier.getValue().id(),
                         service.getText(), decimal(supplierCost.getText())), otherSuppliers);
                 otherSuppliers.clear(); otherSuppliers.addAll(merged);
@@ -700,6 +718,29 @@ final class PersonaOneDialogs {
             Formulario.obligatorios(grid, "Orden", "Origen", "Destino", "Medio", "Estado");
             ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true); scroll.setPrefViewportHeight(520);
             dialog.getDialogPane().setContent(scroll);
+            Formulario.validarAlGuardar(dialog, () -> {
+                String error = Formulario.primerError(
+                        Formulario.errorObligatorio(origin.getText(), "el origen"),
+                        Formulario.errorObligatorio(destination.getText(), "el destino"),
+                        Formulario.errorInstante(departure.getText(), "La salida"),
+                        Formulario.errorInstante(estimatedArrival.getText(), "La llegada estimada"),
+                        Formulario.errorInstante(actualArrival.getText(), "La llegada real"),
+                        Formulario.errorNumero(estimatedCost.getText(), "El costo estimado", "0", true, false),
+                        Formulario.errorNumero(actualCost.getText(), "El costo real", "0", true, false),
+                        vehicle.getValue() != null && operator.getValue() == null ? "El vehículo requiere un operador" : null,
+                        "FINALIZADO".equals(state.getValue()) && actualArrival.getText().isBlank()
+                                ? "Un tramo finalizado requiere fecha de llegada real" : null,
+                        supplierError.get());
+                if (error != null) return error;
+                Instant salida = parseInstant(departure.getText());
+                Instant estimada = parseInstant(estimatedArrival.getText());
+                Instant real = parseInstant(actualArrival.getText());
+                if (salida != null && estimada != null && estimada.isBefore(salida)) {
+                    return "La llegada estimada no puede ser anterior a la salida";
+                }
+                return salida != null && real != null && real.isBefore(salida)
+                        ? "La llegada real no puede ser anterior a la salida" : null;
+            });
             dialog.setResultConverter(b -> {
                 if (b.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
                 RouteSupplierRequest edited = supplier.getValue() == null ? null
@@ -768,6 +809,8 @@ final class PersonaOneDialogs {
                 TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).minusMonths(1).toString());
                 input.setHeaderText("Período a cerrar (primer día del mes)");
                 input.showAndWait().ifPresent(value -> run(() -> {
+                    String error = Formulario.errorFecha(value, "El período");
+                    if (error != null) { showError(error); return; }
                     AccountCloseResponse result = api.closeAccount(selected.id(), new CloseAccountRequest(LocalDate.parse(value))).join();
                     info("Cierre mensual", "Período " + result.period() + " cerrado. Saldo inicial: " + result.initialBalance()
                             + ". Débitos: " + result.debits() + ". Créditos: " + result.credits()
@@ -779,6 +822,8 @@ final class PersonaOneDialogs {
                 TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).minusMonths(1).toString());
                 input.setHeaderText("Período a cerrar en todas las cuentas (primer día del mes)");
                 input.showAndWait().ifPresent(value -> run(() -> {
+                    String error = Formulario.errorFecha(value, "El período");
+                    if (error != null) { showError(error); return; }
                     AutomaticCloseResponse result = api.closeAllAccounts(new CloseAccountRequest(LocalDate.parse(value))).join();
                     info("Cierre mensual", "Cuentas cerradas: " + result.closed() + ". Ya cerradas: " + result.skipped());
                 }));
@@ -821,6 +866,12 @@ final class PersonaOneDialogs {
         Formulario.ayuda(grid, 4, "Generada sola: evita duplicar la factura");
         Formulario.obligatorios(grid, "Concepto", "Cantidad", "Precio unitario", "Vencimiento", "Clave idempotente");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.primerError(
+                Formulario.errorObligatorio(concept.getText(), "el concepto"),
+                Formulario.errorNumero(quantity.getText(), "La cantidad", "0", false, true),
+                Formulario.errorNumero(price.getText(), "El precio unitario", "0", true, true),
+                Formulario.errorFecha(due.getText(), "El vencimiento"),
+                Formulario.errorObligatorio(key.getText(), "la clave idempotente")));
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new InvoiceRequest(account.ownerType(), account.ownerId(), null, LocalDate.parse(due.getText()),
                 key.getText(), List.of(new InvoiceLineRequest(concept.getText(), decimal(quantity.getText()),
@@ -842,6 +893,9 @@ final class PersonaOneDialogs {
         Formulario.ayuda(grid, 3, "Generada sola: evita duplicar el pago");
         Formulario.obligatorios(grid, "Monto", "Medio", "Clave idempotente");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.primerError(
+                Formulario.errorNumero(amount.getText(), "El monto", "0", false, true),
+                Formulario.errorObligatorio(key.getText(), "la clave idempotente")));
         dialog.setResultConverter(b -> b.getButtonData() == ButtonBar.ButtonData.OK_DONE
                 ? new PaymentRequest(decimal(amount.getText()), method.getValue(), key.getText(), reference.getText()) : null);
         return dialog.showAndWait();

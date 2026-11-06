@@ -39,6 +39,26 @@ class FormularioCuitTest {
     }
 
     @Test
+    void avisaLosNumerosYFechasMalEscritos() {
+        assertNull(Formulario.errorNumero("12.5", "El monto", "0", false, true));
+        assertNull(Formulario.errorNumero("0", "El volumen", "0", true, true));
+        assertNull(Formulario.errorNumero("", "El costo", "0", true, false));
+        assertNotNull(Formulario.errorNumero("", "El monto", "0", false, true));
+        assertNotNull(Formulario.errorNumero("0", "El monto", "0", false, true));
+        assertNotNull(Formulario.errorNumero("-1", "El volumen", "0", true, true));
+        assertNotNull(Formulario.errorNumero("12,5", "El monto", "0", false, true));
+        assertNotNull(Formulario.errorNumero("abc", "El monto", "0", false, true));
+        assertNull(Formulario.errorInstante("", "La salida"));
+        assertNull(Formulario.errorInstante("2026-12-01T15:00:00Z", "La salida"));
+        assertNotNull(Formulario.errorInstante("01/12/2026", "La salida"));
+        assertNull(Formulario.errorFecha("2026-12-01", "El vencimiento"));
+        assertNotNull(Formulario.errorFecha("", "El vencimiento"));
+        assertNotNull(Formulario.errorFecha("2026-13-01", "El vencimiento"));
+        assertEquals("El primero", Formulario.primerError(null, "El primero", "El segundo"));
+        assertNull(Formulario.primerError(null, null));
+    }
+
+    @Test
     void armaElCodigoDeUbicacionConPaisYNombre() {
         assertEquals("ARROS", Formulario.codigoUbicacion("Argentina", "Rosario", java.util.Set.of()));
         assertEquals("ESMAL", Formulario.codigoUbicacion("España", "Málaga", java.util.Set.of()));

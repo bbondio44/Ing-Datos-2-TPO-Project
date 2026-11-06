@@ -14,7 +14,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
+import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
@@ -62,6 +66,51 @@ final class Formulario {
         if (!limpio.matches("\\d{11}")) return "El CUIT debe tener 11 dígitos, sin guiones ni espacios";
         return digitoVerificador(limpio) == limpio.charAt(10) - '0' ? null
                 : "El CUIT no es válido: no coincide el último dígito. Podés usar el botón Generar";
+    }
+
+    /** El primer error de la lista, o null si todos los campos están bien. */
+    static String primerError(String... errores) {
+        for (String error : errores) if (error != null) return error;
+        return null;
+    }
+
+    static String errorObligatorio(String texto, String campo) {
+        return texto == null || texto.isBlank() ? "Completá " + campo : null;
+    }
+
+    /** Un número con mínimo. Con incluyeMinimo false el valor tiene que ser mayor; vacío solo vale si es opcional. */
+    static String errorNumero(String texto, String campo, String minimo, boolean incluyeMinimo, boolean obligatorio) {
+        if (texto == null || texto.isBlank()) return obligatorio ? "Completá " + campo : null;
+        BigDecimal valor;
+        try {
+            valor = new BigDecimal(texto.strip());
+        } catch (NumberFormatException exception) {
+            return campo + " debe ser un número. Los decimales van con punto, por ejemplo 12.5";
+        }
+        int comparacion = valor.compareTo(new BigDecimal(minimo));
+        if (incluyeMinimo ? comparacion >= 0 : comparacion > 0) return null;
+        return campo + " debe ser " + (incluyeMinimo ? minimo + " o más" : "mayor a " + minimo);
+    }
+
+    /** Fecha y hora UTC opcional. */
+    static String errorInstante(String texto, String campo) {
+        if (texto == null || texto.isBlank()) return null;
+        try {
+            Instant.parse(texto.strip());
+            return null;
+        } catch (DateTimeParseException exception) {
+            return campo + " no es válida. Usá el formato 2026-12-01T15:00:00Z";
+        }
+    }
+
+    static String errorFecha(String texto, String campo) {
+        if (texto == null || texto.isBlank()) return "Completá " + campo;
+        try {
+            LocalDate.parse(texto.strip());
+            return null;
+        } catch (DateTimeParseException exception) {
+            return campo + " no es válida. Usá el formato AAAA-MM-DD, por ejemplo 2026-12-01";
+        }
     }
 
     /** Dos letras del país y tres del nombre, como ARROS; si ese ya existe, le suma un número. */
