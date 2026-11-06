@@ -779,7 +779,7 @@ public class CapturasPantallas extends Application {
     }
 
     private void guiaEnvioCompleto() throws Exception {
-        String origen = "Origen " + marca;
+        String origen = "Santa Fe";
         Window envios = abrir("Envíos");
         espera(1000);
         Window catalogos = abrirCon(() -> click(boton(envios, "Catálogos contenedores/sensores")));
@@ -799,9 +799,11 @@ public class CapturasPantallas extends Application {
         cerrar(catalogos);
 
         Window nuevo = abrirCon(() -> click(boton(envios, "Nuevo envío")));
-        escribir(nuevo, "Origen", origen);
-        escribir(nuevo, "Destino", "Destino guia");
-        escribir(nuevo, "País destino", "Brasil");
+        elegir(nuevo, "Origen", "Buenos Aires");
+        elegir(nuevo, "Destino", origen);
+        escribir(nuevo, "Volumen m³", "10");
+        espera(2000);
+        verificar("R24 el formulario muestra la ruta y el precio", textos(nuevo).contains("531 km") && textos(nuevo).contains("Rosario"));
         click(boton(nuevo, "Guardar"));
         esperarCierre(nuevo);
         espera(1500);
@@ -854,13 +856,14 @@ public class CapturasPantallas extends Application {
             return null;
         });
         espera(1200);
+        verificar("R24 el envio nuevo trae los tramos de su ruta", filas(trayectos, 0) == 2);
         Window tramo = abrirCon(() -> click(boton(trayectos, "Nuevo tramo")));
         escribir(tramo, "Origen", "Punto A");
         escribir(tramo, "Destino", "Punto B");
         click(boton(tramo, "Guardar"));
         esperarCierre(tramo);
         espera(1500);
-        verificar("R24 el tramo aparece", filas(trayectos, 0) == 1);
+        verificar("R24 el tramo aparece", filas(trayectos, 0) == 3);
         seleccionar(tabla(trayectos, 0), "Punto A");
         Window edicion = abrirCon(() -> click(boton(trayectos, "Editar")));
         elegir(edicion, "Estado", "EN_CURSO");
@@ -876,7 +879,7 @@ public class CapturasPantallas extends Application {
         esperarCierre(edicion);
         espera(1500);
         verificar("R24 el tramo queda EN_CURSO con dos proveedores", fx(() -> {
-            String fila = visibleEnFx(trayectos, TableView.class).getFirst().getItems().getFirst().toString();
+            String fila = visibleEnFx(trayectos, TableView.class).getFirst().getItems().getLast().toString();
             return fila.contains("state=EN_CURSO") && fila.split("supplierName=", -1).length == 3;
         }));
         captura(trayectos, "dos-proveedores", "R24", "R04");
@@ -889,7 +892,7 @@ public class CapturasPantallas extends Application {
         seleccionar(tabla(trayectos, 0), "Punto A");
         click(boton(trayectos, "Eliminar"));
         espera(1500);
-        verificar("R24 el tramo se elimina", filas(trayectos, 0) == 0);
+        verificar("R24 el tramo se elimina", filas(trayectos, 0) == 2);
         cerrar(trayectos);
     }
 

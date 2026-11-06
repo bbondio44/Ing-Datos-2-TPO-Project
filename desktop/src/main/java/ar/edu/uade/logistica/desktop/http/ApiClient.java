@@ -38,6 +38,9 @@ import ar.edu.uade.logistica.contracts.iot.SensorEstadoResponse;
 import ar.edu.uade.logistica.contracts.report.*;
 import ar.edu.uade.logistica.contracts.route.RouteLegRequest;
 import ar.edu.uade.logistica.contracts.route.RouteLegResponse;
+import ar.edu.uade.logistica.contracts.rutas.CotizacionResponse;
+import ar.edu.uade.logistica.contracts.rutas.PuntoRutaResponse;
+import ar.edu.uade.logistica.contracts.rutas.ViajeRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -307,6 +310,19 @@ public class ApiClient {
 
     public CompletableFuture<ShipmentDetailResponse> shipment(UUID id) {
         return send("GET", "/api/v1/envios/" + id, null, ShipmentDetailResponse.class, true);
+    }
+
+    public CompletableFuture<List<PuntoRutaResponse>> routePoints() {
+        return send("GET", "/api/v1/rutas/puntos", null, new TypeReference<>() {}, true);
+    }
+
+    public CompletableFuture<CotizacionResponse> quoteRoute(String origin, String destination, java.math.BigDecimal volume, boolean air) {
+        return send("GET", "/api/v1/rutas/cotizacion?origen=" + origin + "&destino=" + destination
+                + "&volumen=" + volume.toPlainString() + "&aereo=" + air, null, CotizacionResponse.class, true);
+    }
+
+    public CompletableFuture<ShipmentResponse> createTrip(ViajeRequest request) {
+        return send("POST", "/api/v1/rutas/viajes", request, ShipmentResponse.class, true);
     }
 
     public CompletableFuture<ShipmentResponse> createShipment(ShipmentRequest request) {

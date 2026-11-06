@@ -16,6 +16,10 @@ import ar.edu.uade.logistica.contracts.report.*;
 import ar.edu.uade.logistica.contracts.route.RouteLegRequest;
 import ar.edu.uade.logistica.contracts.route.RouteLegResponse;
 import ar.edu.uade.logistica.contracts.route.RouteSupplierRequest;
+import ar.edu.uade.logistica.contracts.rutas.CotizacionResponse;
+import ar.edu.uade.logistica.contracts.rutas.PuntoRutaResponse;
+import ar.edu.uade.logistica.contracts.rutas.TramoCotizadoResponse;
+import ar.edu.uade.logistica.contracts.rutas.ViajeRequest;
 import ar.edu.uade.logistica.desktop.http.ApiClient;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -309,7 +313,8 @@ final class PersonaOneDialogs {
         Button create = new Button("Nuevo envío");
         create.setDisable(!session.permissions().contains("ENVIOS_ESCRIBIR"));
         create.setOnAction(e -> run(() -> {
-            shipmentDialog(null, api.clients("").join().content()).ifPresent(req -> api.createShipment(req).join());
+            newShipmentDialog(api.clients("").join().content(), api.routePoints().join())
+                    .ifPresent(req -> api.createTrip(req).join());
             reload.run();
         }));
         Button edit = new Button("Editar");
@@ -348,6 +353,81 @@ final class PersonaOneDialogs {
         dialog.getDialogPane().setContent(pane(actions, table, status));
         reload.run();
         dialog.showAndWait();
+    }
+
+    /** Un envío nuevo se arma sobre la red de rutas: al elegir origen y destino se ven el camino y el precio. */
+    private Optional<ViajeRequest> newShipmentDialog(List<ClientResponse> clients, List<PuntoRutaResponse> points) {
+        Dialog<ViajeRequest> dialog = resultDialog("Nuevo envío");
+        List<PuntoRutaResponse> places = points.stream().filter(p -> !"ALTA_MAR".equals(p.tipo())).toList();
+        ComboBox<ClientResponse> client = combo(clients, c -> c.businessName() + " — " + value(c.cuit()));
+        ComboBox<PuntoRutaResponse> origin = comboWithEmpty(places, p -> p.nombre() + " — " + p.pais());
+        ComboBox<PuntoRutaResponse> destination = comboWithEmpty(places, p -> p.nombre() + " — " + p.pais());
+        origin.setPromptText("Elegí el origen");
+        destination.setPromptText("Elegí el destino");
+        CheckBox air = new CheckBox("Permitir avión");
+        TextField estimated = text(null);
+        estimated.setPromptText("2026-12-01T15:00:00Z");
+        ComboBox<String> priority = new ComboBox<>(FXCollections.observableArrayList("BAJA", "NORMAL", "ALTA", "URGENTE"));
+        priority.setValue("NORMAL");
+        TextField volume = text("1");
+        Label route = new Label("Elegí origen y destino para ver la ruta y el precio");
+        route.setWrapText(true);
+        route.setMaxWidth(520);
+        Runnable quote = () -> {
+            PuntoRutaResponse from = origin.getValue();
+            PuntoRutaResponse to = destination.getValue();
+            String error = Formulario.errorNumero(volume.getText(), "El volumen", "0", false, true);
+            if (from == null || to == null) route.setText("Elegí origen y destino para ver la ruta y el precio");
+            else if (from.equals(to)) route.setText("El origen y el destino tienen que ser distintos");
+            else if (error != null) route.setText(error);
+            else {
+                route.setText("Calculando...");
+                api.quoteRoute(from.codigo(), to.codigo(), decimal(volume.getText()), air.isSelected())
+                        .whenComplete((result, failure) -> javafx.application.Platform.runLater(() -> {
+                            if (from != origin.getValue() || to != destination.getValue()) return;
+                            route.setText(failure != null ? rootMessage(failure) : routeSummary(result));
+                        }));
+            }
+        };
+        origin.valueProperty().addListener((obs, before, now) -> quote.run());
+        destination.valueProperty().addListener((obs, before, now) -> quote.run());
+        air.selectedProperty().addListener((obs, before, now) -> quote.run());
+        volume.textProperty().addListener((obs, before, now) -> quote.run());
+        GridPane grid = grid();
+        grid.addRow(0, new Label("Cliente"), client);
+        grid.addRow(1, new Label("Origen"), origin);
+        grid.addRow(2, new Label("Destino"), destination);
+        grid.addRow(3, new Label("Transporte"), air);
+        grid.addRow(4, new Label("Entrega estimada UTC"), estimated);
+        grid.addRow(5, new Label("Prioridad"), priority);
+        grid.addRow(6, new Label("Volumen m³"), volume);
+        grid.add(new Label("Ruta y precio"), 0, 7);
+        grid.add(route, 1, 7, 2, 1);
+        Formulario.ayuda(grid, 0, "Debe estar activo");
+        Formulario.ayuda(grid, 3, "Sin tildar va por tierra y mar");
+        Formulario.ayuda(grid, 4, "Opcional. Ejemplo: 2026-12-01T15:00:00Z");
+        Formulario.ayuda(grid, 6, "Mayor a 0. Decimales con punto");
+        Formulario.obligatorios(grid, "Cliente", "Origen", "Destino", "Prioridad", "Volumen m³");
+        dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> Formulario.primerError(
+                client.getValue() == null ? "Elegí el cliente" : null,
+                origin.getValue() == null ? "Elegí el origen" : null,
+                destination.getValue() == null ? "Elegí el destino" : null,
+                origin.getValue() != null && origin.getValue().equals(destination.getValue())
+                        ? "El origen y el destino tienen que ser distintos" : null,
+                Formulario.errorInstante(estimated.getText(), "La entrega estimada"),
+                Formulario.errorNumero(volume.getText(), "El volumen", "0", false, true)));
+        dialog.setResultConverter(button -> button.getButtonData() != ButtonBar.ButtonData.OK_DONE ? null
+                : new ViajeRequest(client.getValue().id(), origin.getValue().codigo(), destination.getValue().codigo(),
+                air.isSelected(), parseInstant(estimated.getText()), priority.getValue(), decimal(volume.getText())));
+        return dialog.showAndWait();
+    }
+
+    private static String routeSummary(CotizacionResponse quote) {
+        List<String> names = new ArrayList<>(quote.tramos().stream().map(t -> t.origen().nombre()).toList());
+        names.add(quote.tramos().getLast().destino().nombre());
+        String transports = String.join(" + ", quote.tramos().stream().map(TramoCotizadoResponse::medio).distinct().toList());
+        return String.format("%,d km · $%,.2f · %s%n%s", quote.km(), quote.total(), transports, String.join(" → ", names));
     }
 
     private Optional<ShipmentRequest> shipmentDialog(ShipmentResponse initial, List<ClientResponse> clients) {
@@ -626,14 +706,15 @@ final class PersonaOneDialogs {
             Button create = new Button("Nuevo tramo");
             create.setOnAction(e -> {
                 if (shipment.getValue() == null) return;
-                routeDialog(null, shipment.getValue().id()).ifPresent(req -> run(() -> {
+                int next = table.getItems().stream().mapToInt(RouteLegResponse::order).max().orElse(0) + 1;
+                routeDialog(null, shipment.getValue().id(), next).ifPresent(req -> run(() -> {
                     api.createRouteLeg(req).join(); reload.run();
                 }));
             });
             Button edit = new Button("Editar");
             edit.setOnAction(e -> {
                 var selected = table.getSelectionModel().getSelectedItem();
-                if (selected != null) routeDialog(selected, selected.shipmentId()).ifPresent(req -> run(() -> {
+                if (selected != null) routeDialog(selected, selected.shipmentId(), selected.order()).ifPresent(req -> run(() -> {
                     api.updateRouteLeg(selected.id(), req).join(); reload.run();
                 }));
             });
@@ -651,14 +732,14 @@ final class PersonaOneDialogs {
         });
     }
 
-    private Optional<RouteLegRequest> routeDialog(RouteLegResponse initial, UUID shipmentId) {
+    private Optional<RouteLegRequest> routeDialog(RouteLegResponse initial, UUID shipmentId, int suggestedOrder) {
         return runResult(() -> {
             List<OrganizationResponse> operators = api.organizations("operadores", "").join().content();
             List<OrganizationResponse> suppliers = api.organizations("proveedores", "").join().content();
             List<VehicleResponse> vehicles = api.vehicles("").join().content();
             List<LocationResponse> locations = api.locations("").join().content();
             Dialog<RouteLegRequest> dialog = resultDialog(initial == null ? "Nuevo tramo" : "Editar tramo");
-            Spinner<Integer> order = new Spinner<>(1, 999, initial == null ? 1 : initial.order());
+            Spinner<Integer> order = new Spinner<>(1, 999, suggestedOrder);
             TextField origin = text(initial == null ? null : initial.origin());
             TextField destination = text(initial == null ? null : initial.destination());
             ComboBox<LocationResponse> originLocation = comboWithEmpty(locations, l -> l.code() + " — " + l.name());
