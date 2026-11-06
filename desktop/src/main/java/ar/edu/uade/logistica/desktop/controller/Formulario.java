@@ -30,9 +30,14 @@ final class Formulario {
     static void cuit(GridPane grid, int fila, TextField campo) {
         Button generar = new Button("Generar");
         generar.setOnAction(event -> campo.setText(generarCuit()));
-        Label ayuda = new Label("Opcional. 11 dígitos sin guiones, válido y no repetido");
+        conBoton(grid, fila, generar, "Opcional. 11 dígitos sin guiones, válido y no repetido");
+    }
+
+    /** Pone a la derecha de un campo un botón que lo completa, junto a la aclaración de sus requisitos. */
+    static void conBoton(GridPane grid, int fila, Button boton, String texto) {
+        Label ayuda = new Label(texto);
         ayuda.setStyle(GRIS);
-        HBox contenido = new HBox(8, generar, ayuda);
+        HBox contenido = new HBox(8, boton, ayuda);
         contenido.setAlignment(Pos.CENTER_LEFT);
         grid.add(contenido, 2, fila);
     }

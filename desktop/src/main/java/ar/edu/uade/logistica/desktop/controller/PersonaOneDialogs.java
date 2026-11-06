@@ -136,6 +136,22 @@ final class PersonaOneDialogs {
         else if (initial.supplierId() != null) { ownerType.setValue("PROVEEDOR"); ownerId.setText(initial.supplierId().toString()); }
         else if (initial.operatorId() != null) { ownerType.setValue("OPERADOR"); ownerId.setText(initial.operatorId().toString()); }
         else ownerType.setValue("SIN ORGANIZACIÓN");
+        ownerType.valueProperty().addListener((obs, before, now) -> ownerId.clear());
+        Button chooseOwner = new Button("Elegir…");
+        chooseOwner.disableProperty().bind(ownerType.valueProperty().isEqualTo("SIN ORGANIZACIÓN"));
+        chooseOwner.setOnAction(event -> run(() -> {
+            if ("CLIENTE".equals(ownerType.getValue())) {
+                choice("Cliente titular", api.clients("").join().content().stream()
+                        .filter(c -> "ACTIVO".equals(c.state())).toList(),
+                        c -> c.businessName() + " — " + value(c.cuit()))
+                        .showAndWait().ifPresent(c -> ownerId.setText(c.id().toString()));
+            } else {
+                String resource = "PROVEEDOR".equals(ownerType.getValue()) ? "proveedores" : "operadores";
+                choice("Organización titular", api.organizations(resource, "").join().content().stream()
+                        .filter(o -> "ACTIVO".equals(o.state())).toList(), OrganizationResponse::businessName)
+                        .showAndWait().ifPresent(o -> ownerId.setText(o.id().toString()));
+            }
+        }));
         ListView<RoleResponse> roleList = new ListView<>(FXCollections.observableArrayList(roles));
         roleList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         roleList.setCellFactory(ignored -> listCell(r -> r.description() + " — " + r.permissions().size() + " permisos"));
@@ -157,7 +173,7 @@ final class PersonaOneDialogs {
         grid.addRow(6, new Label("Roles"), roleList);
         Formulario.ayuda(grid, 2, "Formato nombre@dominio.com, no repetido");
         Formulario.ayuda(grid, 3, initial == null ? "Mínimo 12 caracteres" : "Mínimo 12 caracteres. Vacía conserva la actual");
-        Formulario.ayuda(grid, 5, "Solo si el usuario pertenece a un cliente, proveedor u operador");
+        Formulario.conBoton(grid, 5, chooseOwner, "Solo si pertenece a un cliente, proveedor u operador");
         Formulario.ayuda(grid, 6, "Al menos uno. Ctrl + clic para elegir varios");
         if (initial == null) Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Contraseña", "Roles");
         else Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Roles");
