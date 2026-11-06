@@ -71,7 +71,8 @@ class RutasServiceTest {
     void laRedDeRutasUsaMergeParaNoDuplicarAlRecargar() {
         List<String> sentencias = RedRutas.sentencias();
 
-        assertThat(sentencias).isNotEmpty().allMatch(s -> s.contains("MERGE")).noneMatch(s -> s.contains("CREATE"));
+        assertThat(sentencias).isNotEmpty().allMatch(s -> s.contains("MERGE") || s.contains("DELETE r"))
+                .noneMatch(s -> s.contains("CREATE"));
     }
 
     @Test

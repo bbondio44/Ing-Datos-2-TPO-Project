@@ -39,9 +39,9 @@ public class RutasService {
             ORDER BY p.pais, p.nombre
             """;
     // La relación se guarda una sola vez y se recorre sin dirección: el viaje puede ir para los dos lados.
-    // El viaje más largo de la red, Callao a Valencia, tiene 18 saltos.
+    // El viaje más largo de la red, Callao a Valencia, tiene 20 saltos. Si la red crece, revisar este límite.
     private static final String CAMINOS = """
-            MATCH p=(a:Punto {codigo: $origen})-[:CONECTA*1..20]-(b:Punto {codigo: $destino})
+            MATCH p=(a:Punto {codigo: $origen})-[:CONECTA*1..24]-(b:Punto {codigo: $destino})
             RETURN p
             """;
 

@@ -45,7 +45,7 @@ La red es un dato de referencia que vive solo en Neo4j: está en `backend/src/ma
 y el worker la carga al arrancar con `MERGE`, así que cargarla otra vez no duplica nada.
 
 Cada conexión se guarda una vez y se recorre sin dirección. La búsqueda usa lo visto en clase, un camino con saltos
-limitados (`MATCH p=(a)-[:CONECTA*1..20]-(b) RETURN p`), y la aplicación elige el de menos km.
+limitados (`MATCH p=(a)-[:CONECTA*1..24]-(b) RETURN p`), y la aplicación elige el de menos km.
 
 ## Restricciones e índices
 
