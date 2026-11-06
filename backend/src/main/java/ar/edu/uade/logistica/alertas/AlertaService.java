@@ -39,6 +39,7 @@ public class AlertaService {
     private static final String SENSORES_VIGENTES = """
             SELECT id_sensor, id_contenedor, id_envio, id_cliente
               FROM tp_logistica.v_envio_contenedor_sensor_activo
+             WHERE id_sensor IS NOT NULL
             """;
 
     private final JdbcTemplate jdbcTemplate;
