@@ -1,0 +1,25 @@
+﻿=== R17 monitoreo: un envio con datos de los tres motores
+     Postgres: CÃ³rdoba -> Puerto de Santos, EN_TRANSITO, contenedores=2
+     Cassandra: lecturas=4 posiciones=2
+     Mongo: eventos=10 alertas=2; Postgres incidentes=0
+OK    trae lecturas: esperado=True obtenido=True
+OK    trae eventos: esperado=True obtenido=True
+OK    envio inexistente: esperado=404 obtenido=404
+=== R40 R17 R26 usuario con rol CLIENTE: ve lo suyo
+OK    todas sus alertas son suyas: esperado=0 obtenido=0
+     alertas visibles: 2
+OK    monitoreo de su envio: esperado=200 obtenido=200
+OK    su red en el grafo: esperado=200 obtenido=200
+OK    sus predicciones: esperado=200 obtenido=200
+OK    su desempeno: esperado=200 obtenido=200
+OK    pedir un reporte propio: esperado=201 obtenido=201
+     sensores visibles: 6
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R17 monitoreo: un envio con datos de los tres motores
+     Postgres: CÃ³rdoba -> Puerto de Santos, EN_TRANSITO, contenedores=2
+     Cassandra: lecturas=4 posiciones=2
+     Mongo: eventos=10 alertas=2; Postgres incidentes=0
+OK    trae lecturas: esperado=True obtenido=True
+OK    trae eventos: esperado=True obtenido=True
+OK    envio inexistente: esperado=404 obtenido=404

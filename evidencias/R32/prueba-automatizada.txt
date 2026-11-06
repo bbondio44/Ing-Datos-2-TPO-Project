@@ -1,0 +1,10 @@
+﻿=== R32 anomalia de temperatura
+OK    anomalia detectada: esperado=1 obtenido=1
+OK    con la lectura que la causo: esperado=311d6ce5-fb9b-48cc-a65c-dc99c5d44d15 obtenido=311d6ce5-fb9b-48cc-a65c-dc99c5d44d15
+     z=47.765049984271975 umbral=3.0 severidad=MEDIA
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R32 anomalia de temperatura
+OK    anomalia detectada: esperado=1 obtenido=1
+OK    con la lectura que la causo: esperado=f1037ed8-8ce3-44d4-bd4f-1c4bd60c760c obtenido=f1037ed8-8ce3-44d4-bd4f-1c4bd60c760c
+     z=47.765049984271975 umbral=3.0 severidad=MEDIA

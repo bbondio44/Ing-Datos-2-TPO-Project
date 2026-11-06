@@ -1,0 +1,16 @@
+﻿=== R31 desempeno por periodo
+     2026-08-01: creados=1 entregados=1 fuera_plazo=0 horas=384.00
+     2026-09-01: creados=2 entregados=2 fuera_plazo=1 horas=252.00
+     2026-10-01: creados=21 entregados=15 fuera_plazo=0 horas=64.60
+     2026-11-01: creados=2 entregados=0 fuera_plazo=0 horas=
+OK    mas de un periodo: esperado=True obtenido=True
+OK    creados igual que Postgres: esperado=26 obtenido=26
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R31 desempeno por periodo
+     2026-08-01: creados=1 entregados=1 fuera_plazo=0 horas=384.00
+     2026-09-01: creados=2 entregados=2 fuera_plazo=1 horas=252.00
+     2026-10-01: creados=21 entregados=15 fuera_plazo=0 horas=64.60
+     2026-11-01: creados=2 entregados=0 fuera_plazo=0 horas=
+OK    mas de un periodo: esperado=True obtenido=True
+OK    creados igual que Postgres: esperado=26 obtenido=26

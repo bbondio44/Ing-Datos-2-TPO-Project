@@ -1,0 +1,8 @@
+﻿=== R20 recorrido
+OK    posiciones (solo con GPS): esperado=5 obtenido=5
+     primera=(-33.28027,-56.88948) ultima=(-32.9529,-56.51672)
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase1.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R20 recorrido
+OK    posiciones (solo con GPS): esperado=5 obtenido=5
+     primera=(-33.28027,-56.88948) ultima=(-32.9529,-56.51672)

@@ -1,0 +1,12 @@
+﻿=== R23 tarea periodica
+     alertas del sensor: INACTIVIDADx1 BATERIAx1 BATERIAx1 TEMPERATURAx1
+OK    alerta de inactividad: esperado=True obtenido=True
+OK    alerta de bateria: esperado=True obtenido=True
+     mensaje: Sensor sin lecturas hace 2 minutos
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R23 tarea periodica
+     alertas del sensor: INACTIVIDADx3 BATERIAx1 BATERIAx1 TEMPERATURAx1
+OK    alerta de inactividad: esperado=True obtenido=True
+OK    alerta de bateria: esperado=True obtenido=True
+     mensaje: Sensor sin lecturas hace 2 minutos

@@ -1,0 +1,57 @@
+﻿=== R09/R26/R25 lectura que supera la regla
+OK    POST lectura 60 C: esperado=201 obtenido=201
+OK    una alerta para la regla: esperado=1 obtenido=1
+OK    guarda la lectura que la causo: esperado=48d1e688-531d-4e43-bba0-0df304da9770 obtenido=48d1e688-531d-4e43-bba0-0df304da9770
+OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
+OK    alerta ALTA con incidente: esperado=True obtenido=True
+OK    incidente existe en Postgres: esperado=1 obtenido=1
+OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
+=== R26 deduplicacion (D04)
+OK    segunda lectura: esperado=201 obtenido=201
+OK    sigue una sola alerta: esperado=1 obtenido=1
+OK    ocurrencias suma: esperado=2 obtenido=2
+OK    reenvio no suma ocurrencia: esperado=3 obtenido=3
+=== R26 ciclo de estados
+OK    reconocer: esperado=204 obtenido=204
+OK    reconocer de nuevo: esperado=409 obtenido=409
+OK    cerrar: esperado=204 obtenido=204
+OK    cerrar de nuevo: esperado=409 obtenido=409
+OK    alerta inexistente: esperado=404 obtenido=404
+OK    reapertura tras cerrar: esperado=2 obtenido=2
+OK    una sola activa: esperado=1 obtenido=1
+=== R40 R17 R26 usuario con rol CLIENTE: ve lo suyo
+OK    todas sus alertas son suyas: esperado=0 obtenido=0
+     alertas visibles: 2
+OK    monitoreo de su envio: esperado=200 obtenido=200
+OK    su red en el grafo: esperado=200 obtenido=200
+OK    sus predicciones: esperado=200 obtenido=200
+OK    su desempeno: esperado=200 obtenido=200
+OK    pedir un reporte propio: esperado=201 obtenido=201
+     sensores visibles: 6
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R09/R26/R25 lectura que supera la regla
+OK    POST lectura 60 C: esperado=201 obtenido=201
+OK    una alerta para la regla: esperado=1 obtenido=1
+OK    guarda la lectura que la causo: esperado=c8c1e9e8-1c17-492b-841e-f1d7884c897f obtenido=c8c1e9e8-1c17-492b-841e-f1d7884c897f
+OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
+OK    alerta ALTA con incidente: esperado=True obtenido=True
+OK    incidente existe en Postgres: esperado=1 obtenido=1
+OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R26 deduplicacion (D04)
+OK    segunda lectura: esperado=201 obtenido=201
+OK    sigue una sola alerta: esperado=1 obtenido=1
+OK    ocurrencias suma: esperado=2 obtenido=2
+OK    reenvio no suma ocurrencia: esperado=3 obtenido=3
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R26 ciclo de estados
+OK    reconocer: esperado=204 obtenido=204
+OK    reconocer de nuevo: esperado=409 obtenido=409
+OK    cerrar: esperado=204 obtenido=204
+OK    cerrar de nuevo: esperado=409 obtenido=409
+OK    alerta inexistente: esperado=404 obtenido=404
+OK    reapertura tras cerrar: esperado=2 obtenido=2
+OK    una sola activa: esperado=1 obtenido=1

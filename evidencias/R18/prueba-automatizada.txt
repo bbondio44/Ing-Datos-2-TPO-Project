@@ -1,0 +1,94 @@
+﻿sensor demo = cb6a673c-14a5-5469-a365-30fe9700c80b
+contenedor  = 4a15062a-049f-545e-b35b-911aefcc1d60
+=== 1. Serie de 3 lecturas consecutivas con GPS
+OK    POST lectura -3 min: esperado=201 obtenido=201
+OK    POST lectura -2 min: esperado=201 obtenido=201
+OK    POST lectura -1 min: esperado=201 obtenido=201
+OK    lecturas_por_sensor_dia +3: esperado=3 obtenido=3
+OK    lecturas_por_contenedor_dia +3: esperado=3 obtenido=3
+OK    posiciones_por_contenedor_dia +3: esperado=3 obtenido=3
+=== 2. Reenvio de la misma lectura
+OK    POST reenvio: esperado=201 obtenido=201
+OK    no duplica: esperado=3 obtenido=3
+=== 3. Lectura tardia, 2 horas atras
+OK    ultima = la mas nueva antes de la tardia: esperado=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e obtenido=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e
+OK    POST tardia: esperado=201 obtenido=201
+OK    historial +1: esperado=4 obtenido=4
+OK    tardia no pisa ultima_lectura: esperado=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e obtenido=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e
+     fila:  b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e |           6
+OK    tardia no pisa ultima_posicion: esperado=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e obtenido=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e
+=== 4. Lectura sin GPS
+OK    POST sin GPS: esperado=201 obtenido=201
+OK    posiciones sin cambios: esperado=4 obtenido=4
+OK    ultima_posicion sin cambios: esperado=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e obtenido=b8a9bd97-fb96-48d6-9d4b-b1d6fde3461e
+OK    ultima_lectura se actualiza: esperado=aeae506d-7226-4c06-a589-9d386a97e879 obtenido=aeae506d-7226-4c06-a589-9d386a97e879
+=== 5. Errores
+OK    sin token: esperado=401 obtenido=401
+OK    sensor inexistente: esperado=404 obtenido=404
+OK    sensor sin asignacion vigente (SEN-001 hoy): esperado=409 obtenido=409
+OK    bateria 120: esperado=400 obtenido=400
+OK    latitud sin longitud: esperado=400 obtenido=400
+OK    fecha futura: esperado=400 obtenido=400
+OK    sin mediciones: esperado=400 obtenido=400
+=== 6. Cassandra caida y reintento
+OK    POST con Cassandra caida: esperado=503 obtenido=503
+OK    reintento con el mismo id: esperado=201 obtenido=201
+=== 7. Simulador
+simulador envio 6 lecturas; estados: 201
+OK    lecturas del simulador guardadas: esperado=12 obtenido=12
+usuario de prueba borrado: 1
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+sensor demo = cb6a673c-14a5-5469-a365-30fe9700c80b
+contenedor  = 4a15062a-049f-545e-b35b-911aefcc1d60
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 1. Serie de 3 lecturas consecutivas con GPS
+OK    POST lectura -3 min: esperado=201 obtenido=201
+OK    POST lectura -2 min: esperado=201 obtenido=201
+OK    POST lectura -1 min: esperado=201 obtenido=201
+OK    lecturas_por_sensor_dia +3: esperado=3 obtenido=3
+OK    lecturas_por_contenedor_dia +3: esperado=3 obtenido=3
+OK    posiciones_por_contenedor_dia +3: esperado=3 obtenido=3
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 2. Reenvio de la misma lectura
+OK    POST reenvio: esperado=201 obtenido=201
+OK    no duplica: esperado=3 obtenido=3
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 3. Lectura tardia, 2 horas atras
+OK    ultima = la mas nueva antes de la tardia: esperado=32f65128-3566-4bf6-a6de-02803560fc72 obtenido=32f65128-3566-4bf6-a6de-02803560fc72
+OK    POST tardia: esperado=201 obtenido=201
+OK    historial +1: esperado=4 obtenido=4
+OK    tardia no pisa ultima_lectura: esperado=32f65128-3566-4bf6-a6de-02803560fc72 obtenido=32f65128-3566-4bf6-a6de-02803560fc72
+     fila:  32f65128-3566-4bf6-a6de-02803560fc72 |           6
+OK    tardia no pisa ultima_posicion: esperado=32f65128-3566-4bf6-a6de-02803560fc72 obtenido=32f65128-3566-4bf6-a6de-02803560fc72
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 4. Lectura sin GPS
+OK    POST sin GPS: esperado=201 obtenido=201
+OK    posiciones sin cambios: esperado=4 obtenido=4
+OK    ultima_posicion sin cambios: esperado=32f65128-3566-4bf6-a6de-02803560fc72 obtenido=32f65128-3566-4bf6-a6de-02803560fc72
+OK    ultima_lectura se actualiza: esperado=81e0e266-a125-4fc3-8152-7c65791b6c63 obtenido=81e0e266-a125-4fc3-8152-7c65791b6c63
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 5. Errores
+OK    sin token: esperado=401 obtenido=401
+OK    sensor inexistente: esperado=404 obtenido=404
+OK    sensor sin asignacion vigente (SEN-001 hoy): esperado=409 obtenido=409
+OK    bateria 120: esperado=400 obtenido=400
+OK    latitud sin longitud: esperado=400 obtenido=400
+OK    fecha futura: esperado=400 obtenido=400
+OK    sin mediciones: esperado=400 obtenido=400
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 6. Cassandra caida y reintento
+OK    POST con Cassandra caida: esperado=503 obtenido=503
+OK    reintento con el mismo id: esperado=201 obtenido=201
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r18.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== 7. Simulador
+simulador envio 7 lecturas; estados: 201
+OK    lecturas del simulador guardadas: esperado=13 obtenido=13
+usuario de prueba borrado: 1

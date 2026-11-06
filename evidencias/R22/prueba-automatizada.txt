@@ -1,0 +1,14 @@
+﻿=== R22 estado de sensores
+OK    sensores en la lista: esperado=43 obtenido=43
+     SIN_DATOS=3 OFFLINE=39 ONLINE=1
+OK    SEN-040 nunca reporto: esperado=SIN_DATOS obtenido=SIN_DATOS
+OK    sensor demo con lecturas recientes: esperado=ONLINE obtenido=ONLINE
+usuario temporal borrado: 1
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase1.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R22 estado de sensores
+OK    sensores en la lista: esperado=43 obtenido=43
+     SIN_DATOS=3 OFFLINE=39 ONLINE=1
+OK    SEN-040 nunca reporto: esperado=SIN_DATOS obtenido=SIN_DATOS
+OK    sensor demo con lecturas recientes: esperado=ONLINE obtenido=ONLINE
+usuario temporal borrado: 1

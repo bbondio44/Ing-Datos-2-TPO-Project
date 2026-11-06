@@ -1,0 +1,78 @@
+﻿=== Bandejas segun quien es el usuario
+C02 ve 2 conversaciones
+C01 ve 1 conversaciones
+OK    C02 tiene una conversacion que C01 no ve: esperado=True obtenido=True
+=== Autorizacion: un ajeno no ve nada
+OK    C01 no lee mensajes ajenos: esperado=404 obtenido=404
+OK    C01 no escribe en conversacion ajena: esperado=404 obtenido=404
+OK    C02 si lee su conversacion: esperado=200 obtenido=200
+=== Conversacion privada cliente - operador
+conversacion e372d7c1-9623-4d38-bc54-36ba59bc8984; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
+OK    cliente envia: esperado=201 obtenido=201
+OK    reintento mismo id: esperado=201 obtenido=201
+OK    no duplica el mensaje: esperado=1 obtenido=1
+OK    operador responde: esperado=201 obtenido=201
+OK    operador ve 2 mensajes: esperado=2 obtenido=2
+OK    mas nuevo primero: esperado=Te respondo obtenido=Te respondo
+OK    paginado de a 1: esperado=1 obtenido=1
+OK    contador y extracto en la bandeja: esperado=2|Te respondo obtenido=2|Te respondo
+OK    proveedor ajeno no la ve: esperado=404 obtenido=404
+=== Grupal y validaciones
+OK    grupo proveedor con cliente y operador: esperado=201 obtenido=201
+OK    privada con dos destinatarios: esperado=400 obtenido=400
+OK    participante inexistente: esperado=404 obtenido=404
+OK    mensaje vacio: esperado=400 obtenido=400
+usuario temporal borrado: 1
+=== R40 R17 R26 usuario con rol CLIENTE: ve lo suyo
+OK    todas sus alertas son suyas: esperado=0 obtenido=0
+     alertas visibles: 2
+OK    monitoreo de su envio: esperado=200 obtenido=200
+OK    su red en el grafo: esperado=200 obtenido=200
+OK    sus predicciones: esperado=200 obtenido=200
+OK    su desempeno: esperado=200 obtenido=200
+OK    pedir un reporte propio: esperado=201 obtenido=201
+     sensores visibles: 6
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-roles.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R40 R17 R26 usuario con rol CLIENTE: ve lo suyo
+OK    todas sus alertas son suyas: esperado=0 obtenido=0
+     alertas visibles: 2
+OK    monitoreo de su envio: esperado=200 obtenido=200
+OK    su red en el grafo: esperado=200 obtenido=200
+OK    sus predicciones: esperado=200 obtenido=200
+OK    su desempeno: esperado=200 obtenido=200
+OK    pedir un reporte propio: esperado=201 obtenido=201
+     sensores visibles: 6
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r40.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== Bandejas segun quien es el usuario
+C02 ve 2 conversaciones
+C01 ve 1 conversaciones
+OK    C02 tiene una conversacion que C01 no ve: esperado=True obtenido=True
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r40.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== Autorizacion: un ajeno no ve nada
+OK    C01 no lee mensajes ajenos: esperado=404 obtenido=404
+OK    C01 no escribe en conversacion ajena: esperado=404 obtenido=404
+OK    C02 si lee su conversacion: esperado=200 obtenido=200
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r40.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== Conversacion privada cliente - operador
+conversacion 92e18582-66c3-4b5b-81ee-5b02b48b9390; participantes: FrigorÃ­fico del Sur S.A., Naviera AtlÃ¡ntica S.A.
+OK    cliente envia: esperado=201 obtenido=201
+OK    reintento mismo id: esperado=201 obtenido=201
+OK    no duplica el mensaje: esperado=1 obtenido=1
+OK    operador responde: esperado=201 obtenido=201
+OK    operador ve 2 mensajes: esperado=2 obtenido=2
+OK    mas nuevo primero: esperado=Te respondo obtenido=Te respondo
+OK    paginado de a 1: esperado=1 obtenido=1
+OK    contador y extracto en la bandeja: esperado=2|Te respondo obtenido=2|Te respondo
+OK    proveedor ajeno no la ve: esperado=404 obtenido=404
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-r40.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== Grupal y validaciones
+OK    grupo proveedor con cliente y operador: esperado=201 obtenido=201
+OK    privada con dos destinatarios: esperado=400 obtenido=400
+OK    participante inexistente: esperado=404 obtenido=404
+OK    mensaje vacio: esperado=400 obtenido=400
+usuario temporal borrado: 1

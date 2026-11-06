@@ -1,0 +1,24 @@
+﻿=== R09/R26/R25 lectura que supera la regla
+OK    POST lectura 60 C: esperado=201 obtenido=201
+OK    una alerta para la regla: esperado=1 obtenido=1
+OK    guarda la lectura que la causo: esperado=48d1e688-531d-4e43-bba0-0df304da9770 obtenido=48d1e688-531d-4e43-bba0-0df304da9770
+OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
+OK    alerta ALTA con incidente: esperado=True obtenido=True
+OK    incidente existe en Postgres: esperado=1 obtenido=1
+OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
+=== Control R25: alertas ALTA o CRITICA nuevas sin incidente
+OK    ALTA/CRITICA sin incidente: esperado=0 obtenido=0
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R09/R26/R25 lectura que supera la regla
+OK    POST lectura 60 C: esperado=201 obtenido=201
+OK    una alerta para la regla: esperado=1 obtenido=1
+OK    guarda la lectura que la causo: esperado=c8c1e9e8-1c17-492b-841e-f1d7884c897f obtenido=c8c1e9e8-1c17-492b-841e-f1d7884c897f
+OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
+OK    alerta ALTA con incidente: esperado=True obtenido=True
+OK    incidente existe en Postgres: esperado=1 obtenido=1
+OK    evento ALERTA_GENERADA en Mongo: esperado=1 obtenido=1
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase2.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== Control R25: alertas ALTA o CRITICA nuevas sin incidente
+OK    ALTA/CRITICA sin incidente: esperado=0 obtenido=0

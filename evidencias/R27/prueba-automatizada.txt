@@ -1,0 +1,8 @@
+﻿=== R27 ranking de rutas
+     2 rutas con incidentes; 1ra: Santos -> Valencia (MARITIMO) = 2
+OK    total contra incidentes con tramo: esperado=3 obtenido=3
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R27 ranking de rutas
+     2 rutas con incidentes; 1ra: Santos -> Valencia (MARITIMO) = 2
+OK    total contra incidentes con tramo: esperado=3 obtenido=3

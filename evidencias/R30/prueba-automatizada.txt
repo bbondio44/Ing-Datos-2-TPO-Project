@@ -1,0 +1,74 @@
+﻿pendientes al inicio: 0
+=== R30 worker del outbox: Postgres -> Neo4j
+OK    outbox vacio: esperado=0 obtenido=0
+     Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    Cliente igual que Postgres: esperado=Cliente=12 obtenido=Cliente=12
+OK    Envio igual que Postgres: esperado=Envio=27 obtenido=Envio=27
+OK    Tramo igual que Postgres: esperado=Tramo=48 obtenido=Tramo=48
+OK    Contenedor igual que Postgres: esperado=Contenedor=28 obtenido=Contenedor=28
+OK    Operador igual que Postgres: esperado=Operador=7 obtenido=Operador=7
+OK    Incidente igual que Postgres: esperado=Incidente=9 obtenido=Incidente=9
+=== R30 reprocesar todo no duplica
+OK    outbox vacio tras reprocesar: esperado=0 obtenido=0
+OK    mismos nodos: esperado=Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2 obtenido=Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    mismas relaciones: esperado=268 obtenido=268
+=== R30 falla parcial: Neo4j caido
+     con Neo4j caido: PROCESANDO|1|Unable to connect to localhost:7687, ensure the da
+OK    se pone al dia solo: esperado=0 obtenido=0
+OK    cambio aplicado en el grafo: esperado="INACTIVO" obtenido="INACTIVO"
+=== R30 red de un cliente
+     LÃ¡cteos Pampeanos S.A.: envios=3 tramos=6 operadores=4 contenedores=4
+OK    envios igual que Postgres: esperado=3 obtenido=3
+OK    tramos igual que Postgres: esperado=6 obtenido=6
+OK    operadores igual que Postgres: esperado=4 obtenido=4
+OK    cliente inexistente: esperado=404 obtenido=404
+=== R19 R30 usuario con rol CLIENTE: no ve lo ajeno
+OK    envio de otro cliente: esperado=404 obtenido=404
+OK    grafo de otro cliente: esperado=404 obtenido=404
+OK    contenedor de otro cliente: esperado=404 obtenido=404
+OK    ranking global: esperado=403 obtenido=403
+OK    crear una regla: esperado=403 obtenido=403
+OK    registrar una lectura: esperado=403 obtenido=403
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-roles.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R19 R30 usuario con rol CLIENTE: no ve lo ajeno
+OK    envio de otro cliente: esperado=404 obtenido=404
+OK    grafo de otro cliente: esperado=404 obtenido=404
+OK    contenedor de otro cliente: esperado=404 obtenido=404
+OK    ranking global: esperado=403 obtenido=403
+OK    crear una regla: esperado=403 obtenido=403
+OK    registrar una lectura: esperado=403 obtenido=403
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+pendientes al inicio: 0
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R30 worker del outbox: Postgres -> Neo4j
+OK    outbox vacio: esperado=0 obtenido=0
+     Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    Cliente igual que Postgres: esperado=Cliente=12 obtenido=Cliente=12
+OK    Envio igual que Postgres: esperado=Envio=27 obtenido=Envio=27
+OK    Tramo igual que Postgres: esperado=Tramo=48 obtenido=Tramo=48
+OK    Contenedor igual que Postgres: esperado=Contenedor=28 obtenido=Contenedor=28
+OK    Operador igual que Postgres: esperado=Operador=7 obtenido=Operador=7
+OK    Incidente igual que Postgres: esperado=Incidente=9 obtenido=Incidente=9
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R30 reprocesar todo no duplica
+OK    outbox vacio tras reprocesar: esperado=0 obtenido=0
+OK    mismos nodos: esperado=Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2 obtenido=Cliente=12 Contenedor=28 Envio=27 Incidente=9 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    mismas relaciones: esperado=268 obtenido=268
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R30 falla parcial: Neo4j caido
+     con Neo4j caido: ERROR|1|Unable to connect to localhost:7687, ensure the da
+OK    se pone al dia solo: esperado=0 obtenido=0
+OK    cambio aplicado en el grafo: esperado="INACTIVO" obtenido="INACTIVO"
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R30 red de un cliente
+     LÃ¡cteos Pampeanos S.A.: envios=3 tramos=6 operadores=4 contenedores=4
+OK    envios igual que Postgres: esperado=3 obtenido=3
+OK    tramos igual que Postgres: esperado=6 obtenido=6
+OK    operadores igual que Postgres: esperado=4 obtenido=4
+OK    cliente inexistente: esperado=404 obtenido=404

@@ -1,0 +1,14 @@
+﻿=== R29 prediccion
+     primera corrida genero 6
+OK    segunda corrida del dia no repite: esperado=0 obtenido=0
+OK    una prediccion por envio en transito: esperado=7 obtenido=7
+     ejemplo: Buenos Aires -> Santos eta=2026-11-14T01:40:58.679+00:00 riesgo=1.00000
+     validacion: evaluados=18 promedio=103.17h error_medio=68.06h
+
+--- Reejecucion 2026-11-05 16:43:32 -03:00 | run-fase3.txt (API/backend y motores; no incluye captura JavaFX) ---
+=== R29 prediccion
+     primera corrida genero 6
+OK    segunda corrida del dia no repite: esperado=0 obtenido=0
+OK    una prediccion por envio en transito: esperado=7 obtenido=7
+     ejemplo: Buenos Aires -> Santos eta=2026-11-14T19:21:59.423+00:00 riesgo=1.00000
+     validacion: evaluados=18 promedio=103.17h error_medio=68.06h
