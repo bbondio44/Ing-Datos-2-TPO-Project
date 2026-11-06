@@ -463,9 +463,18 @@ final class PersonaOneDialogs {
                     dialog.close(); reabrirDetalle(shipment);
                 });
             });
+            Button copySensor = new Button("Copiar ID del sensor");
+            copySensor.setOnAction(e -> {
+                SensorAssignmentResponse selected = sensors.getSelectionModel().getSelectedItem();
+                if (selected == null) { showError("Elegí un sensor de la tabla"); return; }
+                javafx.scene.input.ClipboardContent id = new javafx.scene.input.ClipboardContent();
+                id.putString(selected.sensorId().toString());
+                javafx.scene.input.Clipboard.getSystemClipboard().setContent(id);
+                copySensor.setText("ID copiado");
+            });
             VBox content = new VBox(8, new Label("Contenedores (vigentes e históricos)"),
                     containers, new HBox(8, assignContainer, unassignContainer, assignSensor),
-                    new Label("Sensores del envío"), sensors, new HBox(8, unassignSensor));
+                    new Label("Sensores del envío"), sensors, new HBox(8, unassignSensor, copySensor));
             content.setPadding(new Insets(8));
             VBox.setVgrow(containers, Priority.ALWAYS); VBox.setVgrow(sensors, Priority.ALWAYS);
             dialog.getDialogPane().setContent(content);

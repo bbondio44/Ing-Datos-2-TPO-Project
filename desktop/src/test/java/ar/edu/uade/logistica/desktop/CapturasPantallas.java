@@ -368,6 +368,22 @@ public class CapturasPantallas extends Application {
         click(boton(iot, "Ver recorrido"));
         espera(20000);
         captura(iot, "mapa-recorrido", "R20", "R21");
+        verificar("R20 la lista muestra el codigo del contenedor", fx(() -> {
+            ComboBox<?> lista = visibleEnFx(iot, ComboBox.class).getFirst();
+            return lista.getEditor() != null && !lista.getItems().isEmpty();
+        }));
+        Window envios = abrirCon(() -> click(boton(iot, "Elegir envío…")));
+        click(boton(envios, "Seleccionar"));
+        esperarCierre(envios);
+        espera(2500);
+        for (Window extra : ventanas()) {
+            if (extra != iot && extra != principal && extra.getScene().getRoot() instanceof DialogPane) {
+                click(boton(extra, "Seleccionar"));
+                esperarCierre(extra);
+                espera(2000);
+            }
+        }
+        verificar("R20 Elegir envio llega al mapa", textos(iot).contains("posición") || textos(iot).contains("Sin posiciones") || textos(iot).contains("no tiene contenedores"));
         cerrar(iot);
     }
 

@@ -1,5 +1,9 @@
 package ar.edu.uade.logistica.desktop.controller;
 
+import ar.edu.uade.logistica.contracts.logistics.ShipmentResponse;
+import javafx.util.StringConverter;
+import java.util.HashMap;
+import java.util.Map;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
 import ar.edu.uade.logistica.contracts.iot.PosicionResponse;
 import ar.edu.uade.logistica.contracts.iot.SensorEstadoResponse;
@@ -55,6 +59,7 @@ public final class MonitoreoIotWindow {
     private final Label estadoEstados = new Label();
     private final Label estadoHistorico = new Label();
     private final Label estadoMapa = new Label();
+    private final Map<UUID, String> codigos = new HashMap<>();
 
     public static void show() {
         new MonitoreoIotWindow().abrir();
@@ -80,7 +85,7 @@ public final class MonitoreoIotWindow {
         estados.getColumns().add(columna("Batería %", s -> numero(s.bateria())));
         estados.getColumns().add(columna("Última señal", s -> fecha(s.ultimaSenal())));
         estados.getColumns().add(columna("Min. sin señal", s -> s.minutosSinSenal() == null ? "" : s.minutosSinSenal().toString()));
-        estados.getColumns().add(columna("Contenedor", s -> corto(s.idContenedor())));
+        estados.getColumns().add(columna("Contenedor", s -> nombreContenedor(s.idContenedor())));
         estados.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         Button actualizar = new Button("Actualizar");
         actualizar.setOnAction(event -> cargarEstados());
@@ -100,6 +105,7 @@ public final class MonitoreoIotWindow {
         tipoConsulta.setValue(SENSOR);
         tipoConsulta.setOnAction(event -> actualizarOpciones());
         idConsulta.setPrefWidth(320);
+        idConsulta.setConverter(legible());
         Button consultar = new Button("Consultar");
         consultar.setOnAction(event -> consultarHistorico());
         HBox filtros = new HBox(10, tipoConsulta, idConsulta, new Label("Desde"), desdeHistorico,
@@ -108,12 +114,75 @@ public final class MonitoreoIotWindow {
     }
 
     private VBox pestaniaMapa() {
-        contenedorMapa.setPrefWidth(320);
+        contenedorMapa.setPrefWidth(250);
+        contenedorMapa.setConverter(legible());
+        Button elegir = new Button("Elegir envío…");
+        elegir.setOnAction(event -> elegirEnvio());
         Button ver = new Button("Ver recorrido");
         ver.setOnAction(event -> consultarRecorrido());
-        HBox filtros = new HBox(10, new Label("Contenedor"), contenedorMapa, new Label("Desde"), desdeMapa,
+        HBox filtros = new HBox(10, elegir, new Label("Contenedor"), contenedorMapa, new Label("Desde"), desdeMapa,
                 new Label("Hasta"), hastaMapa, ver);
         return panel(filtros, mapa, estadoMapa);
+    }
+
+    /** Elige el envío por cliente y ruta, y dibuja el recorrido de su contenedor. */
+    private void elegirEnvio() {
+        estadoMapa.setText("Cargando envíos...");
+        AppContext.get().api().shipments("").whenComplete((pagina, error) -> Platform.runLater(() -> {
+            if (error != null) {
+                estadoMapa.setText(mensaje(error));
+                return;
+            }
+            estadoMapa.setText("");
+            Formulario.elegirDeLista("Envío", pagina.content(),
+                    e -> e.clientName() + " — " + e.origin() + " → " + e.destination() + " — " + e.state())
+                    .ifPresent(this::mostrarEnvio);
+        }));
+    }
+
+    private void mostrarEnvio(ShipmentResponse envio) {
+        AppContext.get().api().shipment(envio.id()).whenComplete((detalle, error) -> Platform.runLater(() -> {
+            if (error != null) {
+                estadoMapa.setText(mensaje(error));
+                return;
+            }
+            var asignaciones = detalle.containers();
+            if (asignaciones.isEmpty()) {
+                estadoMapa.setText("El envío no tiene contenedores asociados");
+                return;
+            }
+            detalle.containers().forEach(c -> codigos.put(c.containerId(), c.containerCode()));
+            var elegida = asignaciones.size() == 1 ? java.util.Optional.of(asignaciones.getFirst())
+                    : Formulario.elegirDeLista("Contenedor del envío", asignaciones,
+                    c -> c.containerCode() + " — " + c.containerType() + (c.active() ? " — vigente" : ""));
+            elegida.ifPresent(c -> {
+                // El rango cubre todo el viaje, hasta 31 días que es lo máximo que admite la consulta.
+                LocalDate desde = c.startAt().atZone(ZoneOffset.UTC).toLocalDate();
+                LocalDate hasta = c.endAt() == null ? hoyUtc() : c.endAt().atZone(ZoneOffset.UTC).toLocalDate();
+                desdeMapa.setValue(desde.isBefore(hasta.minusDays(30)) ? hasta.minusDays(30) : desde);
+                hastaMapa.setValue(hasta);
+                contenedorMapa.setValue(c.containerId());
+                consultarRecorrido();
+            });
+        }));
+    }
+
+    private String nombreContenedor(UUID id) {
+        return id == null ? "" : codigos.getOrDefault(id, corto(id));
+    }
+
+    /** Muestra cada UUID con lo que identifica: el código del contenedor o el tipo del sensor. */
+    private StringConverter<UUID> legible() {
+        return new StringConverter<>() {
+            @Override public String toString(UUID id) {
+                if (id == null) return "";
+                if (codigos.containsKey(id)) return codigos.get(id) + " — " + corto(id);
+                return estados.getItems().stream().filter(s -> id.equals(s.idSensor())).findFirst()
+                        .map(s -> s.tipo() + " en " + nombreContenedor(s.idContenedor()) + " — " + corto(id))
+                        .orElse(id.toString());
+            }
+            @Override public UUID fromString(String texto) { return null; }
+        };
     }
 
     private VBox panel(HBox filtros, javafx.scene.Node contenido, Label estado) {
@@ -126,6 +195,14 @@ public final class MonitoreoIotWindow {
 
     private void cargarEstados() {
         estadoEstados.setText("Cargando...");
+        // Si el rol no puede ver el catálogo, las listas siguen funcionando con el UUID.
+        AppContext.get().api().containers("").whenComplete((pagina, error) -> Platform.runLater(() -> {
+            if (error == null) pagina.content().forEach(c -> codigos.put(c.id(), c.internationalCode()));
+            cargarSensores();
+        }));
+    }
+
+    private void cargarSensores() {
         AppContext.get().api().sensorStates().whenComplete((lista, error) -> Platform.runLater(() -> {
             if (error != null) {
                 estadoEstados.setText(mensaje(error));
