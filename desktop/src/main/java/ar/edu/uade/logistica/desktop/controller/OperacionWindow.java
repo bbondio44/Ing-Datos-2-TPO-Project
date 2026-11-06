@@ -133,8 +133,9 @@ public final class OperacionWindow {
         tipoContenedor.setValue("Todos");
         Button crear = boton("Crear regla", this::crearRegla);
         Button desactivar = boton("Desactivar", this::desactivarRegla);
+        Button activar = boton("Activar", this::activarRegla);
         HBox.setHgrow(nombreRegla, Priority.ALWAYS);
-        return panel(new HBox(10, nombreRegla, tipoRegla, operador, valorRegla, severidad, tipoContenedor, crear, desactivar),
+        return panel(new HBox(10, nombreRegla, tipoRegla, operador, valorRegla, severidad, tipoContenedor, crear, desactivar, activar),
                 reglas, estadoReglas);
     }
 
@@ -160,13 +161,14 @@ public final class OperacionWindow {
         conversaciones.getColumns().add(columna("Asunto", ConversacionResponse::asunto));
         conversaciones.getColumns().add(columna("Tipo", ConversacionResponse::tipo));
         conversaciones.getColumns().add(columna("Mensajes", c -> String.valueOf(c.cantidadMensajes())));
+        conversaciones.getColumns().add(columna("Participantes", c -> String.join(", ", c.participantes())));
         conversaciones.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         conversaciones.getSelectionModel().selectedItemProperty().addListener((obs, antes, ahora) -> cargarMensajes());
         mensajes.getColumns().add(columna("Fecha", m -> fecha(m.fechaEnvio())));
         mensajes.getColumns().add(columna("De", MensajeResponse::remitente));
         mensajes.getColumns().add(columna("Mensaje", MensajeResponse::contenido));
         mensajes.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-        nuevoMensaje.setPromptText("Escribí un mensaje");
+        nuevoMensaje.setPromptText("Elegí una conversación y escribí un mensaje");
         HBox.setHgrow(nuevoMensaje, Priority.ALWAYS);
         HBox tablas = new HBox(12, conversaciones, mensajes);
         HBox.setHgrow(conversaciones, Priority.ALWAYS);
@@ -175,13 +177,31 @@ public final class OperacionWindow {
         destinatario.setPromptText("UUID del destinatario");
         tipoConversacion.setValue("PRIVADA");
         tipoDestinatario.setValue("CLIENTE");
+        tipoDestinatario.valueProperty().addListener((obs, antes, ahora) -> destinatario.clear());
         HBox.setHgrow(destinatario, Priority.ALWAYS);
-        HBox nueva = new HBox(10, tipoConversacion, asunto, tipoDestinatario, destinatario,
-                boton("Nueva conversación", this::crearConversacion));
-        nueva.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        HBox nueva = new HBox(10, new Label("Nueva conversación:"), tipoConversacion, asunto, tipoDestinatario, destinatario,
+                boton("Elegir…", this::elegirDestinatario), boton("Nueva conversación", this::crearConversacion));
+        HBox escribir = new HBox(10, nuevoMensaje, boton("Enviar", this::enviarMensaje));
+        escribir.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         VBox.setVgrow(tablas, Priority.ALWAYS);
-        return panel(new HBox(10, nuevoMensaje, boton("Enviar", this::enviarMensaje)),
-                new VBox(10, nueva, tablas), estadoMensajes);
+        return panel(nueva, new VBox(10, tablas, escribir), estadoMensajes);
+    }
+
+    private record Contacto(String nombre, UUID id) {
+    }
+
+    /** Lista los posibles destinatarios del tipo elegido, con su nombre y su UUID. */
+    private void elegirDestinatario() {
+        var api = AppContext.get().api();
+        String tipo = tipoDestinatario.getValue();
+        CompletableFuture<List<Contacto>> contactos = "CLIENTE".equals(tipo)
+                ? api.clients("").thenApply(pagina -> pagina.content().stream().filter(c -> "ACTIVO".equals(c.state()))
+                        .map(c -> new Contacto(c.businessName(), c.id())).toList())
+                : api.organizations("PROVEEDOR".equals(tipo) ? "proveedores" : "operadores", "")
+                        .thenApply(pagina -> pagina.content().stream().filter(o -> "ACTIVO".equals(o.state()))
+                                .map(o -> new Contacto(o.businessName(), o.id())).toList());
+        al(contactos, estadoMensajes, lista -> Formulario.elegirDeLista("Destinatario", lista,
+                c -> c.nombre() + " — " + c.id()).ifPresent(c -> destinatario.setText(c.id().toString())));
     }
 
     private void crearConversacion() {
@@ -233,6 +253,10 @@ public final class OperacionWindow {
     }
 
     private void crearRegla() {
+        if (nombreRegla.getText().isBlank()) {
+            estadoReglas.setText("Escribí un nombre para la regla");
+            return;
+        }
         boolean inactividad = "INACTIVIDAD".equals(tipoRegla.getValue());
         double valor;
         try {
@@ -254,6 +278,22 @@ public final class OperacionWindow {
             return;
         }
         al(AppContext.get().api().deactivateAlertRule(regla.idRegla()), estadoReglas, ignorado -> cargarReglas());
+    }
+
+    private void activarRegla() {
+        ReglaAlertaResponse regla = reglas.getSelectionModel().getSelectedItem();
+        if (regla == null) {
+            estadoReglas.setText("Elegí una regla");
+            return;
+        }
+        if (regla.activa()) {
+            estadoReglas.setText("La regla ya está activa");
+            return;
+        }
+        ReglaAlertaRequest activa = new ReglaAlertaRequest(regla.idCliente(), regla.idSensor(), regla.nombre(),
+                regla.tipoRegla(), regla.operador(), regla.umbral(), regla.minutosInactividad(), regla.severidad(),
+                true, regla.tipoContenedor());
+        al(AppContext.get().api().updateAlertRule(regla.idRegla(), activa), estadoReglas, ignorado -> cargarReglas());
     }
 
     private void consultarEnvio() {
@@ -284,8 +324,13 @@ public final class OperacionWindow {
     private void cargarMensajes() {
         ConversacionResponse conversacion = conversaciones.getSelectionModel().getSelectedItem();
         if (conversacion == null) return;
-        al(AppContext.get().api().messages(conversacion.id()), estadoMensajes,
-                lista -> mensajes.setItems(FXCollections.observableArrayList(lista)));
+        // El backend pagina de lo más nuevo a lo más viejo; un chat se lee al revés.
+        al(AppContext.get().api().messages(conversacion.id()), estadoMensajes, lista -> {
+            List<MensajeResponse> enOrden = new java.util.ArrayList<>(lista);
+            java.util.Collections.reverse(enOrden);
+            mensajes.setItems(FXCollections.observableArrayList(enOrden));
+            if (!enOrden.isEmpty()) mensajes.scrollTo(enOrden.size() - 1);
+        });
     }
 
     private void enviarMensaje() {

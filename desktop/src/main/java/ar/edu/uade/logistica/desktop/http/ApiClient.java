@@ -198,6 +198,10 @@ public class ApiClient {
         return send("POST", "/api/v1/reglas", rule, ReglaAlertaResponse.class, true);
     }
 
+    public CompletableFuture<ReglaAlertaResponse> updateAlertRule(UUID id, ReglaAlertaRequest rule) {
+        return send("PUT", "/api/v1/reglas/" + id, rule, ReglaAlertaResponse.class, true);
+    }
+
     public CompletableFuture<Void> deactivateAlertRule(UUID id) {
         return send("DELETE", "/api/v1/reglas/" + id, null, Void.class, true);
     }

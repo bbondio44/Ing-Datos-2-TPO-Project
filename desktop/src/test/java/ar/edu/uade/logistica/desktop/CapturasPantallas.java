@@ -414,6 +414,14 @@ public class CapturasPantallas extends Application {
         captura(alertas, "regla-creada", "R09");
         click(boton(alertas, "Desactivar"));
         espera(1500);
+        seleccionar(tabla(alertas, 0), "Regla desde la pantalla");
+        click(boton(alertas, "Activar"));
+        espera(1500);
+        verificar("R09 activar vuelve a dejar activa la regla", fx(() -> visibleEnFx(alertas, TableView.class).getFirst().getItems()
+                .stream().anyMatch(r -> r.toString().contains("Regla desde la pantalla") && r.toString().contains("activa=true"))));
+        seleccionar(tabla(alertas, 0), "Regla desde la pantalla");
+        click(boton(alertas, "Desactivar"));
+        espera(1500);
         pestania(alertas, "Monitoreo de envío");
         TextField envio = visible(alertas, TextField.class).getFirst();
         fx(() -> {
@@ -431,6 +439,11 @@ public class CapturasPantallas extends Application {
         espera(1500);
         verificar("R40 la conversacion grupal muestra mensajes", filas(alertas, 1) > 0);
         captura(alertas, "mensajeria-grupal", "R40");
+        Window destinatarios = abrirCon(() -> click(boton(alertas, "Elegir…")));
+        click(boton(destinatarios, "Seleccionar"));
+        esperarCierre(destinatarios);
+        verificar("R40 Elegir completa el UUID del destinatario", fx(() -> visibleEnFx(alertas, TextField.class).stream()
+                .anyMatch(t -> "UUID del destinatario".equals(t.getPromptText()) && t.getText().matches("[0-9a-f-]{36}"))));
         cerrar(alertas);
     }
 
@@ -487,7 +500,8 @@ public class CapturasPantallas extends Application {
         seleccionar(tabla(alertas, 0), "PRIVADA");
         espera(1500);
         int mensajes = filas(alertas, 1);
-        TextField texto = visible(alertas, TextField.class).getFirst();
+        TextField texto = fx(() -> visibleEnFx(alertas, TextField.class).stream()
+                .filter(t -> t.getPromptText() != null && t.getPromptText().contains("escribí un mensaje")).findFirst().orElseThrow());
         fx(() -> {
             texto.setText("Mensaje enviado desde la pantalla");
             return null;
@@ -702,6 +716,8 @@ public class CapturasPantallas extends Application {
         int antes = filas(lista, 0);
         Window nuevo = abrirCon(() -> click(boton(lista, "Nuevo")));
         elegir(nuevo, "Operador", "Logistica Oceano");
+        click(boton(nuevo, "Generar"));
+        verificar("R05 Generar arma una patente", fx(() -> ((TextField) campo(nuevo, "Identificación")).getText().matches("[A-Z]{2}[0-9]{3}[A-Z]{2}")));
         escribir(nuevo, "Identificación", "VH" + marca);
         click(boton(nuevo, "Guardar"));
         esperarCierre(nuevo);
@@ -916,6 +932,10 @@ public class CapturasPantallas extends Application {
         pestania(analitica, "Reportes");
         espera(1200);
         ComboBox<Object> tipo = combo(analitica, 0);
+        Window titulares = abrirCon(() -> click(boton(analitica, "Elegir…")));
+        click(boton(titulares, "Seleccionar"));
+        esperarCierre(titulares);
+        verificar("R11 Elegir completa el UUID del cliente", fx(() -> visibleEnFx(analitica, TextField.class).getFirst().getText().matches("[0-9a-f-]{36}")));
         TextField cliente = visible(analitica, TextField.class).getFirst();
         fx(() -> {
             tipo.setValue("PREDICTIVO");

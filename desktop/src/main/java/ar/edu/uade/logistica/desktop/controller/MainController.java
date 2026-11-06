@@ -605,11 +605,11 @@ public class MainController {
                     edit.disableProperty().bind(table.getSelectionModel().selectedItemProperty().isNull()
                             .or(Bindings.createBooleanBinding(() -> !canWrite || operators.isEmpty())));
                 }));
-        create.setOnAction(event -> vehicleDialog(null, operators)
+        create.setOnAction(event -> vehicleDialog(null, operators, identificacionesDe(table))
                 .ifPresent(request -> saveVehicle(null, request, reload, status)));
         edit.setOnAction(event -> {
             VehicleResponse selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) vehicleDialog(selected, operators)
+            if (selected != null) vehicleDialog(selected, operators, identificacionesDe(table))
                     .ifPresent(request -> saveVehicle(selected, request, reload, status));
         });
         deactivate.setOnAction(event -> {
@@ -657,8 +657,14 @@ public class MainController {
         }));
     }
 
+    private java.util.Set<String> identificacionesDe(TableView<VehicleResponse> table) {
+        return table.getItems().stream().map(VehicleResponse::identification)
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
     private Optional<VehicleRequest> vehicleDialog(
-            VehicleResponse initial, javafx.collections.ObservableList<OrganizationResponse> operators) {
+            VehicleResponse initial, javafx.collections.ObservableList<OrganizationResponse> operators,
+            java.util.Set<String> identificaciones) {
         Dialog<VehicleRequest> dialog = new Dialog<>();
         dialog.setTitle(initial == null ? "Nuevo vehículo" : "Editar vehículo");
         ButtonType save = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
@@ -687,7 +693,10 @@ public class MainController {
         grid.addRow(2, new Label("Identificación"), identification);
         grid.addRow(3, new Label("Estado"), state);
         Formulario.ayuda(grid, 0, "Debe estar activo");
-        Formulario.ayuda(grid, 2, "Patente o matrícula, no repetida");
+        Button generate = new Button("Generar");
+        generate.setOnAction(event -> identification.setText(
+                Formulario.generarIdentificacion(type.getValue(), identificaciones)));
+        Formulario.conBoton(grid, 2, generate, "Patente o matrícula, no repetida");
         Formulario.obligatorios(grid, "Operador", "Tipo", "Identificación", "Estado");
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty().bind(

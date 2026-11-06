@@ -59,6 +59,15 @@ class FormularioCuitTest {
     }
 
     @Test
+    void generaIdentificacionesSegunElTipoDeVehiculo() {
+        assertTrue(Formulario.generarIdentificacion("CAMION", java.util.Set.of()).matches("[A-Z]{2}[0-9]{3}[A-Z]{2}"));
+        assertTrue(Formulario.generarIdentificacion("BARCO", java.util.Set.of()).matches("IMO[0-9]{7}"));
+        assertTrue(Formulario.generarIdentificacion("AVION", java.util.Set.of()).matches("LV-[A-Z]{3}"));
+        assertTrue(Formulario.generarIdentificacion("TREN", java.util.Set.of()).matches("TR-[0-9]{4}"));
+        assertTrue(Formulario.generarIdentificacion("OTRO", java.util.Set.of()).matches("VH-[0-9]{6}"));
+    }
+
+    @Test
     void armaElCodigoDeUbicacionConPaisYNombre() {
         assertEquals("ARROS", Formulario.codigoUbicacion("Argentina", "Rosario", java.util.Set.of()));
         assertEquals("ESMAL", Formulario.codigoUbicacion("España", "Málaga", java.util.Set.of()));

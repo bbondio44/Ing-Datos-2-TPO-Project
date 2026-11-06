@@ -1,5 +1,6 @@
 package ar.edu.uade.logistica.desktop.controller;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -10,6 +11,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -19,8 +22,11 @@ import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /** Aclara en cada formulario qué campos son obligatorios y qué requisitos tienen. */
@@ -66,6 +72,54 @@ final class Formulario {
         if (!limpio.matches("\\d{11}")) return "El CUIT debe tener 11 dígitos, sin guiones ni espacios";
         return digitoVerificador(limpio) == limpio.charAt(10) - '0' ? null
                 : "El CUIT no es válido: no coincide el último dígito. Podés usar el botón Generar";
+    }
+
+    /** Abre una lista para elegir un registro por su nombre; vacío si se cancela. */
+    static <T> Optional<T> elegirDeLista(String titulo, List<T> opciones, Function<T, String> texto) {
+        Dialog<T> dialogo = new Dialog<>();
+        dialogo.setTitle(titulo);
+        dialogo.setHeaderText(opciones.isEmpty() ? "No hay registros para elegir" : titulo);
+        ButtonType seleccionar = new ButtonType("Seleccionar", ButtonBar.ButtonData.OK_DONE);
+        dialogo.getDialogPane().getButtonTypes().addAll(seleccionar, ButtonType.CANCEL);
+        ListView<T> lista = new ListView<>(FXCollections.observableArrayList(opciones));
+        lista.setCellFactory(ignorado -> new ListCell<>() {
+            @Override protected void updateItem(T item, boolean vacio) {
+                super.updateItem(item, vacio);
+                setText(vacio || item == null ? null : texto.apply(item));
+            }
+        });
+        lista.setPrefSize(680, 340);
+        lista.getSelectionModel().selectFirst();
+        dialogo.getDialogPane().setContent(lista);
+        dialogo.getDialogPane().lookupButton(seleccionar).setDisable(opciones.isEmpty());
+        dialogo.setResultConverter(boton -> boton == seleccionar ? lista.getSelectionModel().getSelectedItem() : null);
+        return dialogo.showAndWait();
+    }
+
+    /** Una identificación con el formato de cada tipo de vehículo, que no esté usada. */
+    static String generarIdentificacion(String tipo, Set<String> existentes) {
+        while (true) {
+            String identificacion = switch (tipo) {
+                case "CAMION" -> letrasAlAzar(2) + digitosAlAzar(3) + letrasAlAzar(2);
+                case "BARCO" -> "IMO" + digitosAlAzar(7);
+                case "AVION" -> "LV-" + letrasAlAzar(3);
+                case "TREN" -> "TR-" + digitosAlAzar(4);
+                default -> "VH-" + digitosAlAzar(6);
+            };
+            if (!existentes.contains(identificacion)) return identificacion;
+        }
+    }
+
+    private static String letrasAlAzar(int cantidad) {
+        StringBuilder texto = new StringBuilder();
+        for (int i = 0; i < cantidad; i++) texto.append((char) ('A' + ThreadLocalRandom.current().nextInt(26)));
+        return texto.toString();
+    }
+
+    private static String digitosAlAzar(int cantidad) {
+        StringBuilder texto = new StringBuilder();
+        for (int i = 0; i < cantidad; i++) texto.append(ThreadLocalRandom.current().nextInt(10));
+        return texto.toString();
     }
 
     /** El primer error de la lista, o null si todos los campos están bien. */

@@ -101,8 +101,15 @@ public final class AnaliticaWindow {
         HBox tablas = new HBox(12, reportes, contenidoReporte);
         HBox.setHgrow(reportes, Priority.ALWAYS);
         HBox.setHgrow(contenidoReporte, Priority.ALWAYS);
-        return panel(new HBox(10, tipoReporte, clienteReporte, boton("Solicitar", this::solicitarReporte),
-                boton("Facturar", this::facturarReporte)), tablas, estadoReportes);
+        return panel(new HBox(10, tipoReporte, clienteReporte, boton("Elegir…", this::elegirClienteReporte),
+                boton("Solicitar", this::solicitarReporte), boton("Facturar", this::facturarReporte)), tablas, estadoReportes);
+    }
+
+    /** Lista los clientes activos con su nombre y su UUID. */
+    private void elegirClienteReporte() {
+        al(AppContext.get().api().clients(""), estadoReportes, pagina -> Formulario.elegirDeLista("Cliente titular",
+                pagina.content().stream().filter(c -> "ACTIVO".equals(c.state())).toList(),
+                c -> c.businessName() + " — " + c.id()).ifPresent(c -> clienteReporte.setText(c.id().toString())));
     }
 
     private VBox pestaniaRed() {
