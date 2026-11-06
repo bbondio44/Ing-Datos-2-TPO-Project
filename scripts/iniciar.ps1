@@ -57,8 +57,11 @@ if ("$hay".Trim() -eq '0') {
 
 '[4/5] Arrancando el backend'
 $jar = Get-ChildItem backend\target\backend-*.jar -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch 'original' } | Select-Object -First 1
-if (-not $jar -or -not (Test-Path desktop\target\classes)) {
-    'Compilando el proyecto por primera vez'
+# Despues de un git pull el compilado queda viejo: se compara con la fuente mas nueva.
+$fuente = Get-ChildItem backend\src, desktop\src\main, shared-contracts\src -Recurse -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+if (-not $jar -or -not (Test-Path desktop\target\classes) -or $fuente.LastWriteTime -gt $jar.LastWriteTime) {
+    if (Responde) { Salir 'Hay una version vieja corriendo. Cerra la aplicacion y su ventana negra, y volve a abrir iniciar.bat.' }
+    'Compilando la ultima version del proyecto (puede tardar unos minutos)'
     & $mvn -B -q -DskipTests install
     if ($LASTEXITCODE -ne 0) { Salir 'No se pudo compilar el proyecto.' }
     $jar = Get-ChildItem backend\target\backend-*.jar | Where-Object { $_.Name -notmatch 'original' } | Select-Object -First 1
