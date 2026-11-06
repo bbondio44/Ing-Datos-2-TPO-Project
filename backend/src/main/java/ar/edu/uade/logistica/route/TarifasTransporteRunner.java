@@ -25,7 +25,7 @@ class TarifasTransporteRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         crear("7a71fa00-0000-4000-8000-000000000001", "Transporte marítimo por km y m³", "MARITIMO", 3);
         crear("7a71fa00-0000-4000-8000-000000000002", "Transporte terrestre por km y m³", "TERRESTRE", 15);
-        crear("7a71fa00-0000-4000-8000-000000000003", "Transporte aéreo por km y m³", "AEREO", 60);
+        crear("7a71fa00-0000-4000-8000-000000000003", "Transporte aéreo por km y m³", "AEREO", 40);
     }
 
     private void crear(String id, String concepto, String medio, int precio) {
