@@ -5,7 +5,7 @@ OK    R01 el cliente nuevo aparece en la tabla
      R01/captura-02-cliente-creado.png
 OK    R01 listado de clientes (13 filas)
      R01/captura-03-clientes.png
-OK    R02 usuarios (14 filas)
+OK    R02 usuarios (15 filas)
      R02/captura-01-usuarios.png
 OK    R02 roles (6 filas)
      R02/captura-02-roles.png
@@ -50,19 +50,19 @@ OK    hay una fila con [Rutas Globales]
 OK    R16 la cuenta del operador tiene facturas
      R16/captura-02-cuenta-operador.png
      R05/captura-04-cuenta-operador.png
-OK    hay una fila con [Alta desde pantalla d15242]
+OK    hay una fila con [Alta desde pantalla 490c17]
 OK    hay una fila con [state=BORRADOR]
 OK    hay una fila con [state=EMITIDA]
-OK    hay una fila con [Alta desde pantalla d15242]
+OK    hay una fila con [Alta desde pantalla 490c17]
 OK    R10 el cobro parcial cambia el estado
      R10/captura-02-cobro-parcial.png
      R13/captura-01-cobro-parcial.png
 OK    hay una fila con [state=PARCIAL]
 OK    R13 el sobrepago explica el motivo
      R13/captura-02-sobrepago-rechazado.png
-OK    hay una fila con [Alta desde pantalla d15242]
+OK    hay una fila con [Alta desde pantalla 490c17]
 OK    hay una fila con [state=PARCIAL]
-OK    hay una fila con [Alta desde pantalla d15242]
+OK    hay una fila con [Alta desde pantalla 490c17]
 OK    R10 el cobro total deja la factura pagada
      R10/captura-03-cobro-total.png
      R13/captura-03-cobro-total.png
@@ -128,34 +128,34 @@ OK    el script manda la lectura -Cantidad 12
 OK    R22 el sensor demo queda ONLINE con bateria
 OK    R18 las 12 lecturas aparecen con las fechas por defecto (12)
      R18/captura-01-lecturas-enviadas.png
-OK    hay una fila con [Regla guia 060c21]
+OK    hay una fila con [Regla guia a70cc3]
 OK    el script manda la lectura -Temperatura 45
 OK    R09 la lectura de 45 genera alerta de la regla nueva
 OK    R32 la misma lectura genera anomalia
      R09/captura-03-alertas-de-la-lectura.png
      R32/captura-02-alertas-de-la-lectura.png
-OK    hay una fila con [Regla guia 060c21]
-OK    hay una fila con [Regla guia 060c21]
-OK    hay una fila con [Regla guia 060c21]
+OK    hay una fila con [Regla guia a70cc3]
+OK    hay una fila con [Regla guia a70cc3]
+OK    hay una fila con [Regla guia a70cc3]
 OK    R26 repetir la accion avisa el error: Estado | Fecha | Tipo | Severidad | Estado | Ocurrencias | Mensaje | Incidente | La alerta no admite esa transición de estado | Alertas | Reglas | Monitoreo de envío | Mensajería
 OK    el script manda la lectura -Bateria 10
 OK    R23 la bateria baja genera alerta
-OK    hay una fila con [Cliente guia 060c21]
-OK    hay una fila con [Cliente guia 060c21]
+OK    hay una fila con [Cliente guia a70cc3]
+OK    hay una fila con [Cliente guia a70cc3]
 OK    R01 la baja deja el cliente INACTIVO
 OK    R01 el CUIT repetido se rechaza: LOGÍSTICA IoT | Grupo 4 | Administrador Grupo 4 | Clientes | Altas, consulta y estado de las organizaciones. | Razón social | CUIT | País | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
-OK    hay una fila con [Proveedor guia 060c21]
-OK    hay una fila con [Proveedor guia 060c21]
+OK    hay una fila con [Proveedor guia a70cc3]
+OK    hay una fila con [Proveedor guia a70cc3]
 OK    Proveedores la baja queda INACTIVO
 OK    Proveedores el CUIT repetido se rechaza: Administración de proveedores | Razón social | CUIT | País | Servicio | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
-OK    hay una fila con [Operador guia 060c21]
-OK    hay una fila con [Operador guia 060c21]
+OK    hay una fila con [Operador guia a70cc3]
+OK    hay una fila con [Operador guia a70cc3]
 OK    Operadores la baja queda INACTIVO
 OK    Operadores el CUIT repetido se rechaza: Administración de operadores logísticos | Razón social | CUIT | País | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
 OK    R05 el vehiculo se crea con su operador
-OK    hay una fila con [Origen 060c21]
+OK    hay una fila con [Origen a70cc3]
 OK    R06 el envio cambia de estado
-OK    hay una fila con [Origen 060c21]
+OK    hay una fila con [Origen a70cc3]
 OK    R07 el contenedor queda vigente
      R07/captura-04-contenedor-asociado.png
 OK    hay una fila con [active=true]
