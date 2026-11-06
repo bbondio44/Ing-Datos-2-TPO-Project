@@ -489,11 +489,11 @@ final class PersonaOneDialogs {
         table.getColumns().add(column("Estado", ContainerResponse::state));
         Runnable reload = () -> run(() -> table.setItems(FXCollections.observableArrayList(api.containers("").join().content())));
         Button create = new Button("Nuevo contenedor");
-        create.setOnAction(e -> containerDialog(null).ifPresent(req -> run(() -> { api.createContainer(req).join(); reload.run(); })));
+        create.setOnAction(e -> containerDialog(null, codigosDe(table)).ifPresent(req -> run(() -> { api.createContainer(req).join(); reload.run(); })));
         Button edit = new Button("Editar");
         edit.setOnAction(e -> {
             var selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) containerDialog(selected).ifPresent(req -> run(() -> {
+            if (selected != null) containerDialog(selected, codigosDe(table)).ifPresent(req -> run(() -> {
                 api.updateContainer(selected.id(), req).join(); reload.run();
             }));
         });
@@ -524,9 +524,14 @@ final class PersonaOneDialogs {
         });
     }
 
-    private Optional<ContainerRequest> containerDialog(ContainerResponse initial) {
+    private static Set<String> codigosDe(TableView<ContainerResponse> table) {
+        return table.getItems().stream().map(ContainerResponse::internationalCode)
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
+    private Optional<ContainerRequest> containerDialog(ContainerResponse initial, Set<String> codes) {
         Dialog<ContainerRequest> dialog = resultDialog(initial == null ? "Nuevo contenedor" : "Editar contenedor");
-        TextField code = text(initial == null ? null : initial.internationalCode());
+        TextField code = text(initial == null ? Formulario.generarCodigoContenedor(codes) : initial.internationalCode());
         TextField type = text(initial == null ? null : initial.type());
         TextField capacity = text(initial == null ? null : initial.capacity().toPlainString());
         ComboBox<String> state = new ComboBox<>(FXCollections.observableArrayList(
@@ -534,7 +539,7 @@ final class PersonaOneDialogs {
         state.setValue(initial == null ? "DISPONIBLE" : initial.state());
         GridPane grid = grid(); grid.addRow(0, new Label("Código"), code); grid.addRow(1, new Label("Tipo"), type);
         grid.addRow(2, new Label("Capacidad"), capacity); grid.addRow(3, new Label("Estado"), state);
-        Formulario.ayuda(grid, 0, "No repetido");
+        Formulario.ayuda(grid, 0, initial == null ? "Generado solo. Se puede cambiar" : "No repetido");
         Formulario.ayuda(grid, 1, "Ejemplo: REEFER, DRY u OPEN_TOP");
         Formulario.ayuda(grid, 2, "Mayor a 0. Decimales con punto");
         Formulario.obligatorios(grid, "Código", "Tipo", "Capacidad", "Estado");

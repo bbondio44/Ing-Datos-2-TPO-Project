@@ -128,6 +128,14 @@ final class Formulario {
         return texto.toString();
     }
 
+    /** Un código con el formato de los contenedores cargados, como TPEU0000001, que no esté usado. */
+    static String generarCodigoContenedor(Set<String> existentes) {
+        while (true) {
+            String codigo = "TPEU" + digitosAlAzar(7);
+            if (!existentes.contains(codigo)) return codigo;
+        }
+    }
+
     /** El primer error de la lista, o null si todos los campos están bien. */
     static String primerError(String... errores) {
         for (String error : errores) if (error != null) return error;

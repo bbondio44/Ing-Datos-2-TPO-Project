@@ -68,6 +68,11 @@ class FormularioCuitTest {
     }
 
     @Test
+    void generaCodigosDeContenedorConElFormatoDelDataset() {
+        assertTrue(Formulario.generarCodigoContenedor(java.util.Set.of()).matches("TPEU[0-9]{7}"));
+    }
+
+    @Test
     void armaElCodigoDeUbicacionConPaisYNombre() {
         assertEquals("ARROS", Formulario.codigoUbicacion("Argentina", "Rosario", java.util.Set.of()));
         assertEquals("ESMAL", Formulario.codigoUbicacion("España", "Málaga", java.util.Set.of()));
