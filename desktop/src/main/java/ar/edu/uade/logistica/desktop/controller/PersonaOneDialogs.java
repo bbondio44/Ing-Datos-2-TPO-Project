@@ -199,8 +199,13 @@ final class PersonaOneDialogs {
 
     private Node rolesPane() {
         TableView<RoleResponse> table = new TableView<>();
-        table.getColumns().add(column("Rol", RoleResponse::description));
-        table.getColumns().add(column("Nivel", r -> Integer.toString(r.level())));
+        // Sin ancho mínimo, la lista larga de permisos deja a estas dos columnas casi sin lugar.
+        TableColumn<RoleResponse, String> roleName = column("Rol", RoleResponse::description);
+        roleName.setMinWidth(160);
+        TableColumn<RoleResponse, String> roleLevel = column("Nivel", r -> Integer.toString(r.level()));
+        roleLevel.setMinWidth(70);
+        table.getColumns().add(roleName);
+        table.getColumns().add(roleLevel);
         table.getColumns().add(column("Permisos", r -> String.join(", ", r.permissions())));
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
         Label status = new Label();
