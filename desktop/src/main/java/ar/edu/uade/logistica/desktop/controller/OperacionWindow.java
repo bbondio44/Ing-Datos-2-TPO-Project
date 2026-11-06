@@ -154,7 +154,15 @@ public final class OperacionWindow {
         HBox tablas = new HBox(12, lecturasEnvio, eventosEnvio);
         HBox.setHgrow(lecturasEnvio, Priority.ALWAYS);
         HBox.setHgrow(eventosEnvio, Priority.ALWAYS);
-        return panel(new HBox(10, idEnvio, boton("Consultar", this::consultarEnvio)), tablas, resumenEnvio);
+        return panel(new HBox(10, idEnvio, boton("Elegir…", this::elegirEnvio), boton("Consultar", this::consultarEnvio)),
+                tablas, resumenEnvio);
+    }
+
+    /** Lista los envíos con su cliente, su ruta y su UUID. */
+    private void elegirEnvio() {
+        al(AppContext.get().api().shipments(""), resumenEnvio, pagina -> Formulario.elegirDeLista("Envío", pagina.content(),
+                e -> e.clientName() + " — " + e.origin() + " → " + e.destination() + " — " + e.id())
+                .ifPresent(e -> idEnvio.setText(e.id().toString())));
     }
 
     private VBox pestaniaMensajeria() {
