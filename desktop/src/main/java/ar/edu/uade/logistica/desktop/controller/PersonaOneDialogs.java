@@ -331,6 +331,11 @@ final class PersonaOneDialogs {
         return dialog.showAndWait();
     }
 
+    /** Reabre el detalle cuando el anterior ya cerró: abrirlo adentro de su evento apila diálogos y frena Platform.runLater. */
+    private void reabrirDetalle(ShipmentResponse shipment) {
+        javafx.application.Platform.runLater(() -> showShipmentDetail(shipment));
+    }
+
     private void showShipmentDetail(ShipmentResponse shipment) {
         run(() -> {
             Dialog<Void> dialog = baseDialog("Trazabilidad del envío", 980, 620);
@@ -359,14 +364,14 @@ final class PersonaOneDialogs {
                 choice.showAndWait().ifPresent(c -> api.assignContainer(shipment.id(),
                         new ContainerAssignmentRequest(c.id(), Instant.now(), null)).join());
                 dialog.close();
-                showShipmentDetail(shipment);
+                reabrirDetalle(shipment);
             }));
             Button unassignContainer = new Button("Desasociar");
             unassignContainer.setOnAction(e -> {
                 ContainerAssignmentResponse selected = containers.getSelectionModel().getSelectedItem();
                 if (selected != null && selected.active()) run(() -> {
                     api.unassignContainer(shipment.id(), selected.containerId(), selected.startAt()).join();
-                    dialog.close(); showShipmentDetail(shipment);
+                    dialog.close(); reabrirDetalle(shipment);
                 });
             });
             Button assignSensor = new Button("Asociar sensor");
@@ -380,7 +385,7 @@ final class PersonaOneDialogs {
                             s -> s.type() + " — " + s.id());
                     choice.showAndWait().ifPresent(s -> api.assignSensor(new SensorAssignmentRequest(
                             s.id(), selected.containerId(), Instant.now(), null)).join());
-                    dialog.close(); showShipmentDetail(shipment);
+                    dialog.close(); reabrirDetalle(shipment);
                 });
             });
             Button unassignSensor = new Button("Desasociar sensor");
@@ -388,7 +393,7 @@ final class PersonaOneDialogs {
                 SensorAssignmentResponse selected = sensors.getSelectionModel().getSelectedItem();
                 if (selected != null && selected.active()) run(() -> {
                     api.unassignSensor(selected.assignmentId()).join();
-                    dialog.close(); showShipmentDetail(shipment);
+                    dialog.close(); reabrirDetalle(shipment);
                 });
             });
             VBox content = new VBox(8, new Label("Contenedores (vigentes e históricos)"),
