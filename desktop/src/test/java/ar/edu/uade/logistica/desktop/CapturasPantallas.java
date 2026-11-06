@@ -611,6 +611,13 @@ public class CapturasPantallas extends Application {
         String nombre = "Cliente guia " + marca;
         Window nuevo = abrirCon(() -> click(boton(principal, "Nuevo cliente")));
         escribir(nuevo, "Razón social", nombre);
+        escribir(nuevo, "Email", "email-mal-escrito");
+        Window aviso = abrirConError(() -> click(boton(nuevo, "Guardar")));
+        verificar("R01 un email mal escrito avisa", fx(() -> ((DialogPane) aviso.getScene().getRoot()).getContentText().contains("email")));
+        aceptar(aviso);
+        esperarCierre(aviso);
+        verificar("R01 el formulario sigue abierto con lo cargado", fx(nuevo::isShowing));
+        escribir(nuevo, "Email", "");
         click(boton(nuevo, "Generar"));
         click(boton(nuevo, "Guardar"));
         esperarCierre(nuevo);
@@ -963,6 +970,11 @@ public class CapturasPantallas extends Application {
             escribir(nuevo, "Email", usuario[0]);
             escribir(nuevo, "Contraseña", CLAVE_GUIA);
             elegir(nuevo, "Tipo titular", "CLIENTE");
+            Window titulares = abrirCon(() -> click(boton(nuevo, "Elegir…")));
+            click(boton(titulares, "Seleccionar"));
+            esperarCierre(titulares);
+            verificar("R02 Elegir completa el UUID del titular", fx(() ->
+                    ((TextField) campo(nuevo, "UUID titular")).getText().matches("[0-9a-f-]{36}")));
             escribir(nuevo, "UUID titular", usuario[1]);
             fx(() -> {
                 javafx.scene.control.ListView<?> roles = nodosDe(nuevo, javafx.scene.control.ListView.class).getFirst();

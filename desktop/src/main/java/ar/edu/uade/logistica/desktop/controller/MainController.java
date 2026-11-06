@@ -157,11 +157,19 @@ public class MainController {
 
         Node saveButton = dialog.getDialogPane().lookupButton(save);
         saveButton.disableProperty().bind(name.textProperty().isEmpty().or(country.textProperty().isEmpty()));
+        validarCuitYEmail(dialog, cuit, email);
         dialog.setResultConverter(button -> button == save
                 ? new ClientRequest(name.getText().strip(), nullable(cuit.getText()), nullable(email.getText()),
                     nullable(phone.getText()), nullable(address.getText()), country.getText().strip())
                 : null);
         return dialog.showAndWait();
+    }
+
+    private void validarCuitYEmail(Dialog<?> dialog, TextField cuit, TextField email) {
+        Formulario.validarAlGuardar(dialog, () -> {
+            String error = Formulario.errorCuit(cuit.getText());
+            return error != null ? error : Formulario.errorEmail(email.getText());
+        });
     }
 
     private void saveClient(ClientResponse initial, ClientRequest request) {
@@ -402,6 +410,7 @@ public class MainController {
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty()
                 .bind(name.textProperty().isEmpty().or(country.textProperty().isEmpty()));
+        validarCuitYEmail(dialog, cuit, email);
         dialog.setResultConverter(button -> button == save
                 ? new OrganizationRequest(name.getText().strip(), nullable(cuit.getText()), nullable(email.getText()),
                     nullable(phone.getText()), nullable(address.getText()), country.getText().strip(),
@@ -455,11 +464,11 @@ public class MainController {
         Runnable reload = () -> loadLocations(search.getText(), table, status);
         searchButton.setOnAction(event -> reload.run());
         search.setOnAction(event -> reload.run());
-        create.setOnAction(event -> locationDialog(null)
+        create.setOnAction(event -> locationDialog(null, codigosDe(table))
                 .ifPresent(request -> saveLocation(null, request, reload, status)));
         edit.setOnAction(event -> {
             LocationResponse selected = table.getSelectionModel().getSelectedItem();
-            if (selected != null) locationDialog(selected)
+            if (selected != null) locationDialog(selected, codigosDe(table))
                     .ifPresent(request -> saveLocation(selected, request, reload, status));
         });
         delete.setOnAction(event -> {
@@ -502,7 +511,11 @@ public class MainController {
         }));
     }
 
-    private Optional<LocationRequest> locationDialog(LocationResponse initial) {
+    private java.util.Set<String> codigosDe(TableView<LocationResponse> table) {
+        return table.getItems().stream().map(LocationResponse::code).collect(java.util.stream.Collectors.toSet());
+    }
+
+    private Optional<LocationRequest> locationDialog(LocationResponse initial, java.util.Set<String> codigos) {
         Dialog<LocationRequest> dialog = new Dialog<>();
         dialog.setTitle(initial == null ? "Nueva ubicación" : "Editar ubicación");
         ButtonType save = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
@@ -519,11 +532,20 @@ public class MainController {
         grid.addRow(1, new Label("Nombre"), name);
         grid.addRow(2, new Label("País"), country);
         grid.addRow(3, new Label("Tipo"), type);
-        Formulario.ayuda(grid, 0, "No repetido");
+        Button generate = new Button("Generar");
+        generate.disableProperty().bind(name.textProperty().isEmpty().or(country.textProperty().isEmpty()));
+        generate.setOnAction(event -> code.setText(
+                Formulario.codigoUbicacion(country.getText(), name.getText(), codigos)));
+        Formulario.conBoton(grid, 0, generate, "No repetido. Generar lo arma con el país y el nombre");
         Formulario.obligatorios(grid, "Código", "Nombre", "País", "Tipo");
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().lookupButton(save).disableProperty().bind(
                 code.textProperty().isEmpty().or(name.textProperty().isEmpty()).or(country.textProperty().isEmpty()));
+        Formulario.validarAlGuardar(dialog, () -> {
+            String codigo = code.getText().strip();
+            boolean mismo = initial != null && initial.code().equals(codigo);
+            return !mismo && codigos.contains(codigo) ? "Ya existe una ubicación con ese código" : null;
+        });
         dialog.setResultConverter(button -> button == save
                 ? new LocationRequest(code.getText().strip(), name.getText().strip(),
                     country.getText().strip(), type.getValue()) : null);

@@ -178,6 +178,22 @@ final class PersonaOneDialogs {
         if (initial == null) Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Contraseña", "Roles");
         else Formulario.obligatorios(grid, "Nombre", "Apellido", "Email", "Roles");
         dialog.getDialogPane().setContent(grid);
+        Formulario.validarAlGuardar(dialog, () -> {
+            if (firstName.getText().isBlank() || lastName.getText().isBlank()) return "Completá el nombre y el apellido";
+            if (email.getText().isBlank()) return "Completá el email";
+            String emailError = Formulario.errorEmail(email.getText());
+            if (emailError != null) return emailError;
+            if (initial == null && password.getText().isBlank()) return "Completá la contraseña";
+            if (!password.getText().isBlank() && password.getText().length() < 12) {
+                return "La contraseña debe tener al menos 12 caracteres";
+            }
+            if (!"SIN ORGANIZACIÓN".equals(ownerType.getValue())) {
+                if (ownerId.getText().isBlank()) return "Elegí el titular con el botón Elegir…";
+                try { UUID.fromString(ownerId.getText().strip()); }
+                catch (IllegalArgumentException exception) { return "El UUID del titular no es válido"; }
+            }
+            return roleList.getSelectionModel().isEmpty() ? "Elegí al menos un rol" : null;
+        });
         dialog.setResultConverter(button -> {
             if (button.getButtonData() != ButtonBar.ButtonData.OK_DONE) return null;
             try {

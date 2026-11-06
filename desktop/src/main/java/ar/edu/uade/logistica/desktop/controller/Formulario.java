@@ -1,16 +1,23 @@
 package ar.edu.uade.logistica.desktop.controller;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 
+import java.text.Normalizer;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /** Aclara en cada formulario qué campos son obligatorios y qué requisitos tienen. */
 final class Formulario {
@@ -24,6 +31,50 @@ final class Formulario {
         Label ayuda = new Label(texto);
         ayuda.setStyle(GRIS);
         grid.add(ayuda, 2, fila);
+    }
+
+    /** Al tocar Guardar corre la validación: si hay un error lo muestra y deja el formulario abierto con lo cargado. */
+    static void validarAlGuardar(Dialog<?> dialogo, Supplier<String> validacion) {
+        for (ButtonType tipo : dialogo.getDialogPane().getButtonTypes()) {
+            if (tipo.getButtonData() != ButtonBar.ButtonData.OK_DONE) continue;
+            dialogo.getDialogPane().lookupButton(tipo).addEventFilter(ActionEvent.ACTION, evento -> {
+                String error = validacion.get();
+                if (error == null) return;
+                evento.consume();
+                Alert alerta = new Alert(Alert.AlertType.ERROR, error, ButtonType.OK);
+                alerta.setHeaderText("Revisá los datos");
+                alerta.showAndWait();
+            });
+        }
+    }
+
+    /** El mensaje del dato mal cargado, o null si el email está vacío o bien escrito. */
+    static String errorEmail(String email) {
+        if (email == null || email.isBlank()) return null;
+        return email.strip().matches("[^@\\s]+@[^@\\s.]+(\\.[^@\\s.]+)*") ? null
+                : "El email no es válido. Tiene que tener el formato nombre@dominio.com";
+    }
+
+    /** El mensaje del dato mal cargado, o null si el CUIT está vacío o es válido. */
+    static String errorCuit(String cuit) {
+        if (cuit == null || cuit.isBlank()) return null;
+        String limpio = cuit.strip();
+        if (!limpio.matches("\\d{11}")) return "El CUIT debe tener 11 dígitos, sin guiones ni espacios";
+        return digitoVerificador(limpio) == limpio.charAt(10) - '0' ? null
+                : "El CUIT no es válido: no coincide el último dígito. Podés usar el botón Generar";
+    }
+
+    /** Dos letras del país y tres del nombre, como ARROS; si ese ya existe, le suma un número. */
+    static String codigoUbicacion(String pais, String nombre, Set<String> existentes) {
+        String base = letras(pais, 2) + letras(nombre, 3);
+        String codigo = base;
+        for (int i = 2; existentes.contains(codigo); i++) codigo = base + i;
+        return codigo;
+    }
+
+    private static String letras(String texto, int cantidad) {
+        String limpio = Normalizer.normalize(texto, Normalizer.Form.NFD).toUpperCase().replaceAll("[^A-Z0-9]", "");
+        return limpio.substring(0, Math.min(cantidad, limpio.length()));
     }
 
     /** Agrega al lado del CUIT un botón que completa uno válido y la aclaración de sus requisitos. */
