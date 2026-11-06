@@ -5,24 +5,27 @@
 <BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="ar.edu.uade.logistica.desktop.controller.MainController" styleClass="app-root">
     <left>
         <VBox prefWidth="240" spacing="8" styleClass="sidebar">
-            <padding><Insets top="28" right="18" bottom="22" left="18"/></padding>
+            <padding><Insets top="20" right="18" bottom="16" left="18"/></padding>
             <Label text="LOGÍSTICA IoT" styleClass="sidebar-brand"/>
             <Label text="Grupo 4" styleClass="sidebar-caption"/>
             <Separator/>
-            <Button text="Clientes" maxWidth="Infinity" styleClass="nav-button-active"/>
-            <Button text="Usuarios y roles" onAction="#showAdministration" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Proveedores" onAction="#showSuppliers" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Operadores" onAction="#showOperators" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Ubicaciones" onAction="#showLocations" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Vehículos" onAction="#showVehicles" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Envíos" onAction="#showShipments" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Trayectos" onAction="#showRoutes" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Monitoreo IoT" onAction="#showIotMonitoring" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Alertas" onAction="#showOperations" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Facturación" onAction="#showFinance" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Reportes" onAction="#showReports" maxWidth="Infinity" styleClass="nav-button"/>
-            <Button text="Analítica" onAction="#showAnalytics" maxWidth="Infinity" styleClass="nav-button"/>
-            <Region VBox.vgrow="ALWAYS"/>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="sidebar-scroll">
+                <VBox spacing="2">
+                    <Button text="Clientes" maxWidth="Infinity" styleClass="nav-button-active"/>
+                    <Button text="Usuarios y roles" onAction="#showAdministration" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Proveedores" onAction="#showSuppliers" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Operadores" onAction="#showOperators" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Ubicaciones" onAction="#showLocations" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Vehículos" onAction="#showVehicles" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Envíos" onAction="#showShipments" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Trayectos" onAction="#showRoutes" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Monitoreo IoT" onAction="#showIotMonitoring" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Alertas" onAction="#showOperations" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Facturación" onAction="#showFinance" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Reportes" onAction="#showReports" maxWidth="Infinity" styleClass="nav-button"/>
+                    <Button text="Analítica" onAction="#showAnalytics" maxWidth="Infinity" styleClass="nav-button"/>
+                </VBox>
+            </ScrollPane>
             <Label fx:id="userLabel" styleClass="sidebar-user" wrapText="true"/>
             <Button text="Sesiones activas" onAction="#showSessions" maxWidth="Infinity" styleClass="secondary-button"/>
             <Button text="Cerrar sesión" onAction="#logout" maxWidth="Infinity" styleClass="secondary-button"/>

@@ -33,11 +33,12 @@
 .error-label { -fx-text-fill: #ba2d3d; }
 .sidebar-brand { -fx-font-size: 21px; -fx-font-weight: 800; -fx-text-fill: white; }
 .sidebar .separator .line { -fx-border-color: #314464; }
+.sidebar-scroll, .sidebar-scroll > .viewport { -fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0; }
 .nav-button, .nav-button-active {
     -fx-alignment: CENTER_LEFT;
     -fx-background-color: transparent;
     -fx-text-fill: #b9c7db;
-    -fx-padding: 11px 12px;
+    -fx-padding: 7px 12px;
 }
 .nav-button-active { -fx-background-color: #1d75d9; -fx-text-fill: white; -fx-font-weight: 700; }
 .sidebar-user { -fx-text-fill: white; -fx-font-weight: 600; }
