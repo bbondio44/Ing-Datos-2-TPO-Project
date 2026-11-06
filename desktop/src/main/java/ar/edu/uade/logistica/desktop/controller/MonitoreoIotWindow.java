@@ -194,19 +194,23 @@ public final class MonitoreoIotWindow {
                 }));
     }
 
-    /** Mapa con Leaflet: la línea es el recorrido en orden cronológico y el marcador, la última posición. */
+    /**
+     * Mapa con Leaflet: la línea es el recorrido en orden cronológico y el marcador, la última posición.
+     * Sin 3D ni animaciones: con ellas el WebView de JavaFX carga las imágenes pero no las pinta y el mapa queda gris.
+     */
     static String html(List<PosicionResponse> posiciones) {
         String puntos = posiciones.stream()
                 .map(p -> String.format(Locale.ROOT, "[%f,%f]", p.latitud(), p.longitud()))
                 .collect(Collectors.joining(","));
         return """
                 <!doctype html><html><head><meta charset="utf-8">
+                <script>L_DISABLE_3D=true;</script>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
                 <style>html,body,#mapa{height:100%;margin:0}</style></head>
                 <body><div id="mapa"></div><script>
                 var puntos=[PUNTOS];
-                var mapa=L.map('mapa');
+                var mapa=L.map('mapa',{fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false});
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
                   {attribution:'Esri',maxZoom:18}).addTo(mapa);
                 var linea=L.polyline(puntos,{color:'#1769d2',weight:4}).addTo(mapa);
