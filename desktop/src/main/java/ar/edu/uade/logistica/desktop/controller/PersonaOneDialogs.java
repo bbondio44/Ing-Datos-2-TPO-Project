@@ -240,7 +240,8 @@ final class PersonaOneDialogs {
         Spinner<Integer> level = new Spinner<>(0, 100, initial == null ? 50 : initial.level());
         ListView<PermissionResponse> list = new ListView<>(FXCollections.observableArrayList(permissions));
         list.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        list.setCellFactory(ignored -> listCell(p -> p.code() + " — " + p.description()));
+        list.setCellFactory(ignored -> listCell(PersonaOneDialogs::permissionLabel));
+        list.setPrefWidth(470);
         if (initial != null) for (int i = 0; i < permissions.size(); i++) {
             if (initial.permissions().contains(permissions.get(i).code())) list.getSelectionModel().select(i);
         }
@@ -257,6 +258,13 @@ final class PersonaOneDialogs {
                 ? new RoleRequest(name.getText(), level.getValue(), list.getSelectionModel().getSelectedItems()
                 .stream().map(PermissionResponse::code).collect(java.util.stream.Collectors.toSet())) : null);
         return dialog.showAndWait();
+    }
+
+    /** El código del permiso, con su descripción solo cuando agrega algo: varias repiten "Permiso CODIGO". */
+    static String permissionLabel(PermissionResponse permission) {
+        String description = permission.description();
+        return description == null || description.equals("Permiso " + permission.code())
+                ? permission.code() : permission.code() + " — " + description;
     }
 
     void showShipments() {
