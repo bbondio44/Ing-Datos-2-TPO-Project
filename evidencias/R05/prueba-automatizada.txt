@@ -3,14 +3,14 @@ OK    alta: esperado=201 obtenido=201
 OK    baja logica: esperado=204 obtenido=204
 OK    alta de vehiculo: esperado=201 obtenido=201
 OK    vehiculo de operador inactivo: esperado=409 obtenido=409
-OK    operadores de la demo presentes en Neo4j: esperado=8 obtenido=8
+OK    operadores de la demo presentes en Neo4j: esperado=7 obtenido=7
 OK    tramos con operador en Neo4j: esperado=47 obtenido=47
 === R24 R04 R05 trayectos con operador y proveedor
 OK    alta del tramo 2: esperado=201 obtenido=201
 OK    alta del tramo 1: esperado=201 obtenido=201
 OK    tramos en secuencia: esperado=1,2 obtenido=1,2
-OK    R05 operador visible en el tramo: esperado=Operador 4fbc58 obtenido=Operador 4fbc58
-OK    R04 proveedor visible en el tramo: esperado=Proveedor 4fbc58 obtenido=Proveedor 4fbc58
+OK    R05 operador visible en el tramo: esperado=Operador a4a917 obtenido=Operador a4a917
+OK    R04 proveedor visible en el tramo: esperado=Proveedor a4a917 obtenido=Proveedor a4a917
 OK    vehiculo de otro operador: esperado=409 obtenido=409
 OK    fechas invertidas: esperado=409 obtenido=409
 OK    finalizado sin llegada real: esperado=409 obtenido=409

@@ -7,7 +7,7 @@ OK    dia que no es primero de mes: esperado=409 obtenido=409
 OK    cierres registrados: esperado=1 obtenido=1
 === R15 cierre periodico de todas las cuentas
 OK    cierre de todas: esperado=200 obtenido=200
-OK    cerradas mas salteadas igual a cuentas: esperado=42 obtenido=42
+OK    cerradas mas salteadas igual a cuentas: esperado=38 obtenido=38
 OK    la cuenta ya cerrada despues se saltea: esperado=True obtenido=True
 OK    repetir no cierra nada: esperado=0 obtenido=0
 OK    CLIENTE no cierra cuentas: esperado=403 obtenido=403

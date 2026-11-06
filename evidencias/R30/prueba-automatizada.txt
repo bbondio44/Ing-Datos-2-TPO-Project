@@ -1,17 +1,17 @@
 ﻿pendientes al inicio: 0
 === R30 worker del outbox: Postgres -> Neo4j
 OK    outbox vacio: esperado=0 obtenido=0
-     Cliente=14 Contenedor=30 Envio=29 Incidente=17 Operador=8 Tramo=48 Ubicacion=17 Vehiculo=3
-OK    Cliente igual que Postgres: esperado=Cliente=14 obtenido=Cliente=14
-OK    Envio igual que Postgres: esperado=Envio=29 obtenido=Envio=29
+     Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    Cliente igual que Postgres: esperado=Cliente=12 obtenido=Cliente=12
+OK    Envio igual que Postgres: esperado=Envio=28 obtenido=Envio=28
 OK    Tramo igual que Postgres: esperado=Tramo=48 obtenido=Tramo=48
-OK    Contenedor igual que Postgres: esperado=Contenedor=30 obtenido=Contenedor=30
-OK    Operador igual que Postgres: esperado=Operador=8 obtenido=Operador=8
-OK    Incidente igual que Postgres: esperado=Incidente=17 obtenido=Incidente=17
+OK    Contenedor igual que Postgres: esperado=Contenedor=29 obtenido=Contenedor=29
+OK    Operador igual que Postgres: esperado=Operador=7 obtenido=Operador=7
+OK    Incidente igual que Postgres: esperado=Incidente=14 obtenido=Incidente=14
 === R30 reprocesar todo no duplica
 OK    outbox vacio tras reprocesar: esperado=0 obtenido=0
-OK    mismos nodos: esperado=Cliente=14 Contenedor=30 Envio=29 Incidente=17 Operador=8 Tramo=48 Ubicacion=17 Vehiculo=3 obtenido=Cliente=14 Contenedor=30 Envio=29 Incidente=17 Operador=8 Tramo=48 Ubicacion=17 Vehiculo=3
-OK    mismas relaciones: esperado=286 obtenido=286
+OK    mismos nodos: esperado=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2 obtenido=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    mismas relaciones: esperado=280 obtenido=280
 === R30 falla parcial: Neo4j caido
      con Neo4j caido: ERROR|1|Unable to connect to localhost:7687, ensure the da
 OK    se pone al dia solo: esperado=0 obtenido=0

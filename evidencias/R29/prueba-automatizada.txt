@@ -1,12 +1,12 @@
 ﻿=== R29 prediccion
-     primera corrida genero 0
+     primera corrida genero 6
 OK    segunda corrida del dia no repite: esperado=0 obtenido=0
 OK    una prediccion por envio en transito: esperado=7 obtenido=7
-     ejemplo: Buenos Aires -> Santos eta=2026-11-15T02:43:47.571+00:00 riesgo=1.00000
+     ejemplo: Buenos Aires -> Santos eta=2026-11-15T17:51:47.994+00:00 riesgo=1.00000
      validacion: evaluados=18 promedio=103.17h error_medio=68.06h
 === R29 R34 riesgos de la prediccion
 OK    generar predicciones: esperado=200 obtenido=200
 OK    riesgo climatico por medio maritimo: esperado=0.5 obtenido=0.5
-OK    riesgo operativo contra calculo manual: esperado=0.58 obtenido=0.58
+OK    riesgo operativo contra calculo manual: esperado=0.6 obtenido=0.6
 OK    todas las predicciones tienen riesgos: esperado=0 obtenido=0
-OK    R34 el reporte incluye los riesgos: esperado=0.58 obtenido=0.58
+OK    R34 el reporte incluye los riesgos: esperado=0.6 obtenido=0.6
