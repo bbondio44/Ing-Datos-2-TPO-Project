@@ -6,6 +6,7 @@ CREATE CONSTRAINT ubicacion_id IF NOT EXISTS FOR (n:Ubicacion) REQUIRE n.id_ubic
 CREATE CONSTRAINT vehiculo_id IF NOT EXISTS FOR (n:Vehiculo) REQUIRE n.id_vehiculo IS UNIQUE;
 CREATE CONSTRAINT operador_id IF NOT EXISTS FOR (n:Operador) REQUIRE n.id_operador IS UNIQUE;
 CREATE CONSTRAINT incidente_id IF NOT EXISTS FOR (n:Incidente) REQUIRE n.id_incidente IS UNIQUE;
+CREATE CONSTRAINT punto_id IF NOT EXISTS FOR (n:Punto) REQUIRE n.codigo IS UNIQUE;
 CREATE INDEX envio_estado IF NOT EXISTS FOR (n:Envio) ON (n.estado);
 CREATE INDEX tramo_medio IF NOT EXISTS FOR (n:Tramo) ON (n.medio_transporte);
 CREATE INDEX incidente_tipo IF NOT EXISTS FOR (n:Incidente) ON (n.tipo);

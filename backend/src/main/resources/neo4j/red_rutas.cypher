@@ -1,0 +1,84 @@
+// Red de rutas: ciudades, puertos, aeropuertos y puntos de alta mar, unidos por CONECTA.
+// El backend la carga al arrancar. Usa MERGE, así que cargarla dos veces no duplica nada.
+// Coordenadas reales aproximadas. Los km son la distancia en línea recta entre los dos puntos,
+// más un 25 % en los tramos terrestres porque las rutas no van derecho.
+// Los puntos de alta mar existen para que las rutas marítimas no crucen tierra.
+
+MERGE (p:Punto {codigo: 'BUE'}) SET p.nombre = 'Buenos Aires', p.pais = 'Argentina', p.tipo = 'PUERTO', p.latitud = -34.6037, p.longitud = -58.3816;
+MERGE (p:Punto {codigo: 'EZE'}) SET p.nombre = 'Ezeiza', p.pais = 'Argentina', p.tipo = 'AEROPUERTO', p.latitud = -34.8222, p.longitud = -58.5358;
+MERGE (p:Punto {codigo: 'ROS'}) SET p.nombre = 'Rosario', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -32.9468, p.longitud = -60.6393;
+MERGE (p:Punto {codigo: 'SFE'}) SET p.nombre = 'Santa Fe', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -31.6333, p.longitud = -60.7000;
+MERGE (p:Punto {codigo: 'PRA'}) SET p.nombre = 'Paraná', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -31.7413, p.longitud = -60.5115;
+MERGE (p:Punto {codigo: 'GCH'}) SET p.nombre = 'Gualeguaychú', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -33.0094, p.longitud = -58.5172;
+MERGE (p:Punto {codigo: 'COR'}) SET p.nombre = 'Córdoba', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -31.4201, p.longitud = -64.1888;
+MERGE (p:Punto {codigo: 'MDZ'}) SET p.nombre = 'Mendoza', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -32.8895, p.longitud = -68.8458;
+MERGE (p:Punto {codigo: 'TUC'}) SET p.nombre = 'San Miguel de Tucumán', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -26.8083, p.longitud = -65.2176;
+MERGE (p:Punto {codigo: 'SLA'}) SET p.nombre = 'Salta', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -24.7821, p.longitud = -65.4232;
+MERGE (p:Punto {codigo: 'BHI'}) SET p.nombre = 'Bahía Blanca', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -38.7196, p.longitud = -62.2724;
+MERGE (p:Punto {codigo: 'MDQ'}) SET p.nombre = 'Mar del Plata', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -38.0055, p.longitud = -57.5426;
+MERGE (p:Punto {codigo: 'NQN'}) SET p.nombre = 'Neuquén', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -38.9516, p.longitud = -68.0591;
+MERGE (p:Punto {codigo: 'CRR'}) SET p.nombre = 'Corrientes', p.pais = 'Argentina', p.tipo = 'CIUDAD', p.latitud = -27.4692, p.longitud = -58.8306;
+MERGE (p:Punto {codigo: 'ASU'}) SET p.nombre = 'Asunción', p.pais = 'Paraguay', p.tipo = 'CIUDAD', p.latitud = -25.2637, p.longitud = -57.5759;
+MERGE (p:Punto {codigo: 'MVD'}) SET p.nombre = 'Montevideo', p.pais = 'Uruguay', p.tipo = 'PUERTO', p.latitud = -34.9011, p.longitud = -56.1645;
+MERGE (p:Punto {codigo: 'SCL'}) SET p.nombre = 'Santiago', p.pais = 'Chile', p.tipo = 'AEROPUERTO', p.latitud = -33.4489, p.longitud = -70.6693;
+MERGE (p:Punto {codigo: 'VAP'}) SET p.nombre = 'Valparaíso', p.pais = 'Chile', p.tipo = 'PUERTO', p.latitud = -33.0472, p.longitud = -71.6127;
+MERGE (p:Punto {codigo: 'POA'}) SET p.nombre = 'Porto Alegre', p.pais = 'Brasil', p.tipo = 'CIUDAD', p.latitud = -30.0346, p.longitud = -51.2177;
+MERGE (p:Punto {codigo: 'SAO'}) SET p.nombre = 'São Paulo', p.pais = 'Brasil', p.tipo = 'AEROPUERTO', p.latitud = -23.5505, p.longitud = -46.6333;
+MERGE (p:Punto {codigo: 'SSZ'}) SET p.nombre = 'Santos', p.pais = 'Brasil', p.tipo = 'PUERTO', p.latitud = -23.9608, p.longitud = -46.3336;
+MERGE (p:Punto {codigo: 'CLL'}) SET p.nombre = 'Callao', p.pais = 'Perú', p.tipo = 'PUERTO', p.latitud = -12.0566, p.longitud = -77.1181;
+MERGE (p:Punto {codigo: 'VLC'}) SET p.nombre = 'Valencia', p.pais = 'España', p.tipo = 'PUERTO', p.latitud = 39.4443, p.longitud = -0.3166;
+MERGE (p:Punto {codigo: 'MIA'}) SET p.nombre = 'Miami', p.pais = 'Estados Unidos', p.tipo = 'PUERTO', p.latitud = 25.7743, p.longitud = -80.1937;
+MERGE (p:Punto {codigo: 'MPE'}) SET p.nombre = 'Frente a Punta del Este', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = -35.3000, p.longitud = -54.5000;
+MERGE (p:Punto {codigo: 'MRS'}) SET p.nombre = 'Frente a Rio Grande do Sul', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = -31.5000, p.longitud = -49.5000;
+MERGE (p:Punto {codigo: 'MAS'}) SET p.nombre = 'Atlántico Sur', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = -24.5000, p.longitud = -40.0000;
+MERGE (p:Punto {codigo: 'MAC'}) SET p.nombre = 'Atlántico Central', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = -5.0000, p.longitud = -28.0000;
+MERGE (p:Punto {codigo: 'MAE'}) SET p.nombre = 'Atlántico Ecuatorial Norte', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 10.0000, p.longitud = -30.0000;
+MERGE (p:Punto {codigo: 'MAN'}) SET p.nombre = 'Atlántico Norte', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 30.0000, p.longitud = -18.0000;
+MERGE (p:Punto {codigo: 'MGB'}) SET p.nombre = 'Estrecho de Gibraltar', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 35.9500, p.longitud = -5.6000;
+MERGE (p:Punto {codigo: 'MAL'}) SET p.nombre = 'Mar de Alborán', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 36.3000, p.longitud = -1.5000;
+MERGE (p:Punto {codigo: 'MBA'}) SET p.nombre = 'Mar Balear', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 38.7000, p.longitud = 0.7000;
+MERGE (p:Punto {codigo: 'MAO'}) SET p.nombre = 'Atlántico Oeste', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 22.0000, p.longitud = -60.0000;
+MERGE (p:Punto {codigo: 'MBH'}) SET p.nombre = 'Norte de Bahamas', p.pais = 'Alta mar', p.tipo = 'ALTA_MAR', p.latitud = 28.0000, p.longitud = -78.0000;
+
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'EZE'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 35;
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'ROS'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 348;
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'GCH'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 222;
+MATCH (a:Punto {codigo: 'GCH'}), (b:Punto {codigo: 'PRA'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 293;
+MATCH (a:Punto {codigo: 'PRA'}), (b:Punto {codigo: 'SFE'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 27;
+MATCH (a:Punto {codigo: 'ROS'}), (b:Punto {codigo: 'SFE'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 183;
+MATCH (a:Punto {codigo: 'ROS'}), (b:Punto {codigo: 'COR'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 468;
+MATCH (a:Punto {codigo: 'COR'}), (b:Punto {codigo: 'MDZ'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 585;
+MATCH (a:Punto {codigo: 'COR'}), (b:Punto {codigo: 'TUC'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 653;
+MATCH (a:Punto {codigo: 'TUC'}), (b:Punto {codigo: 'SLA'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 283;
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'MDQ'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 482;
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'BHI'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 718;
+MATCH (a:Punto {codigo: 'BHI'}), (b:Punto {codigo: 'NQN'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 627;
+MATCH (a:Punto {codigo: 'NQN'}), (b:Punto {codigo: 'MDZ'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 847;
+MATCH (a:Punto {codigo: 'MDZ'}), (b:Punto {codigo: 'SCL'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 226;
+MATCH (a:Punto {codigo: 'SCL'}), (b:Punto {codigo: 'VAP'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 123;
+MATCH (a:Punto {codigo: 'SFE'}), (b:Punto {codigo: 'CRR'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 621;
+MATCH (a:Punto {codigo: 'CRR'}), (b:Punto {codigo: 'ASU'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 344;
+MATCH (a:Punto {codigo: 'GCH'}), (b:Punto {codigo: 'MVD'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 378;
+MATCH (a:Punto {codigo: 'MVD'}), (b:Punto {codigo: 'POA'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 891;
+MATCH (a:Punto {codigo: 'POA'}), (b:Punto {codigo: 'SAO'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 1065;
+MATCH (a:Punto {codigo: 'SAO'}), (b:Punto {codigo: 'SSZ'}) MERGE (a)-[r:CONECTA {medio: 'TERRESTRE'}]->(b) SET r.km = 69;
+MATCH (a:Punto {codigo: 'BUE'}), (b:Punto {codigo: 'MVD'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 205;
+MATCH (a:Punto {codigo: 'MVD'}), (b:Punto {codigo: 'MPE'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 158;
+MATCH (a:Punto {codigo: 'MPE'}), (b:Punto {codigo: 'MRS'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 628;
+MATCH (a:Punto {codigo: 'MRS'}), (b:Punto {codigo: 'SSZ'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 894;
+MATCH (a:Punto {codigo: 'SSZ'}), (b:Punto {codigo: 'MAS'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 645;
+MATCH (a:Punto {codigo: 'MAS'}), (b:Punto {codigo: 'MAC'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 2519;
+MATCH (a:Punto {codigo: 'MAC'}), (b:Punto {codigo: 'MAE'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 1683;
+MATCH (a:Punto {codigo: 'MAE'}), (b:Punto {codigo: 'MAN'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 2548;
+MATCH (a:Punto {codigo: 'MAN'}), (b:Punto {codigo: 'MGB'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 1331;
+MATCH (a:Punto {codigo: 'MGB'}), (b:Punto {codigo: 'MAL'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 370;
+MATCH (a:Punto {codigo: 'MAL'}), (b:Punto {codigo: 'MBA'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 330;
+MATCH (a:Punto {codigo: 'MBA'}), (b:Punto {codigo: 'VLC'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 121;
+MATCH (a:Punto {codigo: 'MAE'}), (b:Punto {codigo: 'MAO'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 3464;
+MATCH (a:Punto {codigo: 'MAO'}), (b:Punto {codigo: 'MBH'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 1930;
+MATCH (a:Punto {codigo: 'MBH'}), (b:Punto {codigo: 'MIA'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 329;
+MATCH (a:Punto {codigo: 'VAP'}), (b:Punto {codigo: 'CLL'}) MERGE (a)-[r:CONECTA {medio: 'MARITIMO'}]->(b) SET r.km = 2400;
+MATCH (a:Punto {codigo: 'EZE'}), (b:Punto {codigo: 'MIA'}) MERGE (a)-[r:CONECTA {medio: 'AEREO'}]->(b) SET r.km = 7114;
+MATCH (a:Punto {codigo: 'EZE'}), (b:Punto {codigo: 'VLC'}) MERGE (a)-[r:CONECTA {medio: 'AEREO'}]->(b) SET r.km = 10192;
+MATCH (a:Punto {codigo: 'EZE'}), (b:Punto {codigo: 'SCL'}) MERGE (a)-[r:CONECTA {medio: 'AEREO'}]->(b) SET r.km = 1126;
+MATCH (a:Punto {codigo: 'EZE'}), (b:Punto {codigo: 'SAO'}) MERGE (a)-[r:CONECTA {medio: 'AEREO'}]->(b) SET r.km = 1702;

@@ -16,6 +16,7 @@ PostgreSQL (D01) y el grafo se llena solo: el worker del outbox traduce cada cam
 | `Ubicacion` | `id_ubicacion` | `codigo`, `nombre`, `pais`, `tipo` |
 | `Vehiculo` | `id_vehiculo` | `tipo`, `identificacion`, `estado` |
 | `Incidente` | `id_incidente` | `tipo`, `severidad`, `estado`, `descripcion` |
+| `Punto` | `codigo` | `nombre`, `pais`, `tipo`, `latitud`, `longitud` |
 
 ## Relaciones
 
@@ -31,9 +32,20 @@ PostgreSQL (D01) y el grafo se llena solo: el worker del outbox traduce cada cam
 | `Tramo` | `EJECUTADO_POR` | `Vehiculo` | |
 | `Tramo` | `OPERADO_POR` | `Operador` | |
 | `Vehiculo` | `PERTENECE_A` | `Operador` | |
+| `Punto` | `CONECTA` | `Punto` | `medio`, `km` |
 
 `ASIGNADO_A` lleva `fecha_asociacion` en el patrón del `MERGE`, porque un contenedor puede volver al mismo
 envío en otro período (D05). Proveedores y sensores no forman parte de la red.
+
+## Red de rutas
+
+`Punto` y `CONECTA` son la red por donde viajan los envíos: ciudades, puertos, aeropuertos y puntos de alta mar.
+Los puntos de alta mar evitan que una ruta marítima cruce tierra, y no pueden ser origen ni destino.
+La red es un dato de referencia que vive solo en Neo4j: está en `backend/src/main/resources/neo4j/red_rutas.cypher`
+y el worker la carga al arrancar con `MERGE`, así que cargarla otra vez no duplica nada.
+
+Cada conexión se guarda una vez y se recorre sin dirección. La búsqueda usa lo visto en clase, un camino con saltos
+limitados (`MATCH p=(a)-[:CONECTA*1..20]-(b) RETURN p`), y la aplicación elige el de menos km.
 
 ## Restricciones e índices
 

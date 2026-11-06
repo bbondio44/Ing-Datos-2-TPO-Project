@@ -40,7 +40,7 @@ public class OutboxNeo4jWorker {
     private static final Map<String, String> RESTRICCIONES = Map.of(
             "Cliente", "id_cliente", "Envio", "id_envio", "Contenedor", "id_contenedor", "Tramo", "id_tramo",
             "Ubicacion", "id_ubicacion", "Vehiculo", "id_vehiculo", "Operador", "id_operador",
-            "Incidente", "id_incidente");
+            "Incidente", "id_incidente", "Punto", "codigo");
     private static final List<String> INDICES = List.of(
             "CREATE INDEX envio_estado IF NOT EXISTS FOR (n:Envio) ON (n.estado)",
             "CREATE INDEX tramo_medio IF NOT EXISTS FOR (n:Tramo) ON (n.medio_transporte)",
@@ -112,6 +112,7 @@ public class OutboxNeo4jWorker {
                     + etiqueta.toLowerCase() + "_id IF NOT EXISTS FOR (n:" + etiqueta + ") REQUIRE n." + propiedad
                     + " IS UNIQUE").consume());
             INDICES.forEach(indice -> session.run(indice).consume());
+            RedRutas.sentencias().forEach(sentencia -> session.run(sentencia).consume());
         }
         preparado = true;
     }
