@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,6 +63,13 @@ public class OrganizationController {
         service.deactivate(OrganizationKind.SUPPLIER, id);
     }
 
+    @PatchMapping("/proveedores/{id}/activar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('PROVEEDORES_ESCRIBIR')")
+    public void activateSupplier(@PathVariable UUID id) {
+        service.activate(OrganizationKind.SUPPLIER, id);
+    }
+
     @GetMapping("/operadores")
     @PreAuthorize("hasAuthority('OPERADORES_LEER')")
     public PageResponse<OrganizationResponse> operators(@RequestParam(defaultValue = "") String buscar,
@@ -94,5 +102,12 @@ public class OrganizationController {
     @PreAuthorize("hasAuthority('OPERADORES_ESCRIBIR')")
     public void deactivateOperator(@PathVariable UUID id) {
         service.deactivate(OrganizationKind.OPERATOR, id);
+    }
+
+    @PatchMapping("/operadores/{id}/activar")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('OPERADORES_ESCRIBIR')")
+    public void activateOperator(@PathVariable UUID id) {
+        service.activate(OrganizationKind.OPERATOR, id);
     }
 }

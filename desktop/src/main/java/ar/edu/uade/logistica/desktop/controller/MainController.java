@@ -54,6 +54,7 @@ public class MainController {
     @FXML private TableColumn<ClientResponse, String> stateColumn;
     @FXML private Button editButton;
     @FXML private Button deactivateButton;
+    @FXML private Button activateButton;
 
     @FXML
     private void initialize() {
@@ -69,6 +70,7 @@ public class MainController {
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
         deactivateButton.disableProperty().bind(clientsTable.getSelectionModel().selectedItemProperty().isNull()
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
+        activateButton.disableProperty().bind(soloSiEstaInactivo(clientsTable, ClientResponse::state, canWrite));
         searchField.setOnAction(event -> refresh());
         refresh();
     }
@@ -148,7 +150,7 @@ public class MainController {
         grid.addRow(3, new Label("Teléfono"), phone);
         grid.addRow(4, new Label("Dirección"), address);
         grid.addRow(5, new Label("País"), country);
-        Formulario.ayuda(grid, 1, "Opcional. 11 dígitos sin guiones, CUIT válido y no repetido");
+        Formulario.cuit(grid, 1, cuit);
         Formulario.ayuda(grid, 2, "Opcional. Formato nombre@dominio.com, no repetido");
         Formulario.obligatorios(grid, "Razón social", "País");
         dialog.getDialogPane().setContent(grid);
@@ -190,6 +192,27 @@ public class MainController {
                     if (error != null) statusLabel.setText(message(error));
                     else refresh();
                 }));
+    }
+
+    @FXML
+    private void activateClient() {
+        ClientResponse selected = clientsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        statusLabel.setText("Activando cliente...");
+        AppContext.get().api().activateClient(selected.id()).whenComplete((ignored, error) ->
+                Platform.runLater(() -> {
+                    if (error != null) statusLabel.setText(message(error));
+                    else refresh();
+                }));
+    }
+
+    /** Deshabilita "Activar" salvo que la fila elegida esté inactiva y el usuario pueda escribir. */
+    private <T> javafx.beans.binding.BooleanBinding soloSiEstaInactivo(
+            TableView<T> table, java.util.function.Function<T, String> state, boolean canWrite) {
+        return Bindings.createBooleanBinding(() -> {
+            T selected = table.getSelectionModel().getSelectedItem();
+            return !canWrite || selected == null || !"INACTIVO".equals(state.apply(selected));
+        }, table.getSelectionModel().selectedItemProperty());
     }
 
     @FXML
@@ -259,6 +282,7 @@ public class MainController {
         Button create = new Button("Nuevo");
         Button edit = new Button("Editar");
         Button deactivate = new Button("Desactivar");
+        Button activate = new Button("Activar");
         Label status = new Label("Cargando...");
 
         TableView<OrganizationResponse> table = new TableView<>();
@@ -285,6 +309,7 @@ public class MainController {
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
         deactivate.disableProperty().bind(table.getSelectionModel().selectedItemProperty().isNull()
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
+        activate.disableProperty().bind(soloSiEstaInactivo(table, OrganizationResponse::state, canWrite));
 
         Runnable reload = () -> loadOrganizations(resource, search.getText(), table, status);
         searchButton.setOnAction(event -> reload.run());
@@ -311,7 +336,18 @@ public class MainController {
                     }));
         });
 
-        HBox filters = new HBox(10, search, searchButton, create, edit, deactivate);
+        activate.setOnAction(event -> {
+            OrganizationResponse selected = table.getSelectionModel().getSelectedItem();
+            if (selected == null) return;
+            status.setText("Activando...");
+            AppContext.get().api().activateOrganization(resource, selected.id())
+                    .whenComplete((ignored, error) -> Platform.runLater(() -> {
+                        if (error != null) status.setText(message(error));
+                        else reload.run();
+                    }));
+        });
+
+        HBox filters = new HBox(10, search, searchButton, create, edit, deactivate, activate);
         HBox.setHgrow(search, javafx.scene.layout.Priority.ALWAYS);
         VBox content = new VBox(12, filters, table, status);
         content.setPadding(new Insets(8));
@@ -360,7 +396,7 @@ public class MainController {
         grid.addRow(4, new Label("Dirección"), address);
         grid.addRow(5, new Label("País"), country);
         if (supplier) grid.addRow(6, new Label("Tipo de servicio"), service);
-        Formulario.ayuda(grid, 1, "Opcional. 11 dígitos sin guiones, CUIT válido y no repetido");
+        Formulario.cuit(grid, 1, cuit);
         Formulario.ayuda(grid, 2, "Opcional. Formato nombre@dominio.com");
         Formulario.obligatorios(grid, "Razón social", "País");
         dialog.getDialogPane().setContent(grid);
@@ -517,6 +553,7 @@ public class MainController {
         Button create = new Button("Nuevo");
         Button edit = new Button("Editar");
         Button deactivate = new Button("Desactivar");
+        Button activate = new Button("Activar");
         Label status = new Label("Cargando...");
         TableView<VehicleResponse> table = new TableView<>();
         table.getColumns().add(vehicleColumn("Identificación", VehicleResponse::identification));
@@ -531,6 +568,7 @@ public class MainController {
         edit.setDisable(true);
         deactivate.disableProperty().bind(table.getSelectionModel().selectedItemProperty().isNull()
                 .or(Bindings.createBooleanBinding(() -> !canWrite)));
+        activate.disableProperty().bind(soloSiEstaInactivo(table, VehicleResponse::state, canWrite));
         Runnable reload = () -> loadVehicles(search.getText(), table, status);
         searchButton.setOnAction(event -> reload.run());
         search.setOnAction(event -> reload.run());
@@ -565,7 +603,12 @@ public class MainController {
                         else reload.run();
                     }));
         });
-        HBox filters = new HBox(10, search, searchButton, create, edit, deactivate);
+        activate.setOnAction(event -> {
+            VehicleResponse selected = table.getSelectionModel().getSelectedItem();
+            if (selected != null) saveVehicle(selected, new VehicleRequest(selected.operatorId(), selected.type(),
+                    selected.identification(), "ACTIVO"), reload, status);
+        });
+        HBox filters = new HBox(10, search, searchButton, create, edit, deactivate, activate);
         HBox.setHgrow(search, javafx.scene.layout.Priority.ALWAYS);
         VBox content = new VBox(12, filters, table, status);
         content.setPadding(new Insets(8));

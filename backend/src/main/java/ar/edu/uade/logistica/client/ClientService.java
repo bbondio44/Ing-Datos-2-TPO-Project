@@ -69,6 +69,13 @@ public class ClientService {
         entity.deactivate();
     }
 
+    @Transactional
+    public void activate(UUID id) {
+        auditContext.applyToCurrentTransaction();
+        ClientEntity entity = repository.findById(id).orElseThrow(() -> new NotFoundException("El cliente no existe"));
+        entity.activate();
+    }
+
     private void authorizeRead(UUID id, AuthenticatedUser user) {
         if (!user.permissions().contains("CLIENTES_LEER_TODOS") && !id.equals(user.clientId())) {
             throw new NotFoundException("El cliente no existe");

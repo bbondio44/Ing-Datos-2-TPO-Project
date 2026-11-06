@@ -92,6 +92,10 @@ public class ApiClient {
         return send("DELETE", "/api/v1/clientes/" + id, null, Void.class, true);
     }
 
+    public CompletableFuture<Void> activateClient(UUID id) {
+        return send("PATCH", "/api/v1/clientes/" + id + "/activar", null, Void.class, true);
+    }
+
     public CompletableFuture<List<SessionResponse>> sessions() {
         return send("GET", "/api/v1/auth/sessions", null, new TypeReference<>() {}, true);
     }
@@ -117,6 +121,10 @@ public class ApiClient {
 
     public CompletableFuture<Void> deactivateOrganization(String resource, UUID id) {
         return send("DELETE", "/api/v1/" + resource + "/" + id, null, Void.class, true);
+    }
+
+    public CompletableFuture<Void> activateOrganization(String resource, UUID id) {
+        return send("PATCH", "/api/v1/" + resource + "/" + id + "/activar", null, Void.class, true);
     }
 
     public CompletableFuture<PageResponse<LocationResponse>> locations(String search) {
