@@ -66,7 +66,23 @@ Si cambiás las claves del `.env` con las bases ya creadas, dejan de coincidir. 
 
 ## Probar la app
 
-Los sensores se simulan. Con la app abierta, desde PowerShell en la carpeta del proyecto:
+### Un viaje completo
+
+1. En **Envíos**, tocá **Catálogos contenedores/sensores** y creá un contenedor. Para las alertas de cadena de frío, el tipo es `REEFER`.
+2. Tocá **Nuevo envío** y elegí cliente, origen, destino y volumen. Abajo aparecen la ruta, ciudad por ciudad, y el precio. Al guardar se crean los tramos.
+3. En **Detalle y trazabilidad**, asociá el contenedor, elegí esa fila y asociá un sensor.
+4. En **Monitoreo IoT → Seguimiento del viaje**, tocá **Elegir envío…** y después **Iniciar viaje**. Avanza solo, unos 20 segundos por punto, y muestra la ubicación con coordenadas. Al llegar, el envío queda ENTREGADO y el contenedor y el sensor quedan libres.
+5. En **Facturación**, tocá **Facturación mensual** para juntar los viajes entregados de cada cliente en una factura, y **Cobro mensual** para cobrarla. Corren solos los días 1 y 10.
+
+Para probar facturación con clientes, proveedores y operadores en distintas situaciones:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\cargar-datos-facturacion.ps1
+```
+
+### Lecturas a mano
+
+Los sensores también se pueden simular a mano. Con la app abierta, desde PowerShell en la carpeta del proyecto:
 
 ```powershell
 .\scripts\mandar-lecturas.ps1 -Email TU_EMAIL -Clave TU_CLAVE -Cantidad 12      # serie normal
