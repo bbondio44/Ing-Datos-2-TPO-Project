@@ -8,7 +8,8 @@ import javafx.animation.Timeline;
 import javafx.scene.control.ListView;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import ar.edu.uade.logistica.contracts.iot.LecturaHistoricaResponse;
 import ar.edu.uade.logistica.contracts.iot.PosicionResponse;
@@ -63,12 +64,13 @@ public final class MonitoreoIotWindow {
     private final TableView<PosicionResponse> posiciones = new TableView<>();
     private final Label ubicacion = new Label("Elegí un envío para ver su viaje");
     private ShipmentResponse envioElegido;
+    private UUID contenedorDelEnvio;
     private List<RouteLegResponse> tramos = List.of();
     private boolean siguiendo;
     private final Label estadoEstados = new Label();
     private final Label estadoHistorico = new Label();
     private final Label estadoMapa = new Label();
-    private final Map<UUID, String> codigos = new HashMap<>();
+    private final Map<UUID, String> codigos = new ConcurrentHashMap<>();
 
     public static void show() {
         new MonitoreoIotWindow().abrir();
@@ -136,6 +138,10 @@ public final class MonitoreoIotWindow {
         ubicacion.setStyle("-fx-font-weight: bold;");
         contenedorMapa.setPrefWidth(250);
         contenedorMapa.setConverter(legible());
+        // Elegir a mano otro contenedor deja de mostrar el envío: la ruta de la izquierda ya no sería la suya.
+        contenedorMapa.valueProperty().addListener((obs, antes, ahora) -> {
+            if (ahora != null && !ahora.equals(contenedorDelEnvio)) soltarEnvio();
+        });
         Button elegir = new Button("Elegir envío…");
         elegir.setOnAction(event -> elegirEnvio());
         Button ver = new Button("Ver recorrido");
@@ -148,6 +154,16 @@ public final class MonitoreoIotWindow {
         HBox.setHgrow(posiciones, Priority.ALWAYS);
         VBox.setVgrow(cuerpo, Priority.ALWAYS);
         return panel(filtros, new VBox(10, ubicacion, cuerpo), estadoMapa);
+    }
+
+    private void soltarEnvio() {
+        envioElegido = null;
+        contenedorDelEnvio = null;
+        siguiendo = false;
+        tramos = List.of();
+        ruta.getItems().clear();
+        posiciones.getItems().clear();
+        ubicacion.setText("Consultá el recorrido del contenedor con Ver recorrido");
     }
 
     private void iniciarViaje() {
@@ -261,6 +277,7 @@ public final class MonitoreoIotWindow {
                 LocalDate hasta = c.endAt() == null ? hoyUtc() : c.endAt().atZone(ZoneOffset.UTC).toLocalDate();
                 desdeMapa.setValue(desde.isBefore(hasta.minusDays(30)) ? hasta.minusDays(30) : desde);
                 hastaMapa.setValue(hasta);
+                contenedorDelEnvio = c.containerId();
                 contenedorMapa.setValue(c.containerId());
                 consultarRecorrido();
             });
@@ -295,11 +312,24 @@ public final class MonitoreoIotWindow {
 
     private void cargarEstados() {
         estadoEstados.setText("Cargando...");
-        // Si el rol no puede ver el catálogo, las listas siguen funcionando con el UUID.
         AppContext.get().api().containers("").whenComplete((pagina, error) -> Platform.runLater(() -> {
-            if (error == null) pagina.content().forEach(c -> codigos.put(c.id(), c.internationalCode()));
-            cargarSensores();
+            if (error == null) {
+                pagina.content().forEach(c -> codigos.put(c.id(), c.internationalCode()));
+                cargarSensores();
+            } else {
+                cargarCodigosDeSusEnvios();
+            }
         }));
+    }
+
+    /** Un cliente no ve el catálogo de contenedores, pero sus envíos traen el código de los suyos. */
+    private void cargarCodigosDeSusEnvios() {
+        var api = AppContext.get().api();
+        api.shipments("").thenCompose(pagina -> CompletableFuture.allOf(pagina.content().stream()
+                        .map(envio -> api.shipment(envio.id()).thenAccept(detalle -> detalle.containers()
+                                .forEach(c -> codigos.put(c.containerId(), c.containerCode()))))
+                        .toArray(CompletableFuture[]::new)))
+                .whenComplete((nada, error) -> Platform.runLater(this::cargarSensores));
     }
 
     private void cargarSensores() {

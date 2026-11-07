@@ -117,7 +117,17 @@ public final class AnaliticaWindow {
         HBox.setHgrow(clienteRed, Priority.ALWAYS);
         vistaRed.setValue("envios");
         vistaRed.setOnAction(event -> mostrarRed());
-        return panel(new HBox(10, clienteRed, boton("Consultar", this::consultarRed), vistaRed), tablaRed, estadoRed);
+        return panel(new HBox(10, clienteRed, boton("Elegir…", this::elegirClienteRed),
+                boton("Consultar", this::consultarRed), vistaRed), tablaRed, estadoRed);
+    }
+
+    /** Elige el cliente por su nombre y muestra su red. */
+    private void elegirClienteRed() {
+        al(AppContext.get().api().clients(""), estadoRed, pagina -> Formulario.elegirDeLista("Cliente", pagina.content(),
+                c -> c.businessName() + " — " + c.id()).ifPresent(c -> {
+                    clienteRed.setText(c.id().toString());
+                    consultarRed();
+                }));
     }
 
     private void consultar() {

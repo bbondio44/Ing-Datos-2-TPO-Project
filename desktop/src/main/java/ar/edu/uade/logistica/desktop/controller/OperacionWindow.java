@@ -74,6 +74,9 @@ public final class OperacionWindow {
             "CLIENTE", "PROVEEDOR", "OPERADOR"));
     private final TextField asunto = new TextField();
     private final TextField destinatario = new TextField();
+    private final Label participantesGrupo = new Label();
+    private final List<ParticipanteRequest> invitados = new java.util.ArrayList<>();
+    private final java.util.Map<UUID, String> nombres = new java.util.HashMap<>();
 
     public static void show() {
         new OperacionWindow().abrir();
@@ -188,12 +191,15 @@ public final class OperacionWindow {
         tipoDestinatario.setValue("CLIENTE");
         tipoDestinatario.valueProperty().addListener((obs, antes, ahora) -> destinatario.clear());
         HBox.setHgrow(destinatario, Priority.ALWAYS);
+        Button agregar = boton("Agregar", this::agregarAlGrupo);
+        agregar.disableProperty().bind(tipoConversacion.valueProperty().isNotEqualTo("GRUPAL"));
+        tipoConversacion.valueProperty().addListener((obs, antes, ahora) -> vaciarGrupo());
         HBox nueva = new HBox(10, new Label("Nueva conversación:"), tipoConversacion, asunto, tipoDestinatario, destinatario,
-                boton("Elegir…", this::elegirDestinatario), boton("Nueva conversación", this::crearConversacion));
+                boton("Elegir…", this::elegirDestinatario), agregar, boton("Nueva conversación", this::crearConversacion));
         HBox escribir = new HBox(10, nuevoMensaje, boton("Enviar", this::enviarMensaje));
         escribir.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         VBox.setVgrow(tablas, Priority.ALWAYS);
-        return panel(nueva, new VBox(10, tablas, escribir), estadoMensajes);
+        return panel(nueva, new VBox(10, participantesGrupo, tablas, escribir), estadoMensajes);
     }
 
     private record Contacto(String nombre, UUID id) {
@@ -210,15 +216,47 @@ public final class OperacionWindow {
                         .thenApply(pagina -> pagina.content().stream().filter(o -> "ACTIVO".equals(o.state()))
                                 .map(o -> new Contacto(o.businessName(), o.id())).toList());
         al(contactos, estadoMensajes, lista -> Formulario.elegirDeLista("Destinatario", lista,
-                c -> c.nombre() + " — " + c.id()).ifPresent(c -> destinatario.setText(c.id().toString())));
+                c -> c.nombre() + " — " + c.id()).ifPresent(c -> {
+                    nombres.put(c.id(), c.nombre());
+                    destinatario.setText(c.id().toString());
+                }));
     }
 
-    private void crearConversacion() {
+    private void agregarAlGrupo() {
         UUID id;
         try {
             id = UUID.fromString(destinatario.getText().strip());
         } catch (IllegalArgumentException exception) {
-            estadoMensajes.setText("El destinatario no es un UUID válido");
+            estadoMensajes.setText("Elegí un destinatario con Elegir… y tocá Agregar");
+            return;
+        }
+        ParticipanteRequest participante = new ParticipanteRequest(tipoDestinatario.getValue(), id);
+        if (!invitados.contains(participante)) invitados.add(participante);
+        destinatario.clear();
+        participantesGrupo.setText("Participantes del grupo: " + String.join(", ", invitados.stream()
+                .map(p -> nombres.getOrDefault(p.idEntidad(), p.idEntidad().toString().substring(0, 8))).toList()));
+    }
+
+    private void vaciarGrupo() {
+        invitados.clear();
+        participantesGrupo.setText("");
+    }
+
+    private void crearConversacion() {
+        boolean grupal = "GRUPAL".equals(tipoConversacion.getValue());
+        if (!destinatario.getText().isBlank() || !grupal) {
+            UUID id;
+            try {
+                id = UUID.fromString(destinatario.getText().strip());
+            } catch (IllegalArgumentException exception) {
+                estadoMensajes.setText("El destinatario no es un UUID válido");
+                return;
+            }
+            ParticipanteRequest participante = new ParticipanteRequest(tipoDestinatario.getValue(), id);
+            if (!invitados.contains(participante)) invitados.add(participante);
+        }
+        if (invitados.isEmpty()) {
+            estadoMensajes.setText("Agregá al menos un participante");
             return;
         }
         if (asunto.getText().isBlank()) {
@@ -226,11 +264,11 @@ public final class OperacionWindow {
             return;
         }
         ConversacionRequest conversacion = new ConversacionRequest(tipoConversacion.getValue(), asunto.getText().strip(),
-                "GRUPAL".equals(tipoConversacion.getValue()) ? asunto.getText().strip() : null, null,
-                List.of(new ParticipanteRequest(tipoDestinatario.getValue(), id)));
+                grupal ? asunto.getText().strip() : null, null, List.copyOf(invitados));
         al(AppContext.get().api().createConversation(conversacion), estadoMensajes, creada -> {
             asunto.clear();
             destinatario.clear();
+            vaciarGrupo();
             cargarConversaciones(creada.id());
         });
     }

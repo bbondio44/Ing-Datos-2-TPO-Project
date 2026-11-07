@@ -883,6 +883,12 @@ final class PersonaOneDialogs {
                     api.createInvoice(req).join(); reloadInvoices.run();
                 }));
             });
+            Button detail = new Button("Ver detalle");
+            detail.setOnAction(e -> {
+                InvoiceResponse selected = invoices.getSelectionModel().getSelectedItem();
+                if (selected == null) showError("Elegí una factura de la tabla de la derecha");
+                else showInvoiceDetail(selected);
+            });
             Button issue = new Button("Emitir");
             issue.setOnAction(e -> {
                 InvoiceResponse selected = invoices.getSelectionModel().getSelectedItem();
@@ -954,12 +960,28 @@ final class PersonaOneDialogs {
             SplitPane split = new SplitPane(new VBox(new Label("Cuentas corrientes"), accounts),
                     new VBox(new Label("Facturas de la cuenta"), invoices));
             split.setDividerPositions(.42); VBox.setVgrow(accounts, Priority.ALWAYS); VBox.setVgrow(invoices, Priority.ALWAYS);
-            VBox content = new VBox(10, new HBox(8, newInvoice, issue, pay, close, closeAll, monthly, collect), split);
+            VBox content = new VBox(10, new HBox(8, newInvoice, detail, issue, pay, close, closeAll, monthly, collect), split);
             content.setPadding(new Insets(8)); VBox.setVgrow(split, Priority.ALWAYS);
             dialog.getDialogPane().setContent(content);
             reloadInvoices.run();
             dialog.showAndWait();
         });
+    }
+
+    private void showInvoiceDetail(InvoiceResponse invoice) {
+        Dialog<Void> dialog = baseDialog("Factura " + value(invoice.number()), 820, 420);
+        TableView<InvoiceLineResponse> lines = new TableView<>();
+        lines.getColumns().add(column("Concepto", InvoiceLineResponse::concept));
+        lines.getColumns().add(column("Cantidad", l -> l.quantity().toPlainString()));
+        lines.getColumns().add(column("Precio unitario", l -> l.unitPrice().toPlainString()));
+        lines.getColumns().add(column("Subtotal", l -> l.subtotal().toPlainString()));
+        lines.getColumns().getFirst().setMinWidth(430);
+        lines.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        lines.setItems(FXCollections.observableArrayList(invoice.lines()));
+        dialog.getDialogPane().setContent(pane(new Label(invoice.ownerName() + " — " + invoice.state()), lines,
+                new Label("Total: " + invoice.total().toPlainString() + ". Pagado: " + invoice.paid().toPlainString()
+                        + ". Pendiente: " + invoice.pending().toPlainString())));
+        dialog.showAndWait();
     }
 
     private Optional<InvoiceRequest> invoiceDialog(AccountResponse account) {
@@ -1013,7 +1035,7 @@ final class PersonaOneDialogs {
 
     void showReports() {
         run(() -> {
-            Dialog<Void> dialog = baseDialog("Reportes SQL R35–R39", 1180, 720);
+            Dialog<Void> dialog = baseDialog("Reportes", 1180, 720);
             TabPane tabs = new TabPane();
             tabs.getTabs().add(shipmentsReportTab());
             tabs.getTabs().add(deliveryTimesTab());
@@ -1051,7 +1073,7 @@ final class PersonaOneDialogs {
         load.run();
         HBox filters = new HBox(8, country, state, delayed, incidents, filter);
         if (canChooseClient) filters.getChildren().add(2, client);
-        return new Tab("R35 Envíos", pane(filters, table,
+        return new Tab("Envíos", pane(filters, table,
                 new Label("País se interpreta como país de destino; los filtros se combinan.")));
     }
 
@@ -1063,7 +1085,7 @@ final class PersonaOneDialogs {
         table.getColumns().add(column("Máximo (h)", r -> value(r.maximumHours())));
         table.getColumns().add(column("Promedio (h)", r -> value(r.averageHours())));
         table.setItems(FXCollections.observableArrayList(api.clientDeliveryTimes().join()));
-        return new Tab("R36 Máx./mín.", pane(new HBox(), table, new Label("Solo incluye envíos entregados.")));
+        return new Tab("Tiempos por cliente", pane(new HBox(), table, new Label("Solo incluye envíos entregados.")));
     }
 
     private Tab incidentAverageTab() {
@@ -1075,7 +1097,7 @@ final class PersonaOneDialogs {
         table.getColumns().add(column("Incidentes", r -> Long.toString(r.incidents())));
         table.getColumns().add(column("Promedio", r -> value(r.incidentsPerShipment())));
         table.setItems(FXCollections.observableArrayList(api.incidentAverages().join()));
-        return new Tab("R37 Incidentes", pane(new HBox(), table,
+        return new Tab("Incidentes", pane(new HBox(), table,
                 new Label("Denominador: envíos no cancelados de cada país destino, estado y cliente.")));
     }
 
@@ -1085,7 +1107,7 @@ final class PersonaOneDialogs {
                 new Label("Tiempo promedio de entrega: " + value(value.averageHours()) + " horas"),
                 new Label("Los envíos no entregados quedan excluidos."));
         box.setPadding(new Insets(30));
-        return new Tab("R38 Promedio", box);
+        return new Tab("Tiempo promedio", box);
     }
 
     private Tab transportCostsTab() {
@@ -1095,7 +1117,7 @@ final class PersonaOneDialogs {
         table.getColumns().add(column("Costo total", r -> value(r.totalActualCost())));
         table.getColumns().add(column("Costo promedio", r -> value(r.averageActualCost())));
         table.setItems(FXCollections.observableArrayList(api.transportCosts().join()));
-        return new Tab("R39 Costos", pane(new HBox(), table,
+        return new Tab("Costos por transporte", pane(new HBox(), table,
                 new Label("Totales separados para transporte aéreo, marítimo y terrestre.")));
     }
 

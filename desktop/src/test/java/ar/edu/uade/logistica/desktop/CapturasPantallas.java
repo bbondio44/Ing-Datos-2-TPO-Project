@@ -328,7 +328,7 @@ public class CapturasPantallas extends Application {
             cerrar(reportes);
             return;
         }
-        String[][] pestanias = {{"R36", "R36 Máx./mín."}, {"R37", "R37 Incidentes"}, {"R38", "R38 Promedio"}, {"R39", "R39 Costos"}};
+        String[][] pestanias = {{"R36", "Tiempos por cliente"}, {"R37", "Incidentes"}, {"R38", "Tiempo promedio"}, {"R39", "Costos por transporte"}};
         for (String[] p : pestanias) {
             pestania(reportes, p[1]);
             espera(600);
@@ -974,6 +974,10 @@ public class CapturasPantallas extends Application {
             seleccionar(tabla(finanzas, 1), "state=BORRADOR");
             click(boton(finanzas, "Emitir"));
             espera(1500);
+            seleccionar(tabla(finanzas, 1), "state=EMITIDA");
+            Window lineas = abrirCon(() -> click(boton(finanzas, "Ver detalle")));
+            verificar("R10 la factura muestra su detalle", filas(lineas, 0) > 0);
+            cerrar(lineas);
             seleccionar(tabla(finanzas, 1), "state=EMITIDA");
             pagar(finanzas, "200");
             seleccionar(tabla(finanzas, 0), cuenta);
