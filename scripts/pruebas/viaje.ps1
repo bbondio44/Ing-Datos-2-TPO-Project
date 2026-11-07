@@ -17,7 +17,7 @@ $env:APP_BOOTSTRAP_ADMIN_PASSWORD = [guid]::NewGuid().ToString('N')
 function Ver($texto, $esperado, $obtenido) {
     "$(if ("$esperado" -eq "$obtenido") { 'OK   ' } else { 'FALLA' }) ${texto}: esperado=$esperado obtenido=$obtenido"
 }
-function Si($texto, $condicion) { "$(if ($condicion) { 'OK   ' } else { 'FALLA' }) $texto" }
+function Verificar($texto, $condicion) { "$(if ($condicion) { 'OK   ' } else { 'FALLA' }) $texto" }
 function Estado($bloque) {
     try { & $bloque | Out-Null; 200 } catch { [int]$_.Exception.Response.StatusCode }
 }
@@ -33,6 +33,7 @@ try {
     $token = (Invoke-RestMethod "$base/api/v1/auth/login" -Method Post -ContentType 'application/json' -Body $login).token
     $h = @{ Authorization = "Bearer $token" }
     function Lista($ruta) { $r = Invoke-RestMethod "$base$ruta" -Headers $h; ,@($r | ForEach-Object { $_ }) }
+    function Saldo { $cuenta = (Lista '/api/v1/finanzas/cuentas') | Where-Object { $_.ownerId -eq $cliente.id }; [decimal]$cuenta.balance }
     function Post($ruta, $cuerpo) {
         Invoke-RestMethod "$base$ruta" -Method Post -Headers $h -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes(($cuerpo | ConvertTo-Json)))
     }
@@ -70,10 +71,24 @@ try {
     Ver 'todos los tramos terminan' 2 @($tramos | Where-Object state -eq 'FINALIZADO').Count
     Ver 'el costo real es el calculado' ([int]($tramos | Measure-Object estimatedCost -Sum).Sum) ([int]($tramos | Measure-Object actualCost -Sum).Sum)
     $posiciones = Lista "/api/v1/iot/contenedores/$($contenedor.id)/recorrido?desde=$inicio&hasta=$fin"
-    Si "el contenedor registra posiciones en Cassandra ($($posiciones.Count))" ($posiciones.Count -ge 2)
+    Verificar "el contenedor registra posiciones en Cassandra ($($posiciones.Count))" ($posiciones.Count -ge 2)
     $fuera = @($posiciones | Where-Object { $_.latitud -lt -34.7 -or $_.latitud -gt -31.5 -or $_.longitud -lt -60.9 -or $_.longitud -gt -58.3 })
     Ver 'todas las posiciones quedan entre origen y destino' 0 $fuera.Count
     Ver 'un viaje terminado no se puede reiniciar' 409 (Estado { Post "/api/v1/rutas/viajes/$($envio.id)/iniciar" @{} })
+
+    '=== R12 R13 factura y cobro mensual'
+    $mes = @{ period = (Get-Date).ToUniversalTime().ToString('yyyy-MM-01') }
+    $saldoAntes = Saldo
+    $factura = Post '/api/v1/finanzas/facturacion-mensual' $mes
+    Verificar "la corrida crea facturas ($($factura.created)) para los envios ($($factura.processed))" ($factura.created -ge 1 -and $factura.processed -ge 1)
+    $saldoDespues = Saldo
+    Verificar "el saldo del cliente sube al menos el viaje ($saldoAntes a $saldoDespues)" (($saldoDespues - $saldoAntes) -ge 79650)
+    Ver 'repetir la facturacion no crea nada' 0 (Post '/api/v1/finanzas/facturacion-mensual' $mes).created
+    $cobro = Post '/api/v1/finanzas/cobro-mensual' $mes
+    Verificar "el cobro registra pagos ($($cobro.collected))" ($cobro.collected -ge 1)
+    $saldoFinal = Saldo
+    Ver 'el cobro devuelve el saldo al anterior' ([int]$saldoAntes) ([int]$saldoFinal)
+    Ver 'repetir el cobro no cobra nada' 0 (Post '/api/v1/finanzas/cobro-mensual' $mes).collected
 }
 finally {
     if ($proc -and -not $proc.HasExited) { Stop-Process -Id $proc.Id -Force; Start-Sleep 2 }

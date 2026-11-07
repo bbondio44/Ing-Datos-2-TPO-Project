@@ -363,7 +363,7 @@ public class FinanceService {
         return id;
     }
 
-    private void ensureAccountsForExistingOwners() {
+    void ensureAccountsForExistingOwners() {
         jdbcTemplate.update("""
                 INSERT INTO tp_logistica.cuenta_corriente(id_cliente,naturaleza)
                 SELECT id_cliente,'COBRAR' FROM tp_logistica.cliente c

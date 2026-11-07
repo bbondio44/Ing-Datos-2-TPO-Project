@@ -454,6 +454,14 @@ public class ApiClient {
         return send("GET", "/api/v1/finanzas/tarifas", null, new TypeReference<>() {}, true);
     }
 
+    public CompletableFuture<AutomaticInvoiceResponse> runMonthlyBilling(CloseAccountRequest request) {
+        return send("POST", "/api/v1/finanzas/facturacion-mensual", request, AutomaticInvoiceResponse.class, true);
+    }
+
+    public CompletableFuture<MonthlyCollectionResponse> runMonthlyCollection(CloseAccountRequest request) {
+        return send("POST", "/api/v1/finanzas/cobro-mensual", request, MonthlyCollectionResponse.class, true);
+    }
+
     public CompletableFuture<AutomaticInvoiceResponse> runAutomaticBilling(UUID tariffId) {
         return send("POST", "/api/v1/finanzas/facturacion-automatica", new AutomaticInvoiceRequest(tariffId),
                 AutomaticInvoiceResponse.class, true);

@@ -552,6 +552,7 @@ public class CapturasPantallas extends Application {
         paso("R05", () -> guiaOrganizacion("Operadores", "Operador guia"));
         paso("R05 vehiculos", this::guiaVehiculo);
         paso("R24 ubicaciones", this::guiaUbicacion);
+        paso("R20 R21 viaje", this::guiaViaje);
         paso("R06 R07 R08 R24", this::guiaEnvioCompleto);
         paso("R16", this::guiaTerceros);
         paso("R35", this::guiaFiltrosEnvios);
@@ -765,6 +766,68 @@ public class CapturasPantallas extends Application {
         verificar("R05 activar deja el vehiculo ACTIVO", fx(() -> visibleEnFx(lista, TableView.class).getFirst().getItems()
                 .stream().anyMatch(v -> v.toString().contains(patente) && v.toString().contains("state=ACTIVO"))));
         cerrar(lista);
+    }
+
+    /** Un viaje de punta a punta desde la pantalla: se elige el envío, se inicia y se ve llegar. */
+    private void guiaViaje() throws Exception {
+        Window envios = abrir("Envíos");
+        espera(1000);
+        Window catalogos = abrirCon(() -> click(boton(envios, "Catálogos contenedores/sensores")));
+        Window contenedor = abrirCon(() -> click(boton(catalogos, "Nuevo contenedor")));
+        escribir(contenedor, "Código", "VIAJE" + marca);
+        escribir(contenedor, "Tipo", "REEFER");
+        escribir(contenedor, "Capacidad", "30");
+        click(boton(contenedor, "Guardar"));
+        esperarCierre(contenedor);
+        espera(1200);
+        cerrar(catalogos);
+        Window nuevo = abrirCon(() -> click(boton(envios, "Nuevo envío")));
+        elegir(nuevo, "Origen", "Buenos Aires");
+        elegir(nuevo, "Destino", "Rosario");
+        escribir(nuevo, "Volumen m³", "5");
+        espera(1500);
+        click(boton(nuevo, "Guardar"));
+        esperarCierre(nuevo);
+        espera(1500);
+        seleccionar(tabla(envios, 0), "Rosario");
+        Window detalle = abrirCon(() -> click(boton(envios, "Detalle y trazabilidad")));
+        Window eleccion = abrirCon(() -> click(boton(detalle, "Asociar contenedor")));
+        fx(() -> {
+            ComboBox<Object> c = combo0(eleccion);
+            c.getItems().stream().filter(i -> i.toString().contains("VIAJE" + marca)).findFirst().ifPresent(c::setValue);
+            return null;
+        });
+        Window conContenedor = abrirCon(() -> click(boton(eleccion, "Seleccionar")));
+        seleccionar(tabla(conContenedor, 0), "active=true");
+        Window eleccionSensor = abrirCon(() -> click(boton(conContenedor, "Asociar sensor")));
+        Window conSensor = abrirCon(() -> click(boton(eleccionSensor, "Seleccionar")));
+        revisarErrores();
+        cerrar(conSensor);
+        cerrar(envios);
+        Window iot = abrir("Monitoreo IoT");
+        espera(2000);
+        pestania(iot, "Seguimiento del viaje");
+        Window lista = abrirCon(() -> click(boton(iot, "Elegir envío…")));
+        click(boton(lista, "Seleccionar"));
+        esperarCierre(lista);
+        espera(2500);
+        verificar("R20 antes de salir dice que no salio", textos(iot).contains("Todavía no salió"));
+        click(boton(iot, "Iniciar viaje"));
+        boolean enCamino = false;
+        for (int i = 0; i < 40 && !enCamino; i++) {
+            espera(500);
+            enCamino = textos(iot).contains("Ubicación actual: entre Buenos Aires y Rosario");
+        }
+        verificar("R21 en viaje muestra la ubicacion con coordenadas", enCamino);
+        boolean llego = false;
+        for (int i = 0; i < 80 && !llego; i++) {
+            espera(1000);
+            llego = textos(iot).contains("Llegó a Rosario");
+        }
+        verificar("R20 al terminar dice que llego", llego);
+        verificar("R21 quedan las posiciones del viaje", filas(iot, 0) > 0);
+        captura(iot, "viaje-terminado", "R20", "R21");
+        cerrar(iot);
     }
 
     private void guiaUbicacion() throws Exception {
@@ -1066,11 +1129,20 @@ public class CapturasPantallas extends Application {
     private void guiaProcesos() throws Exception {
         Window finanzas = abrir("Facturación");
         for (int vuelta = 1; vuelta <= 2; vuelta++) {
-            Window tarifa = abrirCon(() -> click(boton(finanzas, "Facturación automática")));
-            Window resultado = abrirCon(() -> click(boton(tarifa, "Seleccionar")));
+            Window mes = abrirCon(() -> click(boton(finanzas, "Facturación mensual")));
+            Window resultado = abrirCon(() -> aceptar(mes));
             String texto = fx(() -> ((DialogPane) resultado.getScene().getRoot()).getContentText());
             linea("     " + texto);
-            if (vuelta == 2) verificar("R12 la segunda corrida no crea nada", texto.contains("Nuevos: 0"));
+            if (vuelta == 2) verificar("R12 la segunda corrida no crea nada", texto.contains("Facturas nuevas: 0"));
+            cerrar(resultado);
+            espera(800);
+        }
+        for (int vuelta = 1; vuelta <= 2; vuelta++) {
+            Window mes = abrirCon(() -> click(boton(finanzas, "Cobro mensual")));
+            Window resultado = abrirCon(() -> aceptar(mes));
+            String texto = fx(() -> ((DialogPane) resultado.getScene().getRoot()).getContentText());
+            linea("     " + texto);
+            if (vuelta == 2) verificar("R13 cobrar dos veces no cobra de mas", texto.contains("Facturas cobradas: 0"));
             cerrar(resultado);
             espera(800);
         }

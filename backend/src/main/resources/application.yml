@@ -50,6 +50,11 @@ app:
     zone: ${APP_BILLING_ZONE:America/Buenos_Aires}
   viajes:
     segundos-por-punto: ${APP_VIAJES_SEGUNDOS:20}
+  facturacion-mensual:
+    enabled: ${APP_FACTURACION_MENSUAL_ENABLED:true}
+    cron: ${APP_FACTURACION_MENSUAL_CRON:0 0 2 1 * *}
+  cobro-mensual:
+    cron: ${APP_COBRO_MENSUAL_CRON:0 0 4 10 * *}
   cierre:
     auto-enabled: ${APP_CIERRE_AUTO_ENABLED:false}
     cron: ${APP_CIERRE_CRON:0 0 3 1 * *}

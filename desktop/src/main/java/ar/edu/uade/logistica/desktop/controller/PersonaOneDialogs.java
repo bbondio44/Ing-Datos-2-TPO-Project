@@ -923,24 +923,38 @@ final class PersonaOneDialogs {
                     info("Cierre mensual", "Cuentas cerradas: " + result.closed() + ". Ya cerradas: " + result.skipped());
                 }));
             });
-            Button automatic = new Button("Facturación automática");
-            automatic.setOnAction(e -> run(() -> {
-                List<TariffResponse> tariffs = api.tariffs().join().stream().filter(TariffResponse::active)
-                        .filter(t -> List.of("TRANSPORTE", "SERVICIO").contains(t.serviceType()))
-                        .filter(t -> "FIJO".equals(t.calculation())).toList();
-                Dialog<TariffResponse> choice = choice("Tarifa vigente", tariffs,
-                        t -> t.concept() + " — " + t.price() + " " + t.currency());
-                choice.showAndWait().ifPresent(t -> {
-                    AutomaticInvoiceResponse result = api.runAutomaticBilling(t.id()).join();
-                    info("Facturación automática", "Procesados: " + result.processed() + ". Nuevos: " + result.created()
+            Button monthly = new Button("Facturación mensual");
+            monthly.setOnAction(e -> {
+                TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).toString());
+                input.setHeaderText("Mes a facturar: junta los envíos entregados de cada cliente en una factura");
+                input.showAndWait().ifPresent(value -> run(() -> {
+                    String error = Formulario.errorFecha(value, "El período");
+                    if (error != null) { showError(error); return; }
+                    AutomaticInvoiceResponse result = api.runMonthlyBilling(new CloseAccountRequest(LocalDate.parse(value.strip()))).join();
+                    accounts.setItems(FXCollections.observableArrayList(api.accounts().join()));
+                    info("Facturación mensual", "Envíos facturados: " + result.processed() + ". Facturas nuevas: " + result.created()
                             + ". Salteados por mes cerrado: " + result.skippedClosed());
-                });
+                }));
                 reloadInvoices.run();
-            }));
+            });
+            Button collect = new Button("Cobro mensual");
+            collect.setOnAction(e -> {
+                TextInputDialog input = new TextInputDialog(LocalDate.now().withDayOfMonth(1).toString());
+                input.setHeaderText("Mes a cobrar: registra el pago de las facturas mensuales pendientes");
+                input.showAndWait().ifPresent(value -> run(() -> {
+                    String error = Formulario.errorFecha(value, "El período");
+                    if (error != null) { showError(error); return; }
+                    MonthlyCollectionResponse result = api.runMonthlyCollection(new CloseAccountRequest(LocalDate.parse(value.strip()))).join();
+                    accounts.setItems(FXCollections.observableArrayList(api.accounts().join()));
+                    info("Cobro mensual", "Facturas cobradas: " + result.collected() + ". Total: " + result.total()
+                            + ". Salteadas por mes cerrado: " + result.skippedClosed());
+                }));
+                reloadInvoices.run();
+            });
             SplitPane split = new SplitPane(new VBox(new Label("Cuentas corrientes"), accounts),
                     new VBox(new Label("Facturas de la cuenta"), invoices));
             split.setDividerPositions(.42); VBox.setVgrow(accounts, Priority.ALWAYS); VBox.setVgrow(invoices, Priority.ALWAYS);
-            VBox content = new VBox(10, new HBox(8, newInvoice, issue, pay, close, closeAll, automatic), split);
+            VBox content = new VBox(10, new HBox(8, newInvoice, issue, pay, close, closeAll, monthly, collect), split);
             content.setPadding(new Insets(8)); VBox.setVgrow(split, Priority.ALWAYS);
             dialog.getDialogPane().setContent(content);
             reloadInvoices.run();

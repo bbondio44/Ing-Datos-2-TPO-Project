@@ -8,6 +8,7 @@ import ar.edu.uade.logistica.contracts.finance.AutomaticInvoiceResponse;
 import ar.edu.uade.logistica.contracts.finance.CloseAccountRequest;
 import ar.edu.uade.logistica.contracts.finance.InvoiceRequest;
 import ar.edu.uade.logistica.contracts.finance.InvoiceResponse;
+import ar.edu.uade.logistica.contracts.finance.MonthlyCollectionResponse;
 import ar.edu.uade.logistica.contracts.finance.PaymentRequest;
 import ar.edu.uade.logistica.contracts.finance.PaymentResponse;
 import ar.edu.uade.logistica.contracts.finance.TariffResponse;
@@ -35,8 +36,12 @@ import java.util.UUID;
 @PreAuthorize("hasAuthority('FINANZAS_LEER')")
 public class FinanceController {
     private final FinanceService service;
+    private final FacturacionMensualService monthly;
 
-    public FinanceController(FinanceService service) { this.service = service; }
+    public FinanceController(FinanceService service, FacturacionMensualService monthly) {
+        this.service = service;
+        this.monthly = monthly;
+    }
 
     @GetMapping("/cuentas")
     public List<AccountResponse> accounts(@AuthenticationPrincipal AuthenticatedUser user) {
@@ -123,6 +128,18 @@ public class FinanceController {
 
     @GetMapping("/tarifas")
     public List<TariffResponse> tariffs() { return service.tariffs(); }
+
+    @PostMapping("/facturacion-mensual")
+    @PreAuthorize("hasAuthority('FINANZAS_ESCRIBIR')")
+    public AutomaticInvoiceResponse monthly(@Valid @RequestBody CloseAccountRequest request) {
+        return monthly.facturar(request.period());
+    }
+
+    @PostMapping("/cobro-mensual")
+    @PreAuthorize("hasAuthority('FINANZAS_ESCRIBIR')")
+    public MonthlyCollectionResponse collect(@Valid @RequestBody CloseAccountRequest request) {
+        return monthly.cobrar(request.period());
+    }
 
     @PostMapping("/facturacion-automatica")
     @PreAuthorize("hasAuthority('FINANZAS_ESCRIBIR')")
