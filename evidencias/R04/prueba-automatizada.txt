@@ -9,8 +9,8 @@ OK    CLIENTE no da de alta proveedores: esperado=403 obtenido=403
 OK    alta del tramo 2: esperado=201 obtenido=201
 OK    alta del tramo 1: esperado=201 obtenido=201
 OK    tramos en secuencia: esperado=1,2 obtenido=1,2
-OK    R05 operador visible en el tramo: esperado=Operador a4a917 obtenido=Operador a4a917
-OK    R04 proveedor visible en el tramo: esperado=Proveedor a4a917 obtenido=Proveedor a4a917
+OK    R05 operador visible en el tramo: esperado=Operador a121a7 obtenido=Operador a121a7
+OK    R04 proveedor visible en el tramo: esperado=Proveedor a121a7 obtenido=Proveedor a121a7
 OK    vehiculo de otro operador: esperado=409 obtenido=409
 OK    fechas invertidas: esperado=409 obtenido=409
 OK    finalizado sin llegada real: esperado=409 obtenido=409
@@ -20,3 +20,8 @@ OK    edicion con dos proveedores: esperado=200 obtenido=200
 OK    el tramo conserva los dos proveedores: esperado=2 obtenido=2
 OK    baja de tramo: esperado=204 obtenido=204
 OK    CLIENTE no crea tramos: esperado=403 obtenido=403
+=== R04 activar un proveedor
+OK    proveedor inactivo: no se usa en un tramo: esperado=409 obtenido=409
+OK    proveedor inactivo: no se le crea una factura: esperado=409 obtenido=409
+OK    proveedor activado: se usa en un tramo: esperado=acepta obtenido=acepta
+OK    proveedor activado: se le crea una factura: esperado=acepta obtenido=acepta

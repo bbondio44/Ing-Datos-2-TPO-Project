@@ -19,4 +19,21 @@ OK    R21 la tardia no pisa la ultima posicion: esperado=-32.5 obtenido=-32.5
 OK    R20 la tardia queda primera en el recorrido: esperado=-34.7 obtenido=-34.7
 OK    R22 sensor en linea: esperado=ONLINE obtenido=ONLINE
 OK    R22 bateria de la ultima lectura: esperado=75 obtenido=75
-OK    R22 contenedor del sensor: esperado=3c8da854-d766-41d5-b8fd-f50d682b05ed obtenido=3c8da854-d766-41d5-b8fd-f50d682b05ed
+OK    R22 contenedor del sensor: esperado=6ce9b48b-9fd9-409e-8280-3cecea370e96 obtenido=6ce9b48b-9fd9-409e-8280-3cecea370e96
+=== R20 R24 ruta por ciudades y precio
+OK    Buenos Aires a Posadas pasa por 4 tramos: esperado=4 obtenido=4
+OK    el total es km por m3 por precio: esperado=160500 obtenido=160500
+OK    el envio se crea con sus tramos: esperado=2 obtenido=2
+OK    el primer tramo llega a Rosario: esperado=Rosario obtenido=Rosario
+=== R20 sin sensor no se puede iniciar
+OK    iniciar sin sensor se rechaza: esperado=409 obtenido=409
+=== R18 R20 R21 viaje simulado
+OK    al iniciar queda EN_TRANSITO: esperado=EN_TRANSITO obtenido=EN_TRANSITO
+OK    al llegar queda ENTREGADO: esperado=ENTREGADO obtenido=ENTREGADO
+OK    al llegar el sensor queda libre
+OK    al llegar el contenedor queda disponible: esperado=DISPONIBLE obtenido=DISPONIBLE
+OK    todos los tramos terminan: esperado=2 obtenido=2
+OK    el costo real es el calculado: esperado=79650 obtenido=79650
+OK    el contenedor registra posiciones en Cassandra (2)
+OK    todas las posiciones quedan entre origen y destino: esperado=0 obtenido=0
+OK    un viaje terminado no se puede reiniciar: esperado=409 obtenido=409

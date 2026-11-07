@@ -1,7 +1,7 @@
 ﻿pendientes al inicio: 0
 === R30 worker del outbox: Postgres -> Neo4j
 OK    outbox vacio: esperado=0 obtenido=0
-     Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
+     Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Punto=56 Tramo=48 Ubicacion=17 Vehiculo=2
 OK    Cliente igual que Postgres: esperado=Cliente=12 obtenido=Cliente=12
 OK    Envio igual que Postgres: esperado=Envio=28 obtenido=Envio=28
 OK    Tramo igual que Postgres: esperado=Tramo=48 obtenido=Tramo=48
@@ -10,8 +10,8 @@ OK    Operador igual que Postgres: esperado=Operador=7 obtenido=Operador=7
 OK    Incidente igual que Postgres: esperado=Incidente=14 obtenido=Incidente=14
 === R30 reprocesar todo no duplica
 OK    outbox vacio tras reprocesar: esperado=0 obtenido=0
-OK    mismos nodos: esperado=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2 obtenido=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Tramo=48 Ubicacion=17 Vehiculo=2
-OK    mismas relaciones: esperado=280 obtenido=280
+OK    mismos nodos: esperado=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Punto=56 Tramo=48 Ubicacion=17 Vehiculo=2 obtenido=Cliente=12 Contenedor=29 Envio=28 Incidente=14 Operador=7 Punto=56 Tramo=48 Ubicacion=17 Vehiculo=2
+OK    mismas relaciones: esperado=346 obtenido=346
 === R30 falla parcial: Neo4j caido
      con Neo4j caido: ERROR|1|Unable to connect to localhost:7687, ensure the da
 OK    se pone al dia solo: esperado=0 obtenido=0

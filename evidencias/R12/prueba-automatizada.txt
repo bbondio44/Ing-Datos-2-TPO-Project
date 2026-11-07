@@ -7,3 +7,11 @@ OK    el envio de la cuenta cerrada no se factura: esperado=0 obtenido=0
 OK    segunda corrida no crea nada: esperado=0 obtenido=0
 OK    misma cantidad de facturas: esperado=35 obtenido=35
 OK    una factura por envio: esperado=1 obtenido=1
+=== R12 R13 factura y cobro mensual
+OK    la corrida crea facturas (1) para los envios (1)
+OK    el saldo del cliente sube al menos el viaje (0.00 a 79650.00)
+OK    repetir la facturacion no crea nada: esperado=0 obtenido=0
+OK    el cobro registra pagos (1)
+OK    el cobro devuelve el saldo al anterior: esperado=0 obtenido=0
+OK    repetir el cobro no cobra nada: esperado=0 obtenido=0
+admin temporal desactivado

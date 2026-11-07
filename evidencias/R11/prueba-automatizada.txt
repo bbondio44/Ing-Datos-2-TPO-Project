@@ -4,7 +4,7 @@ OK    reporte generado: esperado=GENERADO obtenido=GENERADO
      resultado en Mongo: 1 filas; riesgo=0.0
 OK    filas del cliente: esperado=1 obtenido=1
 OK    estado facturado: esperado=FACTURADO obtenido=FACTURADO
-OK    facturar dos veces da la misma factura: esperado=571c5d54-aac0-42d2-8530-bfce12043b04 obtenido=571c5d54-aac0-42d2-8530-bfce12043b04
+OK    facturar dos veces da la misma factura: esperado=b2d9614e-8ca0-4c02-b152-ac6945968ecf obtenido=b2d9614e-8ca0-4c02-b152-ac6945968ecf
 OK    una sola factura: esperado=1 obtenido=1
 OK    otro tipo: desempeno: esperado=GENERADO obtenido=GENERADO
 OK    tipo invalido: esperado=400 obtenido=400
@@ -14,7 +14,7 @@ OK    facturar a un cliente del catalogo: esperado=200 obtenido=200
 === R11 R33 reporte facturable, factura y cierre
 OK    reporte generado: esperado=GENERADO obtenido=GENERADO
 OK    reporte facturado: esperado=200 obtenido=200
-OK    factura a nombre del cliente: esperado=b644b7f5-1f8e-4e97-86d7-98d4925d3b46 obtenido=b644b7f5-1f8e-4e97-86d7-98d4925d3b46
+OK    factura a nombre del cliente: esperado=85d14f97-f332-45bc-a5d2-3fc42f4a857c obtenido=85d14f97-f332-45bc-a5d2-3fc42f4a857c
 OK    pago total: esperado=201 obtenido=201
 OK    saldo en cero: esperado=0 obtenido=0
 OK    cierre del mes: esperado=200 obtenido=200

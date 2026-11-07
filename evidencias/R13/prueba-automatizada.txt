@@ -8,3 +8,11 @@ OK    cliente ajeno no ve la factura: esperado=True obtenido=True
 OK    pago total: esperado=201 obtenido=201
 OK    R10 factura pagada: esperado=PAGADA obtenido=PAGADA
 OK    R10 pendiente en cero: esperado=0 obtenido=0
+=== R12 R13 factura y cobro mensual
+OK    la corrida crea facturas (1) para los envios (1)
+OK    el saldo del cliente sube al menos el viaje (0.00 a 79650.00)
+OK    repetir la facturacion no crea nada: esperado=0 obtenido=0
+OK    el cobro registra pagos (1)
+OK    el cobro devuelve el saldo al anterior: esperado=0 obtenido=0
+OK    repetir el cobro no cobra nada: esperado=0 obtenido=0
+admin temporal desactivado

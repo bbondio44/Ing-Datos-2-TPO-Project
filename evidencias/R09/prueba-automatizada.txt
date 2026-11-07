@@ -1,13 +1,13 @@
 ﻿sensores: 18f369fe-9f0b-5ee1-8c0f-bf271eac908f / a752087b-202f-56ff-9b1c-83ac9d6dc748 / cb6a673c-14a5-5469-a365-30fe9700c80b
 === R09 ABM de reglas
-regla creada ce928de1-81ba-4233-a71b-bcc9fd4387d1
+regla creada 4be706ba-ee7a-4f2b-baa0-ab5d9932a5d6
 OK    regla invalida (INACTIVIDAD con umbral): esperado=400 obtenido=400
 OK    editar regla: esperado=200 obtenido=200
 OK    regla inexistente: esperado=404 obtenido=404
 === R09/R26/R25 lectura que supera la regla
 OK    POST lectura 60 C: esperado=201 obtenido=201
 OK    una alerta para la regla: esperado=1 obtenido=1
-OK    guarda la lectura que la causo: esperado=baaa0a1c-9287-4f9a-9698-36b0227ebf61 obtenido=baaa0a1c-9287-4f9a-9698-36b0227ebf61
+OK    guarda la lectura que la causo: esperado=2c4a4491-7dca-473d-9c4a-6192e5d4b480 obtenido=2c4a4491-7dca-473d-9c4a-6192e5d4b480
 OK    estado ABIERTA: esperado=ABIERTA obtenido=ABIERTA
 OK    alerta ALTA con incidente: esperado=True obtenido=True
 OK    incidente existe en Postgres: esperado=1 obtenido=1
@@ -27,5 +27,9 @@ usuario temporal borrado: 1
 === R09 R25 R26 temperatura fuera de rango
 OK    lectura fuera de rango: esperado=201 obtenido=201
 OK    alerta generada: esperado=ABIERTA obtenido=ABIERTA
-OK    con la lectura que la causo: esperado=afac409d-69eb-48e1-9306-2e63861135ac obtenido=afac409d-69eb-48e1-9306-2e63861135ac
+OK    con la lectura que la causo: esperado=b73f582d-08cf-4fa7-995f-a386f7f91ffa obtenido=b73f582d-08cf-4fa7-995f-a386f7f91ffa
 OK    incidente en PostgreSQL: esperado=1 obtenido=1
+=== R09 activar una regla
+OK    regla inactiva: la lectura no genera alerta: esperado=0 obtenido=0
+OK    regla activada: la lectura genera alerta: esperado=1 obtenido=1
+admin temporal desactivado

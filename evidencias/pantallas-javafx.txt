@@ -50,19 +50,19 @@ OK    hay una fila con [Rutas Globales]
 OK    R16 la cuenta del operador tiene facturas
      R16/captura-02-cuenta-operador.png
      R05/captura-04-cuenta-operador.png
-OK    hay una fila con [Alta desde pantalla 165460]
+OK    hay una fila con [Alta desde pantalla 164d20]
 OK    hay una fila con [state=BORRADOR]
 OK    hay una fila con [state=EMITIDA]
-OK    hay una fila con [Alta desde pantalla 165460]
+OK    hay una fila con [Alta desde pantalla 164d20]
 OK    R10 el cobro parcial cambia el estado
      R10/captura-02-cobro-parcial.png
      R13/captura-01-cobro-parcial.png
 OK    hay una fila con [state=PARCIAL]
 OK    R13 el sobrepago explica el motivo
      R13/captura-02-sobrepago-rechazado.png
-OK    hay una fila con [Alta desde pantalla 165460]
+OK    hay una fila con [Alta desde pantalla 164d20]
 OK    hay una fila con [state=PARCIAL]
-OK    hay una fila con [Alta desde pantalla 165460]
+OK    hay una fila con [Alta desde pantalla 164d20]
 OK    R10 el cobro total deja la factura pagada
      R10/captura-03-cobro-total.png
      R13/captura-03-cobro-total.png
@@ -83,9 +83,12 @@ OK    R22 estado de sensores (43 filas)
      R22/captura-01-estado-sensores.png
 OK    R19 historico de dos dias (48 filas)
      R19/captura-01-historico-dos-dias.png
-     R20/captura-01-mapa-recorrido.png
-     R21/captura-01-mapa-recorrido.png
-OK    R26 alertas (19 filas)
+OK    R20 las posiciones del recorrido aparecen en orden
+     R20/captura-01-seguimiento-viaje.png
+     R21/captura-01-seguimiento-viaje.png
+OK    R20 la lista muestra el codigo del contenedor
+OK    R20 Elegir envio llega al mapa
+OK    R26 alertas (8 filas)
      R26/captura-01-alertas.png
 OK    hay una fila con [tipoRegla=TEMPERATURA]
      R09/captura-01-alerta-temperatura.png
@@ -95,22 +98,27 @@ OK    hay una fila con [tipoRegla=ANOMALIA_TEMPERATURA]
 OK    hay una fila con [tipoRegla=INACTIVIDAD]
      R23/captura-01-alerta-inactividad.png
 OK    hay una fila con [estado=ABIERTA]
-OK    hay una fila con [id=9a5ae6f9-4e9e-3d48-9ea4-8f628eaf79bf,]
+OK    hay una fila con [id=74fc30d0-5fa7-52dd-bb1c-2bd1ba8392b0,]
 OK    R26 la alerta pasa a RECONOCIDA
      R26/captura-02-alerta-reconocida.png
-OK    hay una fila con [id=9a5ae6f9-4e9e-3d48-9ea4-8f628eaf79bf,]
+OK    hay una fila con [id=74fc30d0-5fa7-52dd-bb1c-2bd1ba8392b0,]
 OK    R26 la alerta pasa a CERRADA
      R26/captura-03-alerta-cerrada.png
 OK    R09 reglas (10 filas)
 OK    R09 la regla nueva aparece en la tabla
 OK    hay una fila con [Regla desde la pantalla]
      R09/captura-02-regla-creada.png
+OK    hay una fila con [Regla desde la pantalla]
+OK    R09 activar vuelve a dejar activa la regla
+OK    hay una fila con [Regla desde la pantalla]
 OK    R17 monitoreo del envio (14 filas)
      R17/captura-01-monitoreo-envio.png
 OK    R40 conversaciones internas (2 filas)
 OK    hay una fila con [GRUPAL]
 OK    R40 la conversacion grupal muestra mensajes
      R40/captura-01-mensajeria-grupal.png
+OK    R40 Enter envia el mensaje como admin
+OK    R40 Elegir completa el UUID del destinatario
 OK    R27 analitica (6 filas)
      R27/captura-01-resultado.png
 OK    R28 analitica (13 filas)
@@ -126,47 +134,62 @@ OK    R30 red del cliente (3 filas)
 === Guia paso a paso
 OK    el script manda la lectura -Cantidad 12
 OK    R22 el sensor demo queda ONLINE con bateria
-OK    R18 las 12 lecturas aparecen con las fechas por defecto (54)
+OK    R18 las 12 lecturas aparecen con las fechas por defecto (12)
      R18/captura-01-lecturas-enviadas.png
-OK    hay una fila con [Regla guia a69cae]
+OK    hay una fila con [Regla guia 70f5ad]
 OK    el script manda la lectura -Temperatura 45
 OK    R09 la lectura de 45 genera alerta de la regla nueva
 OK    R32 la misma lectura genera anomalia
      R09/captura-03-alertas-de-la-lectura.png
      R32/captura-02-alertas-de-la-lectura.png
-OK    hay una fila con [Regla guia a69cae]
-OK    hay una fila con [Regla guia a69cae]
-OK    hay una fila con [Regla guia a69cae]
+OK    hay una fila con [Regla guia 70f5ad]
+OK    hay una fila con [Regla guia 70f5ad]
+OK    hay una fila con [Regla guia 70f5ad]
 OK    R26 repetir la accion avisa el error: Estado | Fecha | Tipo | Severidad | Estado | Ocurrencias | Mensaje | Incidente | La alerta no admite esa transición de estado | Alertas | Reglas | Monitoreo de envío | Mensajería
 OK    el script manda la lectura -Bateria 10
 OK    R23 la bateria baja genera alerta
+OK    R01 un email mal escrito avisa
+OK    R01 el formulario sigue abierto con lo cargado
 OK    R01 la base acepta el CUIT generado
-OK    hay una fila con [Cliente guia a69cae]
-OK    hay una fila con [Cliente guia a69cae]
+OK    hay una fila con [Cliente guia 70f5ad]
+OK    hay una fila con [Cliente guia 70f5ad]
 OK    R01 la baja deja el cliente INACTIVO
-OK    hay una fila con [Cliente guia a69cae]
+OK    hay una fila con [Cliente guia 70f5ad]
 OK    R01 activar deja el cliente ACTIVO
 OK    R01 el CUIT repetido se rechaza: LOGÍSTICA IoT | Grupo 4 | Administrador Grupo 4 | Clientes | Altas, consulta y estado de las organizaciones. | Razón social | CUIT | País | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
-OK    hay una fila con [Proveedor guia a69cae]
-OK    hay una fila con [Proveedor guia a69cae]
+OK    hay una fila con [Proveedor guia 70f5ad]
+OK    hay una fila con [Proveedor guia 70f5ad]
 OK    Proveedores la baja queda INACTIVO
-OK    hay una fila con [Proveedor guia a69cae]
+OK    hay una fila con [Proveedor guia 70f5ad]
 OK    Proveedores activar deja ACTIVO
 OK    Proveedores el CUIT repetido se rechaza: Administración de proveedores | Razón social | CUIT | País | Servicio | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
-OK    hay una fila con [Operador guia a69cae]
-OK    hay una fila con [Operador guia a69cae]
+OK    hay una fila con [Operador guia 70f5ad]
+OK    hay una fila con [Operador guia 70f5ad]
 OK    Operadores la baja queda INACTIVO
-OK    hay una fila con [Operador guia a69cae]
+OK    hay una fila con [Operador guia 70f5ad]
 OK    Operadores activar deja ACTIVO
 OK    Operadores el CUIT repetido se rechaza: Administración de operadores logísticos | Razón social | CUIT | País | Estado | La operación entra en conflicto con un dato existente o una regla de integridad
+OK    R05 Generar arma una patente
 OK    R05 el vehiculo se crea con su operador
-OK    hay una fila con [VHA69CAE]
+OK    hay una fila con [VH70F5AD]
 OK    R05 la baja deja el vehiculo INACTIVO
-OK    hay una fila con [VHA69CAE]
+OK    hay una fila con [VH70F5AD]
 OK    R05 activar deja el vehiculo ACTIVO
-OK    hay una fila con [Origen a69cae]
+OK    R24 Generar arma un codigo que no existe
+OK    hay una fila con [Rosario]
+OK    hay una fila con [active=true]
+OK    R20 antes de salir dice que no salio
+OK    R21 en viaje muestra la ubicacion con coordenadas
+OK    R20 al terminar dice que llego
+OK    R21 quedan las posiciones del viaje
+     R20/captura-02-viaje-terminado.png
+     R21/captura-02-viaje-terminado.png
+OK    R07 una capacidad que no es numero avisa
+OK    R07 el formulario sigue abierto con lo cargado
+OK    R24 el formulario muestra la ruta y el precio
+OK    hay una fila con [Santa Fe]
 OK    R06 el envio cambia de estado
-OK    hay una fila con [Origen a69cae]
+OK    hay una fila con [Santa Fe]
 OK    R07 el contenedor queda vigente
      R07/captura-04-contenedor-asociado.png
 OK    hay una fila con [active=true]
@@ -176,6 +199,7 @@ OK    hay una fila con [active=true]
 OK    R08 el sensor queda con fecha de fin
 OK    hay una fila con [active=true]
 OK    R07 el contenedor queda con fecha de fin
+OK    R24 el envio nuevo trae los tramos de su ruta
 OK    R24 el tramo aparece
 OK    hay una fila con [Punto A]
 OK    R24 el tramo queda EN_CURSO con dos proveedores
@@ -187,17 +211,22 @@ OK    R24 el tramo se elimina
 OK    hay una fila con [Aduana y Servicios]
 OK    hay una fila con [state=BORRADOR]
 OK    hay una fila con [state=EMITIDA]
+OK    R10 la factura muestra su detalle
+OK    hay una fila con [state=EMITIDA]
 OK    hay una fila con [Aduana y Servicios]
 OK    R16 Aduana y Servicios es cuenta a pagar y refleja el pago
 OK    hay una fila con [Rutas Globales]
 OK    hay una fila con [state=BORRADOR]
 OK    hay una fila con [state=EMITIDA]
+OK    R10 la factura muestra su detalle
+OK    hay una fila con [state=EMITIDA]
 OK    hay una fila con [Rutas Globales]
 OK    R16 Rutas Globales es cuenta a pagar y refleja el pago
-OK    R35 el filtro por pais achica la tabla (8 de 28)
+OK    R35 el filtro por pais achica la tabla (7 de 29)
 OK    R35 los filtros se combinan (5)
 OK    R29 se ven los riesgos
      R29/captura-02-riesgos.png
+OK    R11 Elegir completa el UUID del cliente
 OK    R34 el reporte predictivo trae riesgos
      R34/captura-01-predictivo-con-riesgos.png
 OK    R11 el reporte queda GENERADO con resultado
@@ -205,11 +234,16 @@ OK    R33 queda FACTURADO con una sola factura
      R33/captura-01-reporte-facturado.png
 OK    R30 la vista tramos tiene datos
 OK    R30 la vista operadores tiene datos
+OK    R02 Elegir completa el UUID del titular
 OK    R02 el usuario aparece en la tabla
+OK    R02 Elegir completa el UUID del titular
 OK    R02 el usuario aparece en la tabla
-     Procesados: 23. Nuevos: 23. Salteados por mes cerrado: 0
-     Procesados: 0. Nuevos: 0. Salteados por mes cerrado: 0
+     Envíos facturados: 1. Facturas nuevas: 1. Salteados por mes cerrado: 0
+     Envíos facturados: 0. Facturas nuevas: 0. Salteados por mes cerrado: 0
 OK    R12 la segunda corrida no crea nada
+     Facturas cobradas: 1. Total: 26100.00. Salteadas por mes cerrado: 0
+     Facturas cobradas: 0. Total: 0. Salteadas por mes cerrado: 0
+OK    R13 cobrar dos veces no cobra de mas
      Cuentas cerradas: 31. Ya cerradas: 2
      Cuentas cerradas: 0. Ya cerradas: 33
 OK    R15 repetir no cierra nada
@@ -232,4 +266,4 @@ OK    R02 el usuario creado solo ve su cliente
 OK    R40 el primer cliente ve la demora del E002
 OK    entra a la pantalla principal
 OK    R40 otro cliente no ve esa conversacion
-RESUMEN pantallas: 151 OK, 0 FALLA
+RESUMEN pantallas: 181 OK, 0 FALLA

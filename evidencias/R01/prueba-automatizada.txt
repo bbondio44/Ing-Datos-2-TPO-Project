@@ -8,3 +8,8 @@ OK    edicion: esperado=200 obtenido=200
 OK    listado por busqueda: esperado=1 obtenido=1
 OK    baja logica: esperado=204 obtenido=204
 OK    estado despues de la baja: esperado=INACTIVO obtenido=INACTIVO
+=== R01 activar un cliente
+OK    cliente inactivo: no se le crea un envio: esperado=409 obtenido=409
+OK    cliente inactivo: no se le crea una factura: esperado=409 obtenido=409
+OK    cliente activado: se le crea un envio: esperado=CREADO obtenido=CREADO
+OK    cliente activado: se le crea una factura: esperado=acepta obtenido=acepta
