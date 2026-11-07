@@ -33,6 +33,8 @@ try {
         if ($proc.HasExited) { 'backend termino'; exit 1 }
         try { Invoke-WebRequest "$base/actuator/health" -UseBasicParsing -TimeoutSec 3 | Out-Null; break } catch { Start-Sleep 2 }
     }
+    # El administrador inicial se crea apenas despues de que responde el health.
+    Start-Sleep 6
     $login = @{ email = $env:CAPTURA_ADMIN_EMAIL; password = $env:CAPTURA_ADMIN_PASSWORD } | ConvertTo-Json
     $token = (Invoke-RestMethod "$base/api/v1/auth/login" -Method Post -ContentType 'application/json' -Body $login).token
     $h = @{ Authorization = "Bearer $token" }

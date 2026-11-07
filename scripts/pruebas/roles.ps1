@@ -19,6 +19,8 @@ $proc = $null
 try {
     $proc = Start-Process java -ArgumentList '-jar', $jar.FullName -PassThru -WindowStyle Hidden -RedirectStandardOutput "$Scratch\roles.out.log" -RedirectStandardError "$Scratch\roles.err.log"
     for ($i = 0; $i -lt 45; $i++) { if ($proc.HasExited) { 'backend termino'; exit 1 }; try { Invoke-WebRequest "$base/actuator/health" -UseBasicParsing -TimeoutSec 3 | Out-Null; break } catch { if ($_.Exception.Response) { break } }; Start-Sleep -Seconds 2 }
+    # El administrador inicial se crea apenas despues de que responde el health.
+    Start-Sleep 6
     $script:token = (Invoke-RestMethod "$base/api/v1/auth/login" -Method Post -ContentType 'application/json' -Body (@{ email = $correo; password = $env:APP_BOOTSTRAP_ADMIN_PASSWORD } | ConvertTo-Json)).token
 
     Sql "update tp_logistica.usuario set id_cliente='$c02' where email='$correo'; delete from tp_logistica.usuario_rol where id_usuario=(select id_usuario from tp_logistica.usuario where email='$correo'); insert into tp_logistica.usuario_rol(id_usuario,id_rol) select u.id_usuario, r.id_rol from tp_logistica.usuario u, tp_logistica.rol r where u.email='$correo' and r.descripcion='CLIENTE';" | Out-Null

@@ -61,6 +61,8 @@ try {
         if ($proc.HasExited) { 'backend termino'; exit 1 }
         try { Invoke-WebRequest "$base/actuator/health" -UseBasicParsing -TimeoutSec 3 | Out-Null; break } catch { Start-Sleep 2 }
     }
+    # El administrador inicial se crea apenas despues de que responde el health.
+    Start-Sleep 6
     $login = @{ email = $env:APP_BOOTSTRAP_ADMIN_EMAIL; password = $env:APP_BOOTSTRAP_ADMIN_PASSWORD } | ConvertTo-Json
     $script:token = (Invoke-RestMethod "$base/api/v1/auth/login" -Method Post -ContentType 'application/json' -Body $login).token
     $ahora = (Get-Date).ToUniversalTime()
@@ -129,7 +131,7 @@ try {
     Ver 'guardar de nuevo el tramo' 200 (Api PUT "/api/v1/trayectos/$($t.d.id)" $tramo).s
     $tipos = @(); for ($i = 0; $i -lt 15; $i++) {
         $tipos = @((Api GET "/api/v1/monitoreo/envios/$($envio.id)").d.eventos.tipo)
-        if ($tipos -contains 'SALIDA') { break }; Start-Sleep 2
+        if ($tipos -contains 'SALIDA' -and $tipos -contains 'EN_TRANSITO') { break }; Start-Sleep 2
     }
     foreach ($tipo in 'CARGA_INICIADA', 'EN_TRANSITO', 'SALIDA') { Ver "evento $tipo una sola vez" 1 @($tipos | Where-Object { $_ -eq $tipo }).Count }
 

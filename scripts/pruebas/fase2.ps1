@@ -36,6 +36,8 @@ try {
     $inc0 = [int](Sql "select count(*) from tp_logistica.incidente;")
     $proc = Start-Process java -ArgumentList '-jar', $jar.FullName -PassThru -WindowStyle Hidden -RedirectStandardOutput "$Scratch\f2.out.log" -RedirectStandardError "$Scratch\f2.err.log"
     for ($i = 0; $i -lt 45; $i++) { if ($proc.HasExited) { 'backend termino'; exit 1 }; try { Invoke-WebRequest "$base/actuator/health" -UseBasicParsing -TimeoutSec 3 | Out-Null; break } catch { if ($_.Exception.Response) { break } }; Start-Sleep -Seconds 2 }
+    # El administrador inicial se crea apenas despues de que responde el health.
+    Start-Sleep 6
     $login = @{ email = $env:APP_BOOTSTRAP_ADMIN_EMAIL; password = $env:APP_BOOTSTRAP_ADMIN_PASSWORD } | ConvertTo-Json
     $script:token = (Invoke-RestMethod "$base/api/v1/auth/login" -Method Post -ContentType 'application/json' -Body $login).token
     $ahora = (Get-Date).ToUniversalTime()

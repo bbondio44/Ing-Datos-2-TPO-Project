@@ -68,6 +68,8 @@ try {
         if ($proc.HasExited) { 'backend termino'; exit 1 }
         try { Invoke-WebRequest "$base/actuator/health" -UseBasicParsing -TimeoutSec 3 | Out-Null; break } catch { Start-Sleep 2 }
     }
+    # El administrador inicial se crea apenas despues de que responde el health.
+    Start-Sleep 6
     $script:token = Login $env:APP_BOOTSTRAP_ADMIN_EMAIL $env:APP_BOOTSTRAP_ADMIN_PASSWORD
 
     '=== R01 ABM clientes'
