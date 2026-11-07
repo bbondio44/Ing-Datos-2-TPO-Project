@@ -526,8 +526,11 @@ final class PersonaOneDialogs {
                 ContainerAssignmentResponse selected = containers.getSelectionModel().getSelectedItem();
                 if (selected == null || !selected.active()) return;
                 run(() -> {
+                    // Un sensor ya asignado a un contenedor se rechazaría: la lista muestra solo los libres.
+                    Set<UUID> assigned = api.sensorStates().join().stream().filter(s -> s.idContenedor() != null)
+                            .map(s -> s.idSensor()).collect(java.util.stream.Collectors.toSet());
                     List<SensorResponse> available = api.sensors("").join().content().stream()
-                            .filter(s -> "ACTIVO".equals(s.state())).toList();
+                            .filter(s -> "ACTIVO".equals(s.state()) && !assigned.contains(s.id())).toList();
                     Dialog<SensorResponse> choice = choice("Sensor activo", available,
                             s -> s.type() + " — " + s.id());
                     choice.showAndWait().ifPresent(s -> api.assignSensor(new SensorAssignmentRequest(
