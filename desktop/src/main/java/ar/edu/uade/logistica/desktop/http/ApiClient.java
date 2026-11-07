@@ -321,6 +321,10 @@ public class ApiClient {
                 + "&volumen=" + volume.toPlainString() + "&aereo=" + air, null, CotizacionResponse.class, true);
     }
 
+    public CompletableFuture<ShipmentResponse> startTrip(UUID shipmentId) {
+        return send("POST", "/api/v1/rutas/viajes/" + shipmentId + "/iniciar", null, ShipmentResponse.class, true);
+    }
+
     public CompletableFuture<ShipmentResponse> createTrip(ViajeRequest request) {
         return send("POST", "/api/v1/rutas/viajes", request, ShipmentResponse.class, true);
     }

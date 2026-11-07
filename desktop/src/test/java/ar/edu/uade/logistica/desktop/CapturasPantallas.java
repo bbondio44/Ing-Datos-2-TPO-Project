@@ -356,7 +356,7 @@ public class CapturasPantallas extends Application {
         espera(1800);
         conDatos(iot, "R19 historico de dos dias");
         captura(iot, "historico-dos-dias", "R19");
-        pestania(iot, "Recorrido y mapa");
+        pestania(iot, "Seguimiento del viaje");
         ComboBox<Object> contenedor = combo(iot, 0);
         List<DatePicker> fechasMapa = nodos(iot, DatePicker.class);
         fx(() -> {
@@ -366,8 +366,9 @@ public class CapturasPantallas extends Application {
             return null;
         });
         click(boton(iot, "Ver recorrido"));
-        espera(20000);
-        captura(iot, "mapa-recorrido", "R20", "R21");
+        espera(2500);
+        verificar("R20 las posiciones del recorrido aparecen en orden", filas(iot, 0) > 0);
+        captura(iot, "seguimiento-viaje", "R20", "R21");
         verificar("R20 la lista muestra el codigo del contenedor", fx(() -> {
             ComboBox<?> lista = visibleEnFx(iot, ComboBox.class).getFirst();
             return lista.getEditor() != null && !lista.getItems().isEmpty();

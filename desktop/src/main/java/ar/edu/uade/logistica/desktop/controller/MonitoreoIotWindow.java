@@ -1,6 +1,12 @@
 package ar.edu.uade.logistica.desktop.controller;
 
 import ar.edu.uade.logistica.contracts.logistics.ShipmentResponse;
+import ar.edu.uade.logistica.contracts.route.RouteLegResponse;
+import javafx.animation.KeyFrame;
+import javafx.animation.Animation;
+import javafx.animation.Timeline;
+import javafx.scene.control.ListView;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +30,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.time.Instant;
@@ -37,7 +42,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /** Monitoreo IoT: estado de sensores (R22), histórico (R18, R19), recorrido y mapa (R20, R21). */
 public final class MonitoreoIotWindow {
@@ -55,7 +59,12 @@ public final class MonitoreoIotWindow {
     private final DatePicker hastaHistorico = new DatePicker(hoyUtc());
     private final DatePicker desdeMapa = new DatePicker(hoyUtc().minusDays(1));
     private final DatePicker hastaMapa = new DatePicker(hoyUtc());
-    private final WebView mapa = new WebView();
+    private final ListView<String> ruta = new ListView<>();
+    private final TableView<PosicionResponse> posiciones = new TableView<>();
+    private final Label ubicacion = new Label("Elegí un envío para ver su viaje");
+    private ShipmentResponse envioElegido;
+    private List<RouteLegResponse> tramos = List.of();
+    private boolean siguiendo;
     private final Label estadoEstados = new Label();
     private final Label estadoHistorico = new Label();
     private final Label estadoMapa = new Label();
@@ -69,12 +78,16 @@ public final class MonitoreoIotWindow {
         TabPane tabs = new TabPane(
                 new Tab("Estado de sensores", pestaniaEstados()),
                 new Tab("Histórico de lecturas", pestaniaHistorico()),
-                new Tab("Recorrido y mapa", pestaniaMapa()));
+                new Tab("Seguimiento del viaje", pestaniaSeguimiento()));
         tabs.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         Stage stage = new Stage();
         stage.setTitle("Monitoreo IoT");
         stage.setScene(new Scene(tabs, 1120, Formulario.altoVentana(720)));
         stage.show();
+        Timeline refresco = new Timeline(new KeyFrame(Duration.seconds(4), event -> refrescarViaje()));
+        refresco.setCycleCount(Animation.INDEFINITE);
+        refresco.play();
+        stage.setOnHidden(event -> refresco.stop());
         cargarEstados();
     }
 
@@ -113,16 +126,98 @@ public final class MonitoreoIotWindow {
         return panel(filtros, lecturas, estadoHistorico);
     }
 
-    private VBox pestaniaMapa() {
+    private VBox pestaniaSeguimiento() {
+        posiciones.getColumns().add(columna("Fecha y hora", p -> fecha(p.fechaHora())));
+        posiciones.getColumns().add(columna("Latitud", p -> coordenada(p.latitud())));
+        posiciones.getColumns().add(columna("Longitud", p -> coordenada(p.longitud())));
+        posiciones.getColumns().add(columna("Sensor", p -> corto(p.idSensor())));
+        posiciones.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+        ruta.setPrefWidth(380);
+        ubicacion.setStyle("-fx-font-weight: bold;");
         contenedorMapa.setPrefWidth(250);
         contenedorMapa.setConverter(legible());
         Button elegir = new Button("Elegir envío…");
         elegir.setOnAction(event -> elegirEnvio());
         Button ver = new Button("Ver recorrido");
         ver.setOnAction(event -> consultarRecorrido());
-        HBox filtros = new HBox(10, elegir, new Label("Contenedor"), contenedorMapa, new Label("Desde"), desdeMapa,
+        Button iniciar = new Button("Iniciar viaje");
+        iniciar.setOnAction(event -> iniciarViaje());
+        HBox filtros = new HBox(10, elegir, iniciar, new Label("Contenedor"), contenedorMapa, new Label("Desde"), desdeMapa,
                 new Label("Hasta"), hastaMapa, ver);
-        return panel(filtros, mapa, estadoMapa);
+        HBox cuerpo = new HBox(12, ruta, posiciones);
+        HBox.setHgrow(posiciones, Priority.ALWAYS);
+        VBox.setVgrow(cuerpo, Priority.ALWAYS);
+        return panel(filtros, new VBox(10, ubicacion, cuerpo), estadoMapa);
+    }
+
+    private void iniciarViaje() {
+        if (envioElegido == null) {
+            estadoMapa.setText("Elegí un envío con Elegir envío…");
+            return;
+        }
+        AppContext.get().api().startTrip(envioElegido.id()).whenComplete((envio, error) -> Platform.runLater(() -> {
+            if (error != null) {
+                estadoMapa.setText(mensaje(error));
+                return;
+            }
+            siguiendo = true;
+            hastaMapa.setValue(hoyUtc());
+            estadoMapa.setText("Viaje iniciado");
+        }));
+    }
+
+    private void refrescarViaje() {
+        if (!siguiendo || envioElegido == null) return;
+        cargarTramos();
+        if (contenedorMapa.getValue() != null) consultarRecorrido();
+    }
+
+    private void cargarTramos() {
+        AppContext.get().api().routeLegs(envioElegido.id()).whenComplete((lista, error) -> Platform.runLater(() -> {
+            if (error != null) {
+                estadoMapa.setText(mensaje(error));
+                return;
+            }
+            tramos = lista;
+            ruta.setItems(FXCollections.observableArrayList(lineasDeRuta(lista)));
+            if (!lista.isEmpty() && lista.stream().allMatch(t -> "FINALIZADO".equals(t.state()))) siguiendo = false;
+            mostrarUbicacion();
+        }));
+    }
+
+    /** El recorrido punto por punto: ✔ ya pasó, ● va hacia ahí, ○ falta. */
+    static List<String> lineasDeRuta(List<RouteLegResponse> tramos) {
+        if (tramos.isEmpty()) return List.of("Este envío no tiene tramos");
+        List<String> lineas = new java.util.ArrayList<>();
+        lineas.add(("PENDIENTE".equals(tramos.getFirst().state()) ? "○ " : "✔ ") + tramos.getFirst().origin());
+        for (RouteLegResponse tramo : tramos) {
+            String marca = switch (tramo.state()) {
+                case "FINALIZADO" -> "✔ ";
+                case "EN_CURSO" -> "● ";
+                default -> "○ ";
+            };
+            lineas.add(marca + tramo.destination() + " — " + tramo.transportType());
+        }
+        return lineas;
+    }
+
+    private void mostrarUbicacion() {
+        String texto;
+        RouteLegResponse actual = tramos.stream().filter(t -> "EN_CURSO".equals(t.state())).findFirst().orElse(null);
+        if (actual != null) texto = "Ubicación actual: entre " + actual.origin() + " y " + actual.destination();
+        else if (tramos.isEmpty()) texto = "Última posición registrada";
+        else if (tramos.stream().allMatch(t -> "FINALIZADO".equals(t.state()))) texto = "Llegó a " + tramos.getLast().destination();
+        else if (tramos.stream().anyMatch(t -> "FINALIZADO".equals(t.state()))) texto = "Ubicación actual: en tránsito";
+        else texto = "Todavía no salió";
+        if (!posiciones.getItems().isEmpty()) {
+            PosicionResponse ultima = posiciones.getItems().getFirst();
+            texto += " (" + coordenada(ultima.latitud()) + ", " + coordenada(ultima.longitud()) + ")";
+        }
+        ubicacion.setText(texto);
+    }
+
+    private static String coordenada(Double valor) {
+        return valor == null ? "" : String.format(Locale.ROOT, "%.4f", valor);
     }
 
     /** Elige el envío por cliente y ruta, y dibuja el recorrido de su contenedor. */
@@ -146,8 +241,13 @@ public final class MonitoreoIotWindow {
                 estadoMapa.setText(mensaje(error));
                 return;
             }
+            envioElegido = envio;
+            siguiendo = "EN_TRANSITO".equals(envio.state());
+            posiciones.getItems().clear();
+            cargarTramos();
             var asignaciones = detalle.containers();
             if (asignaciones.isEmpty()) {
+                contenedorMapa.setValue(null);
                 estadoMapa.setText("El envío no tiene contenedores asociados");
                 return;
             }
@@ -253,52 +353,20 @@ public final class MonitoreoIotWindow {
             estadoMapa.setText("Elegí un contenedor");
             return;
         }
-        estadoMapa.setText("Consultando...");
+        if (posiciones.getItems().isEmpty()) estadoMapa.setText("Consultando...");
         AppContext.get().api().route(id, inicio(desdeMapa), fin(hastaMapa))
-                .whenComplete((posiciones, error) -> Platform.runLater(() -> {
+                .whenComplete((lista, error) -> Platform.runLater(() -> {
                     if (error != null) {
                         estadoMapa.setText(mensaje(error));
                         return;
                     }
-                    if (posiciones.isEmpty()) {
-                        mapa.getEngine().loadContent("<p>Sin posiciones en ese rango.</p>");
-                        estadoMapa.setText("Sin posiciones en ese rango");
-                        return;
-                    }
-                    mapa.getEngine().loadContent(html(posiciones));
-                    PosicionResponse ultima = posiciones.get(posiciones.size() - 1);
-                    estadoMapa.setText(posiciones.size() + " posición(es). Última: " + fecha(ultima.fechaHora()));
+                    List<PosicionResponse> recientes = new java.util.ArrayList<>(lista);
+                    java.util.Collections.reverse(recientes);
+                    posiciones.setItems(FXCollections.observableArrayList(recientes));
+                    mostrarUbicacion();
+                    estadoMapa.setText(lista.isEmpty() ? "Sin posiciones en ese rango"
+                            : lista.size() + " posición(es). Última: " + fecha(recientes.getFirst().fechaHora()));
                 }));
-    }
-
-    /**
-     * Mapa con Leaflet: la línea es el recorrido en orden cronológico y el marcador, la última posición.
-     * Sin 3D ni animaciones: con ellas el WebView de JavaFX carga las imágenes pero no las pinta y el mapa queda gris.
-     */
-    static String html(List<PosicionResponse> posiciones) {
-        String puntos = posiciones.stream()
-                .map(p -> String.format(Locale.ROOT, "[%f,%f]", p.latitud(), p.longitud()))
-                .collect(Collectors.joining(","));
-        return """
-                <!doctype html><html><head><meta charset="utf-8">
-                <script>L_DISABLE_3D=true;</script>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-                <style>html,body,#mapa{height:100%;margin:0}</style></head>
-                <body><div id="mapa"></div><script>
-                var puntos=[PUNTOS];
-                var mapa=L.map('mapa',{fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false});
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-                  {attribution:'Esri',maxZoom:18}).addTo(mapa);
-                var linea=L.polyline(puntos,{color:'#1769d2',weight:4}).addTo(mapa);
-                puntos.forEach(function(p){L.circleMarker(p,{radius:3,color:'#1769d2'}).addTo(mapa);});
-                L.circleMarker(puntos[0],{radius:7,color:'#2e9e5b',fillOpacity:1}).addTo(mapa).bindTooltip('Inicio');
-                L.circleMarker(puntos[puntos.length-1],{radius:8,color:'#d2352b',fillOpacity:1}).addTo(mapa).bindTooltip('Última posición');
-                function encuadrar(){mapa.invalidateSize();
-                  if(puntos.length>1){mapa.fitBounds(linea.getBounds(),{padding:[30,30]});}else{mapa.setView(puntos[0],10);}}
-                encuadrar();setTimeout(encuadrar,500);
-                </script></body></html>
-                """.replace("PUNTOS", puntos);
     }
 
     private static <T> TableColumn<T, String> columna(String titulo, Function<T, String> valor) {
