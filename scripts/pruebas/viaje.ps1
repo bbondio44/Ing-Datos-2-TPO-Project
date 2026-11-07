@@ -67,6 +67,10 @@ try {
     }
     Ver 'al llegar queda ENTREGADO' 'ENTREGADO' $estado
     $fin = (Get-Date).ToUniversalTime().AddMinutes(1).ToString('yyyy-MM-ddTHH:mm:ssZ')
+    $libres = Lista '/api/v1/sensores/libres'
+    Verificar 'al llegar el sensor queda libre' (@($libres | Where-Object { $_.id -eq $sensor.id }).Count -eq 1)
+    $catalogo = (Invoke-RestMethod "$base/api/v1/contenedores?buscar=VJ$marca&pagina=0&tamanio=10" -Headers $h).content
+    Ver 'al llegar el contenedor queda disponible' 'DISPONIBLE' @($catalogo)[0].state
     $tramos = Lista "/api/v1/trayectos?envioId=$($envio.id)"
     Ver 'todos los tramos terminan' 2 @($tramos | Where-Object state -eq 'FINALIZADO').Count
     Ver 'el costo real es el calculado' ([int]($tramos | Measure-Object estimatedCost -Sum).Sum) ([int]($tramos | Measure-Object actualCost -Sum).Sum)

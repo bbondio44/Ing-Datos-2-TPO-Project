@@ -150,8 +150,29 @@ public class ViajeSimulador {
     }
 
     private void terminar(UUID idEnvio) {
+        liberarContenedores(idEnvio);
         envios.changeShipmentState(idEnvio, new ShipmentStateRequest("ENTREGADO", Instant.now()));
         enViaje.remove(idEnvio);
+    }
+
+    /** Al llegar, el contenedor y sus sensores quedan libres para otro viaje; la asignación queda como historia. */
+    private void liberarContenedores(UUID idEnvio) {
+        Timestamp ahora = Timestamp.from(Instant.now());
+        jdbcTemplate.update("""
+                UPDATE tp_logistica.asignacion_sensor_contenedor SET fecha_fin = ?
+                 WHERE fecha_fin IS NULL AND id_contenedor IN (
+                       SELECT id_contenedor FROM tp_logistica.envio_contenedor
+                        WHERE id_envio = ? AND fecha_desasociacion IS NULL)
+                """, ahora, idEnvio);
+        jdbcTemplate.update("""
+                UPDATE tp_logistica.contenedor SET estado = 'DISPONIBLE'
+                 WHERE id_contenedor IN (SELECT id_contenedor FROM tp_logistica.envio_contenedor
+                                          WHERE id_envio = ? AND fecha_desasociacion IS NULL)
+                """, idEnvio);
+        jdbcTemplate.update("""
+                UPDATE tp_logistica.envio_contenedor SET fecha_desasociacion = ?
+                 WHERE id_envio = ? AND fecha_desasociacion IS NULL
+                """, ahora, idEnvio);
     }
 
     private List<UUID> sensores(UUID idEnvio) {
