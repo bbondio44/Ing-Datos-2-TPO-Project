@@ -24,8 +24,8 @@ históricas del catálogo son del 20 al 22/10/2026.
 |---|---|---|---|
 | R18 | `POST /api/v1/iot/lecturas`, simulador con `SENSOR_ID` y `API_TOKEN` | Correr el simulador con un sensor demo | Responde 201 y las lecturas aparecen en el histórico |
 | R19 | Monitoreo IoT → Histórico | Sensor SEN-001, del 20/10 al 21/10/2026 | Lecturas de los dos días, ordenadas por fecha |
-| R20 | Monitoreo IoT → Recorrido y mapa | Contenedor MSKU0000001, del 20/10 al 22/10/2026 | Línea en el mapa con los puntos en orden |
-| R21 | Monitoreo IoT → Recorrido y mapa | El mismo contenedor | Marcador rojo en la última posición. Necesita internet |
+| R20 | Monitoreo IoT → Seguimiento del viaje | Contenedor MSKU0000001, del 20/10 al 22/10/2026 | Posiciones en orden, con fecha y coordenadas |
+| R21 | Monitoreo IoT → Seguimiento del viaje | El mismo contenedor | Ubicación actual con coordenadas arriba de la tabla |
 | R22 | Monitoreo IoT → Estado de sensores | Abrir la pestaña | SEN-040 en `SIN_DATOS`; sin señal por más de 120 min en `OFFLINE` |
 | R09 | Alertas → Reglas | Crear una regla de temperatura y mandar una lectura que la supere | Alerta nueva en la pestaña Alertas |
 | R26 | Alertas | Reconocer y después cerrar | ABIERTA → RECONOCIDA → CERRADA; repetir la acción da error |

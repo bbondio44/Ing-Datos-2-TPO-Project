@@ -9,7 +9,7 @@ implementado, al 05/11/2026. Los 40 puntos de promoción están en `docs/requisi
 | Persistencia | Al menos tres paradigmas | Cuatro: relacional, documental, tabular y grafos |
 | Trazabilidad | Historial completo de eventos | `eventos_logisticos`; el worker del outbox registra los cambios de estado de envíos y tramos |
 | Trazabilidad | Seguimiento temporal del envío | Alertas → Monitoreo de envío |
-| Trazabilidad | Reconstrucción del recorrido | Monitoreo IoT → Recorrido y mapa |
+| Trazabilidad | Reconstrucción del recorrido | Monitoreo IoT → Seguimiento del viaje |
 | Comunicación | Mensajería privada y grupal, historial | Alertas → Mensajería; `GrupoDeTrabajo` es la conversación grupal |
 | Consultas avanzadas | Ruta completa de un envío | Trayectos y Analítica → Red del cliente |
 | Consultas avanzadas | Red de relaciones | Analítica → Red del cliente |

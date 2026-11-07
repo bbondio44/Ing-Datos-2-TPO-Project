@@ -23,8 +23,8 @@ Estados permitidos: `PENDIENTE`, `IMPLEMENTADO`, `PROBADO`. La existencia de SQL
 | R17 | Monitoreo integral | Dashboard IoT | PG Cassandra Mongo | Envío con lectura y eventos | IMPLEMENTADO |
 | R18 | Ingesta continua | Simulador | Cassandra | Lecturas consecutivas persistidas | IMPLEMENTADO |
 | R19 | Histórico lecturas | IoT histórico | Cassandra por días | Rango que cruza dos días | IMPLEMENTADO |
-| R20 | Recorrido contenedor | Mapa | posiciones Cassandra | Trayectoria ordenada | IMPLEMENTADO |
-| R21 | GPS | Mapa | última posición e histórico | Punto actual y trayectoria | IMPLEMENTADO |
+| R20 | Recorrido contenedor | Seguimiento del viaje | posiciones Cassandra | Trayectoria ordenada | IMPLEMENTADO |
+| R21 | GPS | Seguimiento del viaje | última posición e histórico | Punto actual y trayectoria | IMPLEMENTADO |
 | R22 | Estado sensores | Sensores | última lectura Cassandra | Activo, inactivo y batería | IMPLEMENTADO |
 | R23 | Alertas sensor | Alertas | reglas y Mongo | Batería, inactividad y umbral | IMPLEMENTADO |
 | R24 | Trayectos | Tramos | tramo y Neo4j | Orden, medio, vehículo y operador | IMPLEMENTADO |

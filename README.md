@@ -17,7 +17,7 @@ Aplicación de escritorio JavaFX con backend Spring Boot y persistencia políglo
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/), abierto y corriendo.
 - JDK 21. Se comprueba con `java -version`.
-- Git e internet, para bajar el proyecto, las imágenes y las dependencias, y para el mapa.
+- Git e internet, para bajar el proyecto, las imágenes y las dependencias.
 - Libres los puertos 5432, 27017, 9042, 7474, 7687 y 8080.
 
 Maven no hace falta: el proyecto trae su propio `mvnw`.

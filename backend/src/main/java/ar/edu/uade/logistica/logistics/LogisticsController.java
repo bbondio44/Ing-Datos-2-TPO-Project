@@ -104,6 +104,12 @@ public class LogisticsController {
         return service.sensors(buscar, pagina, tamanio);
     }
 
+    @GetMapping("/sensores/libres")
+    @PreAuthorize("hasAuthority('LOGISTICA_LEER')")
+    public List<SensorResponse> freeSensors() {
+        return service.freeSensors();
+    }
+
     @PostMapping("/sensores")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('LOGISTICA_ESCRIBIR')")

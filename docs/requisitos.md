@@ -40,7 +40,7 @@ Cassandra (ingesta y consultas):
 | C05 | TTL solo cuando se acuerde la ventana histórica que necesitan reportes y anomalías. |
 
 Caso de aceptación imprescindible de Cassandra: consultar un sensor y un contenedor en un rango que
-cruza dos fechas, mostrar las lecturas ordenadas y reconstruir las posiciones GPS en un mapa.
+cruza dos fechas, mostrar las lecturas ordenadas y reconstruir las posiciones GPS en orden.
 
 ## Casos adversos que hay que probar
 
@@ -86,8 +86,8 @@ Además: `docker-compose.yml` único con los cuatro motores y seguridad (roles, 
 |---|---|---|---|---|
 | R18 | Registro continuo de lecturas IoT | Ingesta y escritura en las tablas desnormalizadas | Serie de lecturas consecutivas consultable | NO: el simulador llama a `POST /api/v1/iot/lecturas`, que no existe |
 | R19 | Consulta histórica de lecturas (contenedor y sensor) | Consultas por rango uniendo días | Histórico de ambos en un intervalo de dos días | NO: falta servicio por rango y vista |
-| R20 | Reconstrucción del recorrido de un contenedor | Ordenar posiciones GPS y armar la secuencia | Mapa dibuja el itinerario con puntos en el tiempo | NO |
-| R21 | Visualización geográfica de posiciones GPS | Última posición y múltiples posiciones válidas | Mapa muestra ubicación y trayectoria | NO: no hay pantalla de mapa (propuesta: WebView con mapa embebido) |
+| R20 | Reconstrucción del recorrido de un contenedor | Ordenar posiciones GPS y armar la secuencia | El seguimiento muestra el itinerario punto por punto, con sus posiciones en el tiempo | NO |
+| R21 | Visualización geográfica de posiciones GPS | Última posición y múltiples posiciones válidas | El seguimiento muestra la ubicación actual con coordenadas y la trayectoria | NO: no hay pantalla de mapa (propuesta: WebView con mapa embebido) |
 | R22 | Control de estado de sensores | Estado por última lectura, batería e inactividad | Sensor sin lecturas queda marcado inactivo | NO: falta calcular online/offline, batería y última señal |
 | R09 | ABM reglas y alertas | `regla_alerta` en PostgreSQL + alerta ejecutada y guardada en MongoDB | Una regla nueva superada por una lectura genera una alerta | NO: falta ABM de reglas, evaluación de lecturas, persistencia en Mongo y pantalla |
 | R23 | Alertas de estado de los sensores | Umbrales de batería baja y sin conexión, tarea periódica | Alerta visible con condición y timestamp | NO |
@@ -132,5 +132,5 @@ Además: conectar MongoDB y Cassandra a Spring Boot con health check real, y el 
 ## Demo integrada
 
 Recorrido continuo para la defensa: crear envío → asignar contenedor y sensor → el simulador manda
-lecturas IoT/GPS → se ven en histórico y mapa → una temperatura fuera de rango dispara alerta e
+lecturas IoT/GPS → se ven en histórico y seguimiento → una temperatura fuera de rango dispara alerta e
 incidente → el evento queda trazado → reporte → factura → cierre del mes.

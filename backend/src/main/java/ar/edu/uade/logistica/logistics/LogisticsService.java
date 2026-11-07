@@ -213,6 +213,18 @@ public class LogisticsService {
         return page(content, spec, total);
     }
 
+    /** Sensores activos sin una asignación vigente: los únicos que se pueden asociar a un contenedor. */
+    @Transactional(readOnly = true)
+    public List<SensorResponse> freeSensors() {
+        return jdbcTemplate.query("""
+                SELECT s.id_sensor,s.tipo,s.fabricante,s.fecha_instalacion,s.estado FROM tp_logistica.sensor_iot s
+                 WHERE s.estado='ACTIVO' AND NOT EXISTS (
+                       SELECT 1 FROM tp_logistica.asignacion_sensor_contenedor a
+                        WHERE a.id_sensor=s.id_sensor AND (a.fecha_fin IS NULL OR a.fecha_fin > now()))
+                 ORDER BY s.fecha_instalacion DESC NULLS LAST
+                """, this::mapSensor);
+    }
+
     @Transactional
     public SensorResponse createSensor(SensorRequest request) {
         auditContext.applyToCurrentTransaction();

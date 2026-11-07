@@ -354,6 +354,10 @@ public class ApiClient {
         return send("PUT", "/api/v1/contenedores/" + id, request, ContainerResponse.class, true);
     }
 
+    public CompletableFuture<List<SensorResponse>> freeSensors() {
+        return send("GET", "/api/v1/sensores/libres", null, new TypeReference<>() {}, true);
+    }
+
     public CompletableFuture<PageResponse<SensorResponse>> sensors(String search) {
         return send("GET", "/api/v1/sensores?buscar=" + encode(search) + "&pagina=0&tamanio=100", null,
                 new TypeReference<>() {}, true);
