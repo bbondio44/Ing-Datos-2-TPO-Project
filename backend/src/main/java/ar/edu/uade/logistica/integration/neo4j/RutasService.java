@@ -38,6 +38,7 @@ public class RutasService {
             RETURN p
             ORDER BY p.pais, p.nombre
             """;
+    // FUERA DE CLASE: los parámetros $origen y $destino. Los usa el driver para no armar el texto de la consulta.
     // La relación se guarda una sola vez y se recorre sin dirección: el viaje puede ir para los dos lados.
     // El viaje más largo de la red, Callao a Valencia, tiene 20 saltos. Si la red crece, revisar este límite.
     private static final String CAMINOS = """
