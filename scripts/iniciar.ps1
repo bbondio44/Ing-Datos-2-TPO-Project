@@ -49,7 +49,8 @@ if ("$hay".Trim() -eq '0') {
     $mo = docker compose ps -q mongo
     $usuario = docker exec $mo printenv MONGO_INITDB_ROOT_USERNAME
     $clave = docker exec $mo printenv MONGO_INITDB_ROOT_PASSWORD
-    powershell -NoProfile -ExecutionPolicy Bypass -File .\tp-grupo4-mongo-cassandra\cargar_todo.ps1 -MongoUser $usuario -MongoPass $clave
+    # cargar_todo espera un Enter al final: se lo pasamos para que el arranque siga solo.
+    '' | powershell -NoProfile -ExecutionPolicy Bypass -File .\tp-grupo4-mongo-cassandra\cargar_todo.ps1 -MongoUser $usuario -MongoPass $clave
     Set-Location $raiz
 } else {
     'Los datos ya estan cargados'
